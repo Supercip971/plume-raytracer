@@ -1,0 +1,26 @@
+---
+
+BasedOnStyle: LLVM
+UseTab: Never
+IndentWidth: 4
+TabWidth: 4
+BreakBeforeBraces: Allman
+AllowShortIfStatementsOnASingleLine: false
+IndentCaseLabels: false
+ColumnLimit: 0
+AccessModifierOffset: -4
+FixNamespaceComments: true
+SpaceBeforeInheritanceColon: true
+BreakInheritanceList: AfterColon
+IndentPPDirectives: AfterHash
+ForEachMacros: ["__dummy_foreach"]
+SpaceBeforeParens: ControlStatementsExceptForEachMacros
+IncludeBlocks: Merge
+IncludeCategories:
+  - Regex:           '<([A-Za-z0-9.\/-_])+>'
+    Priority:        0
+    SortPriority:    0
+  - Regex:           '"([A-Za-z0-9.\/-_])+"'
+    Priority:        10
+    SortPriority:    10
+...
