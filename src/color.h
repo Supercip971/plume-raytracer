@@ -7,3 +7,5 @@ typedef struct color
     float b;
     float a;
 } Color;
+
+Color color_create(float r, float g, float b);
