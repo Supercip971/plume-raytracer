@@ -3,6 +3,7 @@
 #include "config.h"
 #include "engine.h"
 #include "framebuffer_wrapper.h"
+#include "hitable.h"
 struct color *pixels;
 
 struct raw_color *raw_pixels;
@@ -79,6 +80,7 @@ void render_loop(void)
     SDL_Init(SDL_INIT_EVERYTHING);
 
     framebuffer_init();
+    render_init();
 
     while (event_update())
     {
@@ -101,12 +103,11 @@ void render_loop(void)
         }
         frames++;
     }
-
+    render_deinit();
     framebuffer_deinit();
     SDL_DestroyTexture(framebuffer);
 
     SDL_DestroyRenderer(renderer);
     SDL_DestroyWindow(screen);
-
     SDL_Quit();
 }

@@ -1,4 +1,8 @@
 #include "engine.h"
+#include <limits.h>
+#include <math.h>
+#include <stddef.h>
+#include <stdint.h>
 #include "ray.h"
 #include "shapes.h"
 #include "vec3.h"
@@ -7,30 +11,21 @@
 
 static Vec3 ccol(Ray from, float time)
 {
+    HitRecord record = {0};
+    float t;
+    Vec3 unit_direction;
+    (void)time;
 
-    Vec3 u_direction = vec3_unit(from.direction);
-    Vec3 sphere_pos = vec3_create(0, sin(time / 100), -1);
-    float t = 0.5 * (u_direction.y + 1.0);
-    Sphere sphere;
-    float v = 0;
-    Vec3 color;
-    sphere.radius = 0.5;
-    sphere.pos = sphere_pos;
-    v = ray_sphere_collide(from, sphere);
-
-    if (v > 0)
+    if (hit_call_all_object(from, 0.0, 100000000, &record))
     {
-        color = vec3_sub(vec3_unit(ray_point_param(from, v)), vec3_create(0, 0, 1));
-
-        color = vec3_mul_val(vec3_create(color.x + 1, color.y + 1, color.z + 1), 0.5);
+        return vec3_mul_val(vec3_create(record.normal.x + 1, record.normal.y + 1, record.normal.z + 1), 0.5);
     }
     else
     {
-
-        color = vec3_add(vec3_mul_val(vec3_create(1, 1, 1), 1 - t),
-                         vec3_mul_val(vec3_create(0.5, 0.7, 1), t));
+        unit_direction = vec3_unit(from.direction);
+        t = 0.5 * (unit_direction.y + 1);
+        return vec3_add(vec3_mul_val(vec3_create(1, 1, 1), 1 - t), vec3_mul_val(vec3_create(0.5, 0.7, 1), t));
     }
-    return color;
 }
 
 void render_update(Color *framebuffer, size_t width, size_t height)
@@ -62,4 +57,15 @@ void render_update(Color *framebuffer, size_t width, size_t height)
             framebuffer[x + y * width] = col;
         }
     }
+}
+
+void render_init(void)
+{
+    add_hitable_object((HitCallback)hit_sphere_object_callback, sphere_create(0.5, vec3_create(0, 0, -1)));
+    add_hitable_object((HitCallback)hit_sphere_object_callback, sphere_create(100, vec3_create(0, -100.5, -1)));
+}
+
+void render_deinit(void)
+{
+    hit_destroy_all_objects();
 }
