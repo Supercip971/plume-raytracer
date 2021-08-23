@@ -3,8 +3,11 @@
 #include <math.h>
 #include <stddef.h>
 #include <stdint.h>
+#include <stdlib.h>
+#include "camera.h"
 #include "ray.h"
 #include "shapes.h"
+#include "utils.h"
 #include "vec3.h"
 
 /* https://www.realtimerendering.com/raytracing/Ray%20Tracing%20in%20a%20Weekend.pdf */
@@ -31,30 +34,31 @@ static Vec3 ccol(Ray from, float time)
 void render_update(Color *framebuffer, size_t width, size_t height)
 {
     static float t = 0.0f;
-    Vec3 low_left = vec3_create(-3, -2, -2);
-    Vec3 horizontal = vec3_create(6, 0, 0);
-    Vec3 vertical = vec3_create(0, 4, 0);
-    Vec3 origin = vec3_create(0, 0, 0);
-    Color col;
+    static const int sample_count = 4;
+    static const int sample_step = (int)sample_count / 2;
+    Camera camera = get_camera_default();
+    Vec3 current_color;
     Ray r;
+    float x, y;
+    int sample;
 
-    size_t x;
-    size_t y;
     t += 1.f;
     for (x = 0; x < width; x++)
     {
         for (y = 0; y < height; y++)
         {
-            float u = (float)x / (float)width;
-            float v = (float)y / (float)height;
-            r.origin = origin;
-            r.direction = vec3_add(
-                vec3_add(vec3_mul_val(horizontal, u),
-                         vec3_mul_val(vertical, 1 - v)),
-                low_left);
+            Vec3 col = {0};
+            for (sample = 0; sample < sample_count; sample++)
+            {
 
-            col = vec_to_color(ccol(r, t));
-            framebuffer[x + y * width] = col;
+                float u = (x + ((float)(sample % sample_step) / sample_count)) / (float)width;
+                float v = (y + ((float)(sample / sample_step) / sample_count)) / (float)height;
+                r = get_camera_ray(&camera, u, v);
+                current_color = (ccol(r, t));
+                col = vec3_add(col, current_color);
+            }
+
+            framebuffer[(int)x + (int)y * width] = vec_to_color(vec3_div_val(col, sample_count));
         }
     }
 }

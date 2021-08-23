@@ -9,7 +9,6 @@ typedef struct vec3_t
     float z;
 } Vec3;
 
-
 /* may use float later (?)
 
   using inline for better performance with the compiler (less call instruction)*/
