@@ -1,6 +1,6 @@
 #include "camera.h"
 
-Ray get_camera_ray(const Camera *camera, float u, float v)
+Ray get_camera_ray(const Camera *camera, double u, double v)
 {
     Ray result;
     result.origin = camera->origin;

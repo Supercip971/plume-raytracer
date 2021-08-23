@@ -1,16 +1,16 @@
 #include "shapes.h"
 #include <stdlib.h>
-bool hit_sphere_object_callback(Ray ray, float t_min, float t_max, HitRecord *record, const Sphere *self)
+bool hit_sphere_object_callback(Ray ray, double t_min, double t_max, HitRecord *record, const Sphere *self)
 {
     /* the vec from the ray to the sphere (that must be under sphere.radius to be in collision) */
     Vec3 oc = vec3_sub(ray.origin, self->pos);
 
-    float a = vec3_dot(ray.direction, ray.direction); /* ray length^2*/
-    float b = vec3_dot(oc, ray.direction);
-    float c = vec3_dot(oc, oc) - (self->radius * self->radius);
+    double a = vec3_dot(ray.direction, ray.direction); /* ray length^2*/
+    double b = vec3_dot(oc, ray.direction);
+    double c = vec3_dot(oc, oc) - (self->radius * self->radius);
 
-    float discriminant = b * b - a * c; /* ^ = b^2 - 4ac */
-    float temp;
+    double discriminant = b * b - a * c; /* ^ = b^2 - 4ac */
+    double temp;
     if (discriminant > 0)
     {
         temp = (-b - sqrt(b * b - a * c)) / a;
@@ -34,7 +34,7 @@ bool hit_sphere_object_callback(Ray ray, float t_min, float t_max, HitRecord *re
     return false;
 }
 
-Sphere *sphere_create(float radius, Vec3 pos)
+Sphere *sphere_create(double radius, Vec3 pos)
 {
     Sphere *sphere = malloc(sizeof(Sphere));
     sphere->radius = radius;

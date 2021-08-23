@@ -5,10 +5,10 @@
 #include "vec3.h"
 typedef struct sphere
 {
-    float radius;
+    double radius;
     Vec3 pos;
 } Sphere;
 
-bool hit_sphere_object_callback(Ray ray, float t_min, float t_max, HitRecord *record, const Sphere *self);
+bool hit_sphere_object_callback(Ray ray, double t_min, double t_max, HitRecord *record, const Sphere *self);
 
-Sphere *sphere_create(float radius, Vec3 pos);
+Sphere *sphere_create(double radius, Vec3 pos);

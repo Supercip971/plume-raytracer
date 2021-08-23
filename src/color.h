@@ -2,10 +2,10 @@
 
 typedef struct color
 {
-    float r;
-    float g;
-    float b;
-    float a;
+    double r;
+    double g;
+    double b;
+    double a;
 } Color;
 
-Color color_create(float r, float g, float b);
+Color color_create(double r, double g, double b);

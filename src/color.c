@@ -1,6 +1,6 @@
 #include "color.h"
 
-Color color_create(float r, float g, float b)
+Color color_create(double r, double g, double b)
 {
     Color res;
     res.r = r;

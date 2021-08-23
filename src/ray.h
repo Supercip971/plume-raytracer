@@ -8,4 +8,4 @@ typedef struct ray
     Vec3 direction;
 } Ray;
 
-Vec3 ray_point_param(Ray self, float t);
+Vec3 ray_point_param(Ray self, double t);

@@ -1,5 +1,5 @@
 #pragma once
 #include <stdlib.h>
 
-#define random_float() \
-    (float)((float)random() / (float)RAND_MAX)
+#define random_double() \
+    (double)((double)rand() / RAND_MAX)

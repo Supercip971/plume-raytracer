@@ -3,9 +3,9 @@ MKCWD=mkdir -p $(@D)
 
 PROJECT_NAME = craytracer
 
-CC = gcc
-CFLAGS = -mavx2 -mavx -m64 -msse4 -msse3 -msse2 -msse -ansi -Ofast -g -Isrc/  \
-	-std=c89 -Wall -Wextra  \
+CC = clang
+CFLAGS = -mavx2 -mavx -m64 -msse4 -msse3 -msse2 -msse -ansi -O3 -g -Isrc/  \
+	-std=gnu89 -Wall -Wextra  \
 	-pedantic -Wmissing-prototypes -Wstrict-prototypes \
     -Wold-style-definition -Werror -flto
 

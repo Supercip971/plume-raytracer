@@ -16,11 +16,11 @@ void add_hitable_object(HitCallback callback, const void *self)
     hitable_count++;
 }
 
-bool hit_call_all_object(Ray r, float t_min, float t_max, HitRecord *result)
+bool hit_call_all_object(Ray r, double t_min, double t_max, HitRecord *result)
 {
     HitRecord temp;
     bool hit_anything = false;
-    float closest = t_max;
+    double closest = t_max;
     size_t i;
     for (i = 0; i < hitable_count; i++)
     {

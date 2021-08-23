@@ -4,12 +4,12 @@
 
 typedef struct
 {
-    float t;
+    double t;
     Vec3 pos;
     Vec3 normal;
 } HitRecord;
 
-typedef bool (*HitCallback)(Ray r, float t_min, float t_max, HitRecord *record, const void *self);
+typedef bool (*HitCallback)(Ray r, double t_min, double t_max, HitRecord *record, const void *self);
 
 typedef struct
 {
@@ -22,4 +22,4 @@ void add_hitable_object(HitCallback callback, const void *self);
 
 void hit_destroy_all_objects(void);
 
-bool hit_call_all_object(Ray r, float t_min, float t_max, HitRecord *result);
+bool hit_call_all_object(Ray r, double t_min, double t_max, HitRecord *result);

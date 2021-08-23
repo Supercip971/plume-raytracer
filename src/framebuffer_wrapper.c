@@ -1,4 +1,6 @@
 #include <SDL2/SDL.h>
+#include <stdlib.h>
+#include <unistd.h>
 #include "boolean.h"
 #include "config.h"
 #include "engine.h"
@@ -71,10 +73,10 @@ static void framebuffer_deinit(void)
 void render_loop(void)
 {
     int frames = 0;
-    float fps;
+    double fps;
     uint32_t prev_ticks = SDL_GetTicks();
-    SDL_Window *screen = SDL_CreateWindow("c raytracer", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SCRN_WIDTH, SCRN_HEIGHT, 0);
-    SDL_Renderer *renderer = SDL_CreateRenderer(screen, -1, 0);
+    SDL_Window *screen = SDL_CreateWindow("c raytracer", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SCRN_WIDTH, SCRN_HEIGHT, SDL_WINDOW_VULKAN);
+    SDL_Renderer *renderer = SDL_CreateRenderer(screen, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
     SDL_Texture *framebuffer = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_STREAMING, SCRN_WIDTH, SCRN_HEIGHT);
 
     SDL_Init(SDL_INIT_EVERYTHING);
@@ -91,10 +93,14 @@ void render_loop(void)
 
         SDL_UpdateTexture(framebuffer, NULL, raw_pixels,
                           SCRN_WIDTH * sizeof(struct raw_color));
+
+        framebuffer_lock();
         SDL_RenderCopy(renderer, framebuffer, NULL, NULL);
+        framebuffer_unlock();
         SDL_RenderPresent(renderer);
         SDL_RenderClear(renderer);
 
+        SDL_Delay(17 - (prev_ticks - SDL_GetTicks()));
         if (frames > 20)
         {
             frames = 0;

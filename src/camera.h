@@ -12,6 +12,6 @@ typedef struct
 
 } Camera;
 
-Ray get_camera_ray(const Camera *camera, float u, float v);
+Ray get_camera_ray(const Camera *camera, double u, double v);
 
 Camera get_camera_default(void);
