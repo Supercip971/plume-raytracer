@@ -1,6 +1,8 @@
 #include "utils.h"
 #include <stdlib.h>
 #include <string.h>
+#include <x86intrin.h>
+#include <xmmintrin.h>
 static uint32_t g_seed = 0xfffaa;
 uint32_t fast_rand(void)
 {
@@ -10,6 +12,8 @@ uint32_t fast_rand(void)
 }
 
 #pragma GCC diagnostic ignored "-Wstrict-aliasing"
+#ifdef NOT_USE_SSE
+
 float Q_rsqrt(float number)
 {
     long i = 0;
@@ -24,8 +28,28 @@ float Q_rsqrt(float number)
     memcpy(&y, &i, sizeof(float));
     /*  y = *(float *)&i;*/
     y = y * (threehalfs - (x2 * y * y));
-    	y = y * ( threehalfs - ( x2 * y * y ) ); /* 2nd iteration, this can be removed*/
+    y = y * (threehalfs - (x2 * y * y)); /* 2nd iteration, this can be removed*/
 
     return y;
 }
+#else
+inline float Q_rsqrt(float number)
+{
+    float a;
+    float b = number;
+    __m128 in = _mm_load_ss(&b);
+    _mm_store_ss(&a, _mm_rsqrt_ss(in));
+    return a;
+}
+
+#endif
 #pragma GCC diagnostic pop
+
+float fast_sqrt(float number)
+{
+    float a;
+    float b = number;
+    __m128 in = _mm_load_ss(&b);
+    _mm_store_ss(&a, _mm_sqrt_ss(in));
+    return a;
+}

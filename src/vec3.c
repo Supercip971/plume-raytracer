@@ -1,5 +1,11 @@
 #include "vec3.h"
+#include <immintrin.h>
+#include <mmintrin.h>
+#include <smmintrin.h>
+#include <x86intrin.h>
+#include <xmmintrin.h>
 #include "utils.h"
+
 Vec3 vec3_create(double x, double y, double z)
 {
     Vec3 res;
@@ -21,7 +27,7 @@ double vec3_squared_length(Vec3 vec)
 
 double vec3_length(Vec3 vec)
 {
-    return sqrt(vec3_squared_length(vec));
+    return fast_sqrt(vec3_squared_length(vec));
 }
 Vec3 vec3_add(Vec3 vec1, Vec3 vec2)
 {
@@ -78,7 +84,6 @@ Vec3 vec3_unit(Vec3 vec)
 // vec * Q_rdqrt()*/
 Vec3 vec3_unit(Vec3 vec)
 {
-
     return vec3_mul_val(vec, Q_rsqrt(vec3_squared_length(vec)));
 }
 

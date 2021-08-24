@@ -1,5 +1,7 @@
 #pragma once
+#include <immintrin.h>
 #include <math.h>
+#include <x86intrin.h>
 #include "boolean.h"
 #include "color.h"
 
@@ -9,6 +11,7 @@ typedef struct vec3_t
     double y;
     double z;
 } Vec3;
+
 
 /* may use double later (?)
 

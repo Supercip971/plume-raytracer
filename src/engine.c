@@ -2,6 +2,7 @@
 #include <limits.h>
 #include <math.h>
 #define __USE_GNU
+#include <SDL2/SDL.h>
 #include <pthread.h>
 #include <stdatomic.h>
 #include <stddef.h>
@@ -56,6 +57,7 @@ static Vec3 ccol(Ray from, int depth)
         }
         else
         {
+
             return vec3_create(0, 0, 0);
         }
     }
@@ -72,6 +74,8 @@ static void render_update_part(Color *framebuffer, size_t width, size_t height, 
 
     const int sample_count = 16;
     const double sample_inv = (double)1 / sample_count;
+
+    uint32_t t = SDL_GetTicks();
 
     Camera camera = get_camera_default();
     Vec3 current_color;
@@ -97,19 +101,18 @@ static void render_update_part(Color *framebuffer, size_t width, size_t height, 
                 col = vec3_add(col, current_color);
             }
             col = vec3_mul_val(col, sample_inv);
-            col = vec3_create(sqrt(col.x), sqrt(col.y), sqrt(col.z));
+            col = vec3_create(fast_sqrt(col.x), fast_sqrt(col.y), fast_sqrt(col.z));
             final_color = vec_to_color(col);
 
-            framebuffer_lock();
             framebuffer[(int)x + (int)y * width] = final_color;
             if (stop)
             {
-                framebuffer_unlock();
                 return;
             }
-            framebuffer_unlock();
         }
     }
+
+    printf("ended: %i \n", SDL_GetTicks() - t);
 }
 static void *render_update_part_thread(void *arg)
 {
