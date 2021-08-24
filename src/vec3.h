@@ -35,3 +35,5 @@ Vec3 vec3_unit(Vec3 vec);
 Color vec_to_color(Vec3 from);
 
 Vec3 random_vec3_unit(void);
+
+Vec3 reflect(Vec3 vec1, Vec3 vec2);

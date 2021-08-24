@@ -1,0 +1,22 @@
+#include "metal.h"
+#include <stdlib.h>
+
+bool metal_callback(const Ray *r_in, const HitRecord *record, Vec3 *attenuation, Ray *scattered, const Metal *self)
+{
+    Vec3 target = reflect(vec3_unit(r_in->direction), record->normal);
+    scattered->origin = record->pos;
+    scattered->direction = target;
+    *attenuation = self->albedo;
+    return (vec3_dot(scattered->direction, record->normal) > 0);
+}
+
+Material metal_create(Vec3 albedo)
+{
+    Metal *self = malloc(sizeof(Metal));
+    Material mat;
+    self->albedo = albedo;
+
+    mat.data = self;
+    mat.material_callback = (MaterialCallback)metal_callback;
+    return mat;
+}

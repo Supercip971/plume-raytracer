@@ -10,6 +10,8 @@
 #include <stdlib.h>
 #include "camera.h"
 #include "config.h"
+#include "lambertian.h"
+#include "metal.h"
 #include "ray.h"
 #include "shapes.h"
 #include "utils.h"
@@ -21,7 +23,7 @@ const int sample_count_x = RENDER_THREAD;
 const int sample_step_x = SCRN_WIDTH / sample_count_x;
 const int sample_count_y = RENDER_THREAD;
 const int sample_step_y = SCRN_HEIGHT / sample_count_y;
-
+bool stop;
 struct render_thread_args
 {
     Color *framebuffer;
@@ -33,7 +35,7 @@ struct render_thread_args
 struct render_thread_args args[256];
 pthread_t thr[256] = {0};
 
-static Vec3 ccol(Ray from)
+static Vec3 ccol(Ray from, int depth)
 {
     HitRecord record = {0};
     double t;
@@ -41,12 +43,18 @@ static Vec3 ccol(Ray from)
 
     if (hit_call_all_object(from, 0.0, 100000000, &record))
     {
-        Vec3 target = vec3_add(record.pos, vec3_add(record.normal, random_vec3_unit()));
         Ray forked_ray = from;
-        forked_ray.origin = record.pos;
-        forked_ray.direction = vec3_sub(target, record.pos);
+        Vec3 attenuation;
 
-        return vec3_mul_val(ccol(forked_ray), 0.5);
+        if (depth < 100 && record.material.material_callback(&from, &record, &attenuation, &forked_ray, record.material.data))
+        {
+            return vec3_mul(attenuation, ccol(forked_ray, depth + 1));
+        }
+        else
+        {
+
+            return vec3_create(0, 0, 0);
+        }
     }
     else
     {
@@ -59,8 +67,7 @@ static Vec3 ccol(Ray from)
 static void render_update_part(Color *framebuffer, size_t width, size_t height, double x_from, double y_from, double x_max, double y_max)
 {
 
-    const int sample_count = 128;
-    const int sample_step = (int)sample_count / 2;
+    const int sample_count = 16;
 
     Camera camera = get_camera_default();
     Vec3 current_color;
@@ -68,6 +75,8 @@ static void render_update_part(Color *framebuffer, size_t width, size_t height, 
     Ray r;
     double x, y;
     int sample;
+
+    (void)height;
 
     for (x = x_from; x < x_max; x += 1.f)
     {
@@ -77,10 +86,10 @@ static void render_update_part(Color *framebuffer, size_t width, size_t height, 
             for (sample = 0; sample < sample_count; sample++)
             {
 
-                double u = (x + ((double)(sample % sample_step) / sample_count)) / (double)width;
-                double v = (y + ((double)(sample / sample_step) / sample_count)) / (double)height;
+                double u = (x + random_double()) / (double)width;
+                double v = (y + random_double()) / (double)height;
                 r = get_camera_ray(&camera, u, v);
-                current_color = (ccol(r));
+                current_color = (ccol(r, 0));
                 col = vec3_add(col, current_color);
             }
             col = vec3_div_val(col, sample_count);
@@ -89,6 +98,11 @@ static void render_update_part(Color *framebuffer, size_t width, size_t height, 
 
             framebuffer_lock();
             framebuffer[(int)x + (int)y * width] = final_color;
+            if (stop)
+            {
+                framebuffer_unlock();
+                return;
+            }
             framebuffer_unlock();
         }
     }
@@ -126,7 +140,6 @@ void render_update(Color *framebuffer, size_t width, size_t height)
             args[i].s_y = s_y;
 
             pthread_create(&thr[i], NULL, render_update_part_thread, &args[i]);
-            pthread_detach(thr[i]);
         }
 
         i++;
@@ -147,14 +160,18 @@ void render_update(Color *framebuffer, size_t width, size_t height)
 pthread_mutex_t main_mutex;
 void render_init(void)
 {
-    add_hitable_object((HitCallback)hit_sphere_object_callback, sphere_create(0.5, vec3_create(0, 0, -1)));
-    add_hitable_object((HitCallback)hit_sphere_object_callback, sphere_create(100, vec3_create(0, -100.5, -1)));
+    stop = false;
+    add_hitable_object((HitCallback)hit_sphere_object_callback, sphere_create(0.5, vec3_create(0, 0, -1)), metal_create(vec3_create(0.8, 0.3, 0.3)));
+    add_hitable_object((HitCallback)hit_sphere_object_callback, sphere_create(100, vec3_create(0, -100.5, -1)), metal_create(vec3_create(0.8, 0.8, 0)));
+    add_hitable_object((HitCallback)hit_sphere_object_callback, sphere_create(0.5, vec3_create(1, 0, -1)), metal_create(vec3_create(0.8, 0.6, 0.2)));
+    add_hitable_object((HitCallback)hit_sphere_object_callback, sphere_create(0.5, vec3_create(-1, 0, -1)), metal_create(vec3_create(0.8, 0.8, 0.8)));
     pthread_mutex_init(&main_mutex, NULL);
 }
 
 void render_deinit(void)
 {
     size_t i = 0;
+    stop = true;
     for (i = 0; i < 256; i++)
     {
         if (thr[i] != 0)

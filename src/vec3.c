@@ -86,3 +86,8 @@ Vec3 random_vec3_unit(void)
     } while (vec3_squared_length(vec) >= 1.0);
     return vec;
 }
+
+Vec3 reflect(Vec3 vec1, Vec3 vec2)
+{
+    return vec3_sub(vec1, vec3_mul_val(vec2, (vec3_dot(vec1, vec2) * 2.0)));
+}

@@ -1,6 +1,7 @@
 #pragma once
 #include "boolean.h"
 #include "hitable.h"
+#include "material.h"
 #include "ray.h"
 #include "vec3.h"
 typedef struct sphere
