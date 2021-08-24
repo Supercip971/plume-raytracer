@@ -7,7 +7,7 @@ CC = clang
 CFLAGS =  -march=native -ansi -O3 -g -Isrc/  \
 	-std=gnu89 -Wall -Wextra  \
 	-pedantic -Wmissing-prototypes -Wstrict-prototypes \
-    -Wold-style-definition -Werror -flto
+    -Wold-style-definition -Werror -flto -funsafe-math-optimizations 
 
 BUILD_DIR = build
 
@@ -23,12 +23,12 @@ OUTPUT = build/$(PROJECT_NAME).elf
 $(OUTPUT): $(OFILES)
 	@$(MKCWD)
 	@echo "[ $@ ] $^"
-	gcc $(CFLAGS) -lpthread -lm -lSDL2 -o $@ $^
+	clang $(CFLAGS) -lpthread -lm -lSDL2 -o $@ $^
 
 $(BUILD_DIR)/%.o: src/%.c 
 	@$(MKCWD)
 	@echo "[ $@ ] $^"
-	gcc $^ -c -o $@  $(CFLAGS)
+	clang $^ -c -o $@  $(CFLAGS)
 
 run: $(OUTPUT)
 	$(OUTPUT)

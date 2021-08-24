@@ -4,4 +4,4 @@
 #define SCRN_HEIGHT 1080
 
 /* use render_thread ^2 */
-#define RENDER_THREAD 4
+#define RENDER_THREAD 1
