@@ -64,10 +64,24 @@ Vec3 vec3_cross(Vec3 vec1, Vec3 vec2)
                        vec1.y * vec2.x - vec1.x * vec2.y);
 }
 
+#ifdef NO_FAST
+
 Vec3 vec3_unit(Vec3 vec)
 {
     return vec3_div_val(vec, vec3_length(vec));
 }
+
+#else
+
+// vec / sqrt(vecx * vecx + vecy * vecy + vecz * vecz)
+// vec * 1/sqrt()
+// vec * Q_rdqrt()
+Vec3 vec3_unit(Vec3 vec)
+{
+    return vec3_mul_val(vec, Q_rsqrt(vec3_squared_length(vec)));
+}
+
+#endif
 
 Color vec_to_color(Vec3 from)
 {
