@@ -14,9 +14,9 @@ Ray get_camera_ray(const Camera *camera, double u, double v)
 Camera get_camera_default(void)
 {
     Camera result;
-    result.low_left = vec3_create(-3, -2, -2);
-    result.horizontal = vec3_create(6, 0, 0);
-    result.vertical = vec3_create(0, 4, 0);
+    result.low_left = vec3_create(-8, -4.5, -4.5);
+    result.horizontal = vec3_create(16, 0, 0);
+    result.vertical = vec3_create(0, 9, 0);
     result.origin = vec3_create(0, 0, 0);
     return result;
 }
