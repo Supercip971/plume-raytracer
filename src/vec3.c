@@ -73,11 +73,12 @@ Vec3 vec3_unit(Vec3 vec)
 
 #else
 
-// vec / sqrt(vecx * vecx + vecy * vecy + vecz * vecz)
+/* vec / sqrt(vecx * vecx + vecy * vecy + vecz * vecz)
 // vec * 1/sqrt()
-// vec * Q_rdqrt()
+// vec * Q_rdqrt()*/
 Vec3 vec3_unit(Vec3 vec)
 {
+
     return vec3_mul_val(vec, Q_rsqrt(vec3_squared_length(vec)));
 }
 
@@ -93,15 +94,27 @@ Color vec_to_color(Vec3 from)
 
 Vec3 random_vec3_unit(void)
 {
-    Vec3 vec;
-    do
-    {
-        vec = vec3_sub(vec3_mul_val(vec3_create(random_double(), random_double(), random_double()), 2), vec3_create(1, 1, 1));
-    } while (vec3_squared_length(vec) >= 1.0);
-    return vec;
+
+    return vec3_unit(vec3_create(random_double() * 2 - 1, random_double() * 2 - 1, random_double() * 2 - 1));
 }
 
 Vec3 reflect(Vec3 vec1, Vec3 vec2)
 {
     return vec3_sub(vec1, vec3_mul_val(vec2, (vec3_dot(vec1, vec2) * 2.0)));
+}
+
+bool refract(Vec3 *result, Vec3 vec1, Vec3 vec2, double ni_over_nt)
+{
+    Vec3 uv = vec3_unit(vec1);
+    double dt = vec3_dot(uv, vec2);
+    double discriminant = 1 - ni_over_nt * ni_over_nt * (1 - dt * dt);
+    if (discriminant > 0)
+    {
+
+        *result = vec3_sub(vec3_mul_val(vec3_sub(uv, vec3_mul_val(vec2, dt)), ni_over_nt), vec3_mul_val(vec2, sqrt(discriminant)));
+
+        return true;
+    }
+
+    return false;
 }

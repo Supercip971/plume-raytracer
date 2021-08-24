@@ -10,8 +10,9 @@
 #include <stdlib.h>
 #include "camera.h"
 #include "config.h"
-#include "lambertian.h"
-#include "metal.h"
+#include "material/dielectric.h"
+#include "material/lambertian.h"
+#include "material/metal.h"
 #include "ray.h"
 #include "shapes.h"
 #include "utils.h"
@@ -55,7 +56,6 @@ static Vec3 ccol(Ray from, int depth)
         }
         else
         {
-
             return vec3_create(0, 0, 0);
         }
     }
@@ -70,7 +70,7 @@ static Vec3 ccol(Ray from, int depth)
 static void render_update_part(Color *framebuffer, size_t width, size_t height, double x_from, double y_from, double x_max, double y_max)
 {
 
-    const int sample_count = 8;
+    const int sample_count = 16;
     const double sample_inv = (double)1 / sample_count;
 
     Camera camera = get_camera_default();
@@ -165,7 +165,7 @@ pthread_mutex_t main_mutex;
 void render_init(void)
 {
     stop = false;
-    add_hitable_object((HitCallback)hit_sphere_object_callback, sphere_create(0.5, vec3_create(0, 0, -1)), metal_create(vec3_create(0.8, 0.3, 0.3), 1));
+    add_hitable_object((HitCallback)hit_sphere_object_callback, sphere_create(0.5, vec3_create(0, 0, -1)), dieletric_create(1.5));
     add_hitable_object((HitCallback)hit_sphere_object_callback, sphere_create(100, vec3_create(0, -100.5, -1)), metal_create(vec3_create(0.8, 0.8, 0), 0.3));
     add_hitable_object((HitCallback)hit_sphere_object_callback, sphere_create(0.5, vec3_create(1, 0, -1)), metal_create(vec3_create(0.8, 0.6, 0.2), 0));
     add_hitable_object((HitCallback)hit_sphere_object_callback, sphere_create(0.5, vec3_create(-1, 0, -1)), metal_create(vec3_create(0.8, 0.8, 0.8), 5));

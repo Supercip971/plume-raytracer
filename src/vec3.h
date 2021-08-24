@@ -1,5 +1,6 @@
 #pragma once
 #include <math.h>
+#include "boolean.h"
 #include "color.h"
 
 typedef struct vec3_t
@@ -37,3 +38,4 @@ Color vec_to_color(Vec3 from);
 Vec3 random_vec3_unit(void);
 
 Vec3 reflect(Vec3 vec1, Vec3 vec2);
+bool refract(Vec3 *result, Vec3 vec1, Vec3 vec2, double ni_over_nt);
