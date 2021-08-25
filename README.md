@@ -1,13 +1,11 @@
 # ANSI C raytracer
 
-'just for fun
+A portable simple ANSI C raytracer on CPU !
 
-(not complete rn)
-
+![basic render](./pic/25-08-2021.png)
 
 # doc
 
-old:
-[raytracing in a weekend](https://www.realtimerendering.com/raytracing/Ray%20Tracing%20in%20a%20Weekend.pdf)
-new :
-[raytracing in a weekend](https://raytracing.github.io/books/RayTracingInOneWeekend.html)
+- Raytracing in a weekend: 
+  - old: [raytracing in a weekend](https://www.realtimerendering.com/raytracing/Ray%20Tracing%20in%20a%20Weekend.pdf)
+  - new [raytracing in a weekend](https://raytracing.github.io/books/RayTracingInOneWeekend.html)
