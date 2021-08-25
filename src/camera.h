@@ -10,7 +10,7 @@ typedef struct
     Vec3 vertical;
     Vec3 origin;
     Vec3 u, v, w;
-    double lens_radius;
+    rt_float lens_radius;
 
 } Camera;
 
@@ -19,12 +19,12 @@ struct camera_config
     Vec3 position;
     Vec3 lookat;
     Vec3 up;
-    double vfov;
-    double aspect;
-    double aperture;
-    double focus_distance;
+    rt_float vfov;
+    rt_float aspect;
+    rt_float aperture;
+    rt_float focus_distance;
 };
 
-Ray get_camera_ray(const Camera *camera, double u, double v);
+Ray get_camera_ray(const Camera *camera, rt_float u, rt_float v);
 
 Camera create_camera(struct camera_config config);

@@ -7,7 +7,7 @@ typedef struct hit_record HitRecord;
 
 typedef bool (*MaterialCallback)(const Ray *r_in, const HitRecord *record, Vec3 *attenuation, Ray *scattered, const void *self);
 
-typedef bool (*HitCallback)(Ray r, double t_min, double t_max, HitRecord *record, const void *self);
+typedef bool (*HitCallback)(Ray r, rt_float t_min, rt_float t_max, HitRecord *record, const void *self);
 
 typedef struct material
 {
@@ -17,7 +17,7 @@ typedef struct material
 
 struct hit_record
 {
-    double t;
+    rt_float t;
     Vec3 pos;
     Vec3 normal;
     Material material;
@@ -36,6 +36,6 @@ void add_hitable_object(HitCallback callback, const void *object, Material mater
 
 void hit_destroy_all_objects(void);
 
-bool hit_call_all_object(Ray r, double t_min, double t_max, HitRecord *result);
+bool hit_call_all_object(Ray r, rt_float t_min, rt_float t_max, HitRecord *result);
 
 void set_face_normal(const Ray *r, const Vec3 outward, HitRecord *self);

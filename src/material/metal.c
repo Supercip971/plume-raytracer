@@ -13,11 +13,11 @@ bool metal_callback(const Ray *r_in, const HitRecord *record, Vec3 *attenuation,
     return vec3_dot(scattered->direction, record->normal) > 0;
 }
 
-Material metal_create(Vec3 albedo, double fuzzy)
+Material metal_create(Vec3 albedo, rt_float fuzzy)
 {
     Material mat;
     Metal *self = malloc(sizeof(Metal));
-    
+
     self->albedo = albedo;
     self->fuzzy = fuzzy;
 

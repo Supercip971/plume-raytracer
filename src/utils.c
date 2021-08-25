@@ -3,6 +3,7 @@
 #include <string.h>
 #include <x86intrin.h>
 #include <xmmintrin.h>
+#include "config.h"
 static uint32_t g_seed = 0xfffaa;
 
 uint32_t fast_rand(void)
@@ -15,19 +16,19 @@ uint32_t fast_rand(void)
 
 #ifdef USE_QUAKE_INV_SQUAREROOT
 
-float Q_rsqrt(float number)
+rt_float Q_rsqrt(rt_float number)
 {
     long i = 0;
-    float x2, y = 0;
-    const float threehalfs = 1.5F;
+    rt_float x2, y = 0;
+    const rt_float threehalfs = 1.5F;
 
     x2 = number * 0.5F;
     y = number;
-    memcpy(&i, &y, sizeof(float));
+    memcpy(&i, &y, sizeof(rt_float));
     /* i = *(long *)&y;*/
     i = 0x5f3759df - (i >> 1);
-    memcpy(&y, &i, sizeof(float));
-    /*  y = *(float *)&i;*/
+    memcpy(&y, &i, sizeof(rt_float));
+    /*  y = *(rt_float *)&i;*/
     y = y * (threehalfs - (x2 * y * y));
     y = y * (threehalfs - (x2 * y * y)); /* 2nd iteration, this can be removed*/
 

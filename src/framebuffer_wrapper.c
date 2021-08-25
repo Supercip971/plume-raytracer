@@ -19,7 +19,7 @@ struct raw_color
     uint8_t r;
 } __attribute__((packed));
 
-static double color_clamp(double value)
+static rt_float color_clamp(rt_float value)
 {
     if (value > 0.999)
     {
@@ -87,7 +87,7 @@ static void framebuffer_deinit(void)
 void render_loop(void)
 {
     int frames = 0;
-    double fps;
+    rt_float fps;
     uint32_t prev_ticks = SDL_GetTicks();
     SDL_Window *screen = SDL_CreateWindow("c raytracer", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SCRN_WIDTH, SCRN_HEIGHT, SDL_WINDOW_VULKAN);
     SDL_Renderer *renderer = SDL_CreateRenderer(screen, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);

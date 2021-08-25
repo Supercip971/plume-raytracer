@@ -17,13 +17,13 @@ void add_hitable_object(HitCallback callback, const void *self, Material mat)
     hitable_count++;
 }
 
-bool hit_call_all_object(Ray r, double t_min, double t_max, HitRecord *result)
+bool hit_call_all_object(Ray r, rt_float t_min, rt_float t_max, HitRecord *result)
 {
     HitRecord temp;
     size_t i;
 
     bool hit_anything = false;
-    double closest = t_max;
+    rt_float closest = t_max;
 
     for (i = 0; i < hitable_count; i++)
     {
@@ -37,7 +37,7 @@ bool hit_call_all_object(Ray r, double t_min, double t_max, HitRecord *result)
             result->material = hitable_table[i].material;
         }
     }
-    
+
     return hit_anything;
 }
 

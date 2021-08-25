@@ -1,6 +1,8 @@
+
 #include "engine.h"
 #include <limits.h>
 #include <math.h>
+#include "config.h"
 #define __USE_GNU
 #include <SDL2/SDL.h>
 #include <pthread.h>
@@ -10,7 +12,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "camera.h"
-#include "config.h"
 #include "framebuffer_wrapper.h"
 #include "material/dielectric.h"
 #include "material/lambertian.h"
@@ -34,10 +35,10 @@ struct render_part_args
     Color *framebuffer;
     size_t width;
     size_t height;
-    double x_from;
-    double y_from;
-    double x_max;
-    double y_max;
+    rt_float x_from;
+    rt_float y_from;
+    rt_float x_max;
+    rt_float y_max;
     size_t sample_count;
 };
 
@@ -54,7 +55,7 @@ pthread_t thr[MAX_RENDER_THREAD] = {0};
 
 static Vec3 calculate_void_color(Ray from)
 {
-    double t;
+    rt_float t;
     Vec3 unit_direction;
 
     unit_direction = vec3_unit(from.direction);
@@ -104,14 +105,14 @@ static void render_update_part(struct render_part_args arg)
     Color previous_color;
     Ray r;
     size_t x, y;
-    double u, v;
+    rt_float u, v;
 
     for (x = arg.x_from; x < arg.x_max; x += 1)
     {
         for (y = arg.y_from; y < arg.y_max; y += 1)
         {
-            u = ((double)x + random_double()) / (double)(arg.width - 1);
-            v = ((double)y + random_double()) / (double)(arg.height - 1);
+            u = ((rt_float)x + random_rt_float()) / (rt_float)(arg.width - 1);
+            v = ((rt_float)y + random_rt_float()) / (rt_float)(arg.height - 1);
 
             r = get_camera_ray(&camera, u, v);
 
@@ -138,15 +139,14 @@ static void render_update_part(struct render_part_args arg)
             }
         }
     }
-
 }
 static void *render_update_part_thread(void *arg)
 {
     struct render_thread_args *args = arg;
     struct render_part_args render_argument;
 
-    double u = (double)args->s_x;
-    double v = (double)args->s_y;
+    rt_float u = (rt_float)args->s_x;
+    rt_float v = (rt_float)args->s_y;
 
     render_argument.sample_count = 1;
     render_argument.width = args->width;
@@ -157,11 +157,13 @@ static void *render_update_part_thread(void *arg)
     render_argument.x_max = sample_step_x + u;
     render_argument.y_max = sample_step_y + v;
 
-    while (render_argument.sample_count < 128)
+    while (render_argument.sample_count < 10000)
     {
         render_update_part(render_argument);
         render_argument.sample_count++;
     }
+
+    printf("thread ended [!] \n");
 
     return NULL;
 }
@@ -215,20 +217,20 @@ static void random_scene(void)
         {
             Material result_material;
 
-            double material = random_double();
-            Vec3 center = vec3_create(a + 0.9 * random_double(), 0.2, b + 0.9 * random_double());
+            rt_float material = random_rt_float();
+            Vec3 center = vec3_create(a + 0.9 * random_rt_float(), 0.2, b + 0.9 * random_rt_float());
 
             if (vec3_length(vec3_sub(center, vec3_create(4, 0.2, 0))) > 0.9)
             {
                 if (material < 0.8)
                 {
-                    Vec3 random_albedo = vec3_create(random_double(), random_double(), random_double());
+                    Vec3 random_albedo = vec3_create(random_rt_float(), random_rt_float(), random_rt_float());
                     result_material = lambertian_create(vec3_mul(random_albedo, random_albedo));
                 }
                 else if (material < 0.95)
                 {
-                    Vec3 random_albedo = vec3_create(random_double(), random_double(), random_double());
-                    double fuzz = random_double() / 2;
+                    Vec3 random_albedo = vec3_create(random_rt_float(), random_rt_float(), random_rt_float());
+                    rt_float fuzz = random_rt_float() / 2;
                     result_material = metal_create(random_albedo, fuzz);
                 }
                 else
@@ -253,7 +255,7 @@ void render_init(void)
     camera_config.position = vec3_create(13, 2, 3);
     camera_config.lookat = vec3_create(0, 0, 0);
     camera_config.up = vec3_create(0, 1, 0);
-    camera_config.aspect = ((float)SCRN_WIDTH / (float)SCRN_HEIGHT);
+    camera_config.aspect = ((rt_float)SCRN_WIDTH / (rt_float)SCRN_HEIGHT);
     camera_config.vfov = 20;
     camera_config.aperture = 0.1;
     camera_config.focus_distance = 10;

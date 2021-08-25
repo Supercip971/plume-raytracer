@@ -3,10 +3,10 @@
 #include "utils.h"
 
 /* this is so bad there is too much arg >:()*/
-static bool hit_sphere_object_callback2(double discriminant, double a, double b, double t_min, double t_max, HitRecord *record)
+static bool hit_sphere_object_callback2(rt_float discriminant, rt_float a, rt_float b, rt_float t_min, rt_float t_max, HitRecord *record)
 {
-    double t;
-    double discriminent_root = fast_sqrt(discriminant);
+    rt_float t;
+    rt_float discriminent_root = fast_sqrt(discriminant);
 
     t = (-b - discriminent_root) / a;
 
@@ -24,16 +24,16 @@ static bool hit_sphere_object_callback2(double discriminant, double a, double b,
 
     return true;
 }
-FLATTEN bool hit_sphere_object_callback(Ray ray, double t_min, double t_max, HitRecord *record, const Sphere *self)
+FLATTEN bool hit_sphere_object_callback(Ray ray, rt_float t_min, rt_float t_max, HitRecord *record, const Sphere *self)
 {
     /* the vec from the ray to the sphere (that must be under sphere.radius to be in collision) */
     Vec3 oc = vec3_sub(ray.origin, self->pos);
 
-    double a = vec3_squared_length(ray.direction); /* ray length^2*/
-    double b = vec3_dot(oc, ray.direction);
-    double c = vec3_squared_length(oc) - (self->radius * self->radius);
+    rt_float a = vec3_squared_length(ray.direction); /* ray length^2*/
+    rt_float b = vec3_dot(oc, ray.direction);
+    rt_float c = vec3_squared_length(oc) - (self->radius * self->radius);
 
-    double discriminant = b * b - a * c; /* ^ = b^2 - 4ac */
+    rt_float discriminant = b * b - a * c; /* ^ = b^2 - 4ac */
 
     if (discriminant > 0.f && a != 0)
     {
@@ -47,7 +47,7 @@ FLATTEN bool hit_sphere_object_callback(Ray ray, double t_min, double t_max, Hit
     return false;
 }
 
-Sphere *sphere_create(double radius, Vec3 pos)
+Sphere *sphere_create(rt_float radius, Vec3 pos)
 {
     Sphere *sphere = malloc(sizeof(Sphere));
     sphere->radius = radius;
