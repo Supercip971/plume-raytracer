@@ -34,6 +34,7 @@ bool dieletric_callback(const Ray *r_in, const HitRecord *record, Vec3 *attenuat
 
     scattered->direction = direction;
     scattered->origin = record->pos;
+    scattered->time = r_in->time;
 
     *attenuation = vec3_create(1, 1, 1);
     return 1;

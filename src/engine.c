@@ -224,21 +224,23 @@ static void random_scene(void)
             {
                 if (material < 0.8)
                 {
+                    Vec3 center2 = vec3_create(center.x, center.y + random_rt_float() * 0.5, center.z);
                     Vec3 random_albedo = vec3_create(random_rt_float(), random_rt_float(), random_rt_float());
                     result_material = lambertian_create(vec3_mul(random_albedo, random_albedo));
+                    add_hitable_object(moving_sphere_create(0.2, 0, 1, center, center2), result_material);
                 }
                 else if (material < 0.95)
                 {
                     Vec3 random_albedo = vec3_create(random_rt_float(), random_rt_float(), random_rt_float());
                     rt_float fuzz = random_rt_float() / 2;
                     result_material = metal_create(random_albedo, fuzz);
+                    add_hitable_object(sphere_create(0.2, center), result_material);
                 }
                 else
                 {
                     result_material = dieletric_create(1.5);
+                    add_hitable_object(sphere_create(0.2, center), result_material);
                 }
-
-                add_hitable_object(sphere_create(0.2, center), result_material);
             }
         }
     }

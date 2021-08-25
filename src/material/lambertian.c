@@ -13,6 +13,7 @@ bool lambertian_callback(const Ray *r_in, const HitRecord *record, Vec3 *attenua
 
     scattered->origin = record->pos;
     scattered->direction = direction;
+    scattered->time = r_in->time;
 
     *attenuation = self->albedo;
 
@@ -23,7 +24,7 @@ Material lambertian_create(Vec3 albedo)
 {
     Material mat;
     Lambertian *self = malloc(sizeof(Lambertian));
-    
+
     self->albedo = albedo;
 
     mat.data = self;
