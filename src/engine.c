@@ -11,6 +11,7 @@
 #include <stdlib.h>
 #include "camera.h"
 #include "config.h"
+#include "framebuffer_wrapper.h"
 #include "material/dielectric.h"
 #include "material/lambertian.h"
 #include "material/metal.h"
@@ -18,17 +19,6 @@
 #include "shapes.h"
 #include "utils.h"
 #include "vec3.h"
-
-/* https://www.realtimerendering.com/raytracing/Ray%20Tracing%20in%20a%20Weekend.pdf */
-
-const int sample_count_x = RENDER_THREAD;
-const int sample_step_x = SCRN_WIDTH / sample_count_x;
-const int sample_count_y = RENDER_THREAD;
-const int sample_step_y = SCRN_HEIGHT / sample_count_y;
-bool stop;
-Camera camera;
-
-#define double_max (double)((uint64_t)-1)
 
 struct render_thread_args
 {
@@ -38,16 +28,49 @@ struct render_thread_args
     size_t s_x;
     size_t s_y;
 };
-struct render_thread_args args[256];
-pthread_t thr[256] = {0};
 
-static Vec3 ccol(Ray from, int depth)
+struct render_part_args
 {
-    HitRecord record = {0};
+    Color *framebuffer;
+    size_t width;
+    size_t height;
+    double x_from;
+    double y_from;
+    double x_max;
+    double y_max;
+    size_t sample_count;
+};
+
+static const int sample_count_x = RENDER_THREAD;
+static const int sample_step_x = SCRN_WIDTH / sample_count_x;
+static const int sample_count_y = RENDER_THREAD;
+static const int sample_step_y = SCRN_HEIGHT / sample_count_y;
+
+static bool stop;
+static Camera camera;
+
+struct render_thread_args args[MAX_RENDER_THREAD];
+pthread_t thr[MAX_RENDER_THREAD] = {0};
+
+static Vec3 calculate_void_color(Ray from)
+{
     double t;
     Vec3 unit_direction;
-    if (depth > 128)
+
+    unit_direction = vec3_unit(from.direction);
+    t = 0.5 * (unit_direction.y + 1);
+
+    return vec3_add(vec3_mul_val(vec3_create(1, 1, 1), 1 - t), vec3_mul_val(vec3_create(0.5, 0.7, 1), t));
+}
+
+static Vec3 calculate_ray_color(Ray from, int depth)
+{
+    HitRecord record = {0};
+
+    if (depth > MAX_BOUNCE_DEPTH)
+    {
         return vec3_create(0, 0, 0);
+    }
 
     if (hit_call_all_object(from, 0.001, __builtin_inff64(), &record))
     {
@@ -56,60 +79,59 @@ static Vec3 ccol(Ray from, int depth)
 
         if (record.material.material_callback(&from, &record, &attenuation, &forked_ray, record.material.data))
         {
-            return vec3_mul(attenuation, ccol(forked_ray, depth + 1));
+            Vec3 next = calculate_ray_color(forked_ray, depth + 1);
+            return vec3_mul(attenuation, next);
         }
         else
         {
-
             return vec3_create(0, 0, 0);
         }
     }
     else
     {
-        unit_direction = vec3_unit(from.direction);
-        t = 0.5 * (unit_direction.y + 1);
-        return vec3_add(vec3_mul_val(vec3_create(1, 1, 1), 1 - t), vec3_mul_val(vec3_create(0.5, 0.7, 1), t));
+        return calculate_void_color(from);
     }
 }
 
-static void render_update_part(Color *framebuffer, size_t width, size_t height, double x_from, double y_from, double x_max, double y_max, size_t sample_count)
+static void render_update_part(struct render_part_args arg)
 {
 
     /*ù  uint32_t t = SDL_GetTicks();*/
 
     Vec3 current_color;
     Color final_color;
+
+    Color previous_color;
     Ray r;
     size_t x, y;
-    (void)height;
+    double u, v;
 
-    for (x = x_from; x < x_max; x += 1)
+    for (x = arg.x_from; x < arg.x_max; x += 1)
     {
-        for (y = y_from; y < y_max; y += 1)
+        for (y = arg.y_from; y < arg.y_max; y += 1)
         {
-            Vec3 col = {0};
-            double offx = random_double();
-            double offy = random_double();
-            double u = ((double)x + offx) / (double)(width - 1);
-            double v = ((double)y + offy) / (double)(height - 1);
+            u = ((double)x + random_double()) / (double)(arg.width - 1);
+            v = ((double)y + random_double()) / (double)(arg.height - 1);
+
             r = get_camera_ray(&camera, u, v);
-            current_color = (ccol(r, 0));
-            col = current_color;
+
+            current_color = (calculate_ray_color(r, 0));
 
             /* add current sample to sum */
-            if (sample_count != 0)
+            if (arg.sample_count != 0)
             {
-                Color previous_color;
-                Vec3 prev_color;
-                previous_color = framebuffer[(int)x + (int)y * width];
-                prev_color = vec3_create(previous_color.r, previous_color.g, previous_color.b);
+                previous_color = get_pixel(arg.framebuffer, x, y, arg.width);
 
-                col = vec3_div_val(vec3_add(vec3_mul_val(prev_color, sample_count - 1), col), sample_count);
+                current_color = vec3_div_val(
+                    vec3_add(
+                        vec3_mul_val(vec_from_color(previous_color), arg.sample_count - 1), current_color),
+                    arg.sample_count);
             }
-            col = vec3_create((col.x), (col.y), (col.z));
-            final_color = vec_to_color(col);
 
-            framebuffer[(int)x + (int)y * width] = final_color;
+            final_color = vec_to_color(current_color);
+
+            set_pixel(arg.framebuffer, x, y, arg.width, final_color);
+
             if (stop)
             {
                 return;
@@ -118,15 +140,29 @@ static void render_update_part(Color *framebuffer, size_t width, size_t height, 
     }
 
     /* printf("ended: %i \n", SDL_GetTicks() - t);*/
-    render_update_part(framebuffer, width, height, x_from, y_from, x_max, y_max, sample_count + 1);
 }
 static void *render_update_part_thread(void *arg)
 {
     struct render_thread_args *args = arg;
+    struct render_part_args render_argument;
+
     double u = (double)args->s_x;
     double v = (double)args->s_y;
 
-    render_update_part(args->framebuffer, args->width, args->height, u, v, u + sample_step_x, v + sample_step_y, 1);
+    render_argument.sample_count = 1;
+    render_argument.width = args->width;
+    render_argument.height = args->height;
+    render_argument.framebuffer = args->framebuffer;
+    render_argument.x_from = u;
+    render_argument.y_from = v;
+    render_argument.x_max = sample_step_x + u;
+    render_argument.y_max = sample_step_y + v;
+
+    while (render_argument.sample_count < 128)
+    {
+        render_update_part(render_argument);
+        render_argument.sample_count++;
+    }
 
     return NULL;
 }
@@ -136,10 +172,6 @@ void render_update(Color *framebuffer, size_t width, size_t height)
     size_t i = 0;
     size_t s_x = 0;
     size_t s_y = 0;
-    static const int sample_count_x = RENDER_THREAD;
-    static const int sample_step_x = SCRN_WIDTH / sample_count_x;
-    static const int sample_count_y = RENDER_THREAD;
-    static const int sample_step_y = SCRN_HEIGHT / sample_count_y;
 
     while (true)
     {
@@ -163,7 +195,6 @@ void render_update(Color *framebuffer, size_t width, size_t height)
             s_y += sample_step_y;
             if (s_y >= SCRN_HEIGHT)
             {
-                s_y = 0;
                 break;
             }
         }
@@ -176,15 +207,18 @@ static void random_scene(void)
 {
 
     int a, b;
+
     add_hitable_object((HitCallback)hit_sphere_object_callback, sphere_create(1000, vec3_create(0, -1000, -1)), lambertian_create(vec3_create(0.5, 0.5, 0.5)));
 
     for (a = -11; a < 11; a++)
     {
         for (b = -11; b < 11; b++)
         {
+            Material result_material;
+
             double material = random_double();
             Vec3 center = vec3_create(a + 0.9 * random_double(), 0.2, b + 0.9 * random_double());
-            Material result_material;
+
             if (vec3_length(vec3_sub(center, vec3_create(4, 0.2, 0))) > 0.9)
             {
                 if (material < 0.8)
@@ -202,10 +236,12 @@ static void random_scene(void)
                 {
                     result_material = dieletric_create(1.5);
                 }
+
                 add_hitable_object((HitCallback)hit_sphere_object_callback, sphere_create(0.2, center), result_material);
             }
         }
     }
+
     add_hitable_object((HitCallback)hit_sphere_object_callback, sphere_create(1.0, vec3_create(0, 1, 0)), dieletric_create(1.5));
     add_hitable_object((HitCallback)hit_sphere_object_callback, sphere_create(1.0, vec3_create(-4, 1, 0)), lambertian_create(vec3_create(0.4, 0.2, 0.1)));
     add_hitable_object((HitCallback)hit_sphere_object_callback, sphere_create(1.0, vec3_create(4, 1, 0)), metal_create(vec3_create(0.7, 0.6, 0.5), 0));
@@ -213,39 +249,39 @@ static void random_scene(void)
 void render_init(void)
 {
     struct camera_config camera_config;
+
     stop = false;
     camera_config.position = vec3_create(13, 2, 3);
     camera_config.lookat = vec3_create(0, 0, 0);
     camera_config.up = vec3_create(0, 1, 0);
     camera_config.aspect = ((float)SCRN_WIDTH / (float)SCRN_HEIGHT);
     camera_config.vfov = 20;
-    /* camera_config.aperture = 0.05; */
     camera_config.aperture = 0.1;
-    camera_config.focus_distance =  10;
+    camera_config.focus_distance = 10;
 
     camera = create_camera(camera_config);
 
-    /*
-    add_hitable_object((HitCallback)hit_sphere_object_callback, sphere_create(0.5, vec3_create(0, 0, -1)), dieletric_create(1.5));
-    add_hitable_object((HitCallback)hit_sphere_object_callback, sphere_create(100, vec3_create(0, -100.5, -1)), lambertian_create(vec3_create(0.5, 0.5, 0.5)));
-    add_hitable_object((HitCallback)hit_sphere_object_callback, sphere_create(0.5, vec3_create(1, 0, -1)), metal_create(vec3_create(0.8, 0.6, 0.2), 0));
-    add_hitable_object((HitCallback)hit_sphere_object_callback, sphere_create(0.5, vec3_create(-1, 0, -1)), metal_create(vec3_create(0.8, 0.8, 0.8), 5));*/
     random_scene();
+
     pthread_mutex_init(&main_mutex, NULL);
 }
 
 void render_deinit(void)
 {
     size_t i = 0;
+
     stop = true;
-    for (i = 0; i < 256; i++)
+
+    for (i = 0; i < MAX_RENDER_THREAD; i++)
     {
         if (thr[i] != 0)
             pthread_join(thr[i], NULL);
     }
+
     hit_destroy_all_objects();
     pthread_mutex_destroy(&main_mutex);
 }
+
 void framebuffer_lock(void)
 {
     pthread_mutex_lock(&main_mutex);

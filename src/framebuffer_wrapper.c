@@ -10,7 +10,6 @@
 struct color *pixels;
 
 struct raw_color *raw_pixels;
-#define set_pixel(_X, _Y, _COLOR) pixels[_X + (_Y * SCRN_WIDTH)] = _COLOR;
 
 struct raw_color
 {

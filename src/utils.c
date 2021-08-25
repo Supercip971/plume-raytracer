@@ -4,14 +4,16 @@
 #include <x86intrin.h>
 #include <xmmintrin.h>
 static uint32_t g_seed = 0xfffaa;
+
 uint32_t fast_rand(void)
 {
-
     g_seed = (214013 * g_seed + 2531011);
     return (g_seed >> 16) & 0x7FFF;
 }
 
-#ifdef NOT_USE_SSE
+/* note: quake squareroot is slower than sse square root */
+
+#ifdef USE_QUAKE_INV_SQUAREROOT
 
 float Q_rsqrt(float number)
 {
@@ -31,8 +33,10 @@ float Q_rsqrt(float number)
 
     return y;
 }
+
 #else
- float Q_rsqrt(float number)
+
+float Q_rsqrt(float number)
 {
     float a;
     float b = number;

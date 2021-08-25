@@ -17,12 +17,12 @@ Vec3 vec3_create(double x, double y, double z)
 
 Vec3 vec3_inv(Vec3 vec)
 {
-    return vec3_create(-(vec).x, -(vec).y, -(vec).z);
+    return vec3_create(-vec.x, -vec.y, -vec.z);
 }
 
 double vec3_squared_length(Vec3 vec)
 {
-    return ((vec).x * (vec).x + (vec).y * (vec).y + (vec).z * (vec).z);
+    return (vec.x * vec.x + vec.y * vec.y + vec.z * vec.z);
 }
 
 double vec3_length(Vec3 vec)
@@ -74,7 +74,7 @@ Vec3 vec3_cross(Vec3 vec1, Vec3 vec2)
 
 Vec3 vec3_unit(Vec3 vec)
 {
-    return vec3_div_val(vec, vec3_length(vec));
+    return vec3_div_val(vec, vec3_lengthvec);
 }
 
 #else
@@ -88,14 +88,6 @@ Vec3 vec3_unit(Vec3 vec)
 }
 
 #endif
-
-Color vec_to_color(Vec3 from)
-{
-    return color_create(
-        from.x,
-        from.y,
-        from.z);
-}
 
 Vec3 random_vec3_unit(void)
 {
@@ -124,34 +116,19 @@ Vec3 reflect(Vec3 vec1, Vec3 vec2)
     return vec3_sub(vec1, vec3_mul_val(vec2, (vec3_dot(vec1, vec2) * 2.0)));
 }
 
-bool refract(Vec3 *result, Vec3 vec1, Vec3 vec2, double ni_over_nt)
+Vec3 refract(Vec3 vec1, Vec3 vec2, double ni_over_nt)
 {
-    /*
-    Vec3 uv = vec3_unit(vec1);
-    double dt = vec3_dot(uv, vec2);
-    double discriminant = 1 - ni_over_nt * ni_over_nt * (1 - dt * dt);
-    if (discriminant > 0)
-    {
-
-        *result = vec3_sub(vec3_mul_val(vec3_sub(uv, vec3_mul_val(vec2, dt)), ni_over_nt), vec3_mul_val(vec2, sqrt(discriminant)));
-
-        return true;
-    }
-
-    return false;
-*/
-
     double cos_theta = fmin(vec3_dot(vec3_inv(vec1), vec2), 1.0);
     Vec3 r_out_perp = vec3_mul_val(vec3_add(vec1, vec3_mul_val(vec2, cos_theta)), ni_over_nt);
     Vec3 r_out_parl = vec3_mul_val(vec2, -fast_sqrt(fabs(1.0 - vec3_squared_length(r_out_perp))));
 
-    *result = vec3_add(r_out_perp, r_out_parl);
-    return true;
+    return vec3_add(r_out_perp, r_out_parl);
 }
 
 Vec3 random_vec3_in_hemisphere(Vec3 normal)
 {
     Vec3 in_unit = random_vec3_unit();
+
     if (vec3_dot(in_unit, normal) > 0.0)
     {
         return in_unit;
@@ -164,4 +141,17 @@ bool is_vec3_near_zero(Vec3 vec)
     const double precision = 1e-8;
 
     return (fabs(vec.x) < precision) && (fabs(vec.y) < precision) && (fabs(vec.z) < precision);
+}
+
+Vec3 vec_from_color(Color col)
+{
+    return vec3_create(col.r, col.g, col.b);
+}
+
+Color vec_to_color(Vec3 from)
+{
+    return color_create(
+        from.x,
+        from.y,
+        from.z);
 }

@@ -1,32 +1,28 @@
 #include "shapes.h"
 #include <stdlib.h>
+#include "utils.h"
 
 /* this is so bad there is too much arg >:()*/
-static bool hit_sphere_object_callback2(double discriminant, double a, double b, Ray ray, double t_min, double t_max, HitRecord *record, const Sphere *self)
+static bool hit_sphere_object_callback2(double discriminant, double a, double b, double t_min, double t_max, HitRecord *record)
 {
-    double temp;
-    double discriminent_root = sqrt(discriminant);
+    double t;
+    double discriminent_root = fast_sqrt(discriminant);
 
-    temp = (-b - discriminent_root) / a;
+    t = (-b - discriminent_root) / a;
 
-    if (temp < t_max && temp > t_min)
+    if (!(t < t_max && t > t_min))
     {
-        record->t = temp;
-        record->pos = ray_point_param(ray, temp);
-        set_face_normal(&ray, vec3_div_val(vec3_sub(record->pos, self->pos), self->radius), record);
-        return true;
+        t = (-b + discriminent_root) / a;
+
+        if (!(t < t_max && t > t_min)) /* if it is still not in range just return false */
+        {
+            return false;
+        }
     }
 
-    temp = (-b + discriminent_root) / a;
+    record->t = t;
 
-    if (temp < t_max && temp > t_min)
-    {
-        record->t = temp;
-        record->pos = ray_point_param(ray, temp);
-        set_face_normal(&ray, vec3_div_val(vec3_sub(record->pos, self->pos), self->radius), record);
-        return true;
-    }
-    return false;
+    return true;
 }
 bool hit_sphere_object_callback(Ray ray, double t_min, double t_max, HitRecord *record, const Sphere *self)
 {
@@ -38,9 +34,15 @@ bool hit_sphere_object_callback(Ray ray, double t_min, double t_max, HitRecord *
     double c = vec3_squared_length(oc) - (self->radius * self->radius);
 
     double discriminant = b * b - a * c; /* ^ = b^2 - 4ac */
+
     if (discriminant > 0.f && a != 0)
     {
-        return hit_sphere_object_callback2(discriminant, a, b, ray, t_min, t_max, record, self);
+        if (hit_sphere_object_callback2(discriminant, a, b, t_min, t_max, record))
+        {
+            record->pos = ray_point_param(ray, record->t);
+            set_face_normal(&ray, vec3_div_val(vec3_sub(record->pos, self->pos), self->radius), record);
+            return true;
+        }
     }
     return false;
 }
