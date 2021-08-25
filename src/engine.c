@@ -139,7 +139,6 @@ static void render_update_part(struct render_part_args arg)
         }
     }
 
-    /* printf("ended: %i \n", SDL_GetTicks() - t);*/
 }
 static void *render_update_part_thread(void *arg)
 {

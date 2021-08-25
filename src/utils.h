@@ -12,3 +12,5 @@ float Q_rsqrt(float number);
 float fast_sqrt(float number);
 
 #define double_max (double)((uint64_t)-1)
+
+#define FLATTEN __attribute__((flatten))

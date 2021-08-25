@@ -24,7 +24,7 @@ static bool hit_sphere_object_callback2(double discriminant, double a, double b,
 
     return true;
 }
-bool hit_sphere_object_callback(Ray ray, double t_min, double t_max, HitRecord *record, const Sphere *self)
+FLATTEN bool hit_sphere_object_callback(Ray ray, double t_min, double t_max, HitRecord *record, const Sphere *self)
 {
     /* the vec from the ray to the sphere (that must be under sphere.radius to be in collision) */
     Vec3 oc = vec3_sub(ray.origin, self->pos);

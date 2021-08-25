@@ -9,3 +9,4 @@
 #define MAX_RENDER_THREAD 256
 
 #define MAX_BOUNCE_DEPTH 64
+

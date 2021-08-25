@@ -10,6 +10,6 @@ typedef struct sphere
     Vec3 pos;
 } Sphere;
 
-bool hit_sphere_object_callback(Ray ray, double t_min, double t_max, HitRecord *record, const Sphere *self);
+bool hit_sphere_object_callback(Ray ray, double t_min, double t_max, HitRecord *record, const Sphere *self) ;
 
 Sphere *sphere_create(double radius, Vec3 pos);
