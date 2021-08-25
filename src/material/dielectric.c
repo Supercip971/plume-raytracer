@@ -12,7 +12,7 @@ bool dieletric_callback(const Ray *r_in, const HitRecord *record, Vec3 *attenuat
 {
     Vec3 outward_normal;
     Vec3 reflected = reflect(r_in->direction, record->normal);
-    Vec3 refracted = { 0};
+    Vec3 refracted = {0};
     double ni_over_nt;
     double reflect_prob;
     double cosine;

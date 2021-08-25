@@ -66,8 +66,8 @@ double vec3_dot(Vec3 vec1, Vec3 vec2)
 Vec3 vec3_cross(Vec3 vec1, Vec3 vec2)
 {
     return vec3_create(vec1.y * vec2.z - vec1.z * vec2.y,
-                       -(vec1.x * vec2.z - vec1.z * vec2.x),
-                       vec1.y * vec2.x - vec1.x * vec2.y);
+                       (vec1.z * vec2.x - vec1.x * vec2.z),
+                       vec1.x * vec2.y - vec1.y * vec2.x);
 }
 
 #ifdef NO_FAST

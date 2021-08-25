@@ -26,6 +26,7 @@ const int sample_step_x = SCRN_WIDTH / sample_count_x;
 const int sample_count_y = RENDER_THREAD;
 const int sample_step_y = SCRN_HEIGHT / sample_count_y;
 bool stop;
+Camera camera;
 
 #define double_max (double)((uint64_t)-1)
 
@@ -69,38 +70,42 @@ static Vec3 ccol(Ray from, int depth)
     }
 }
 
-static void render_update_part(Color *framebuffer, size_t width, size_t height, double x_from, double y_from, double x_max, double y_max)
+static void render_update_part(Color *framebuffer, size_t width, size_t height, double x_from, double y_from, double x_max, double y_max, int sample_count)
 {
 
-    const int sample_count = 16;
-    const double sample_inv = (double)1 / sample_count;
+    /*ù  uint32_t t = SDL_GetTicks();*/
 
-    uint32_t t = SDL_GetTicks();
-
-    Camera camera = get_camera_default();
     Vec3 current_color;
     Color final_color;
     Ray r;
     size_t x, y;
-    int sample;
-
     (void)height;
+    if (sample_count > 64)
+    {
+        printf("ended uwu ! \n");
+        return;
+    }
 
     for (x = x_from; x < x_max; x += 1)
     {
         for (y = y_from; y < y_max; y += 1)
         {
             Vec3 col = {0};
-            for (sample = 0; sample < sample_count; sample++)
-            {
+            double offx = random_double();
+            double offy = random_double();
+            double u = ((double)x + offx) / (double)width;
+            double v = ((double)y + offy) / (double)height;
+            r = get_camera_ray(&camera, u, v);
+            current_color = (ccol(r, 0));
+            col = current_color;
 
-                double u = ((double)x + random_double()) / (double)width;
-                double v = ((double)y + random_double()) / (double)height;
-                r = get_camera_ray(&camera, u, v);
-                current_color = (ccol(r, 0));
-                col = vec3_add(col, current_color);
+            /* add current sample to sum */
+            if (sample_count != 0)
+            {
+                Color previous_color = framebuffer[(int)x + (int)y * width];
+                Vec3 prev_color = vec3_create(previous_color.r, previous_color.g, previous_color.b);
+                col = vec3_div_val(vec3_add(vec3_mul_val(vec3_mul(prev_color, prev_color), sample_count - 1), col), sample_count);
             }
-            col = vec3_mul_val(col, sample_inv);
             col = vec3_create(fast_sqrt(col.x), fast_sqrt(col.y), fast_sqrt(col.z));
             final_color = vec_to_color(col);
 
@@ -112,7 +117,8 @@ static void render_update_part(Color *framebuffer, size_t width, size_t height, 
         }
     }
 
-    printf("ended: %i \n", SDL_GetTicks() - t);
+    /* printf("ended: %i \n", SDL_GetTicks() - t);*/
+    render_update_part(framebuffer, width, height, x_from, y_from, x_max, y_max, sample_count + 1);
 }
 static void *render_update_part_thread(void *arg)
 {
@@ -120,7 +126,7 @@ static void *render_update_part_thread(void *arg)
     double u = (double)args->s_x;
     double v = (double)args->s_y;
 
-    render_update_part(args->framebuffer, args->width, args->height, u, v, u + sample_step_x, v + sample_step_y);
+    render_update_part(args->framebuffer, args->width, args->height, u, v, u + sample_step_x, v + sample_step_y, 1);
 
     return NULL;
 }
@@ -168,6 +174,7 @@ pthread_mutex_t main_mutex;
 void render_init(void)
 {
     stop = false;
+    camera = create_camera(vec3_create(-2, 2, 1), vec3_create(0, 0, -1), vec3_create(0, 1, 0), 90, ((float)SCRN_WIDTH / (float)SCRN_HEIGHT));
     add_hitable_object((HitCallback)hit_sphere_object_callback, sphere_create(0.5, vec3_create(0, 0, -1)), dieletric_create(1.5));
     add_hitable_object((HitCallback)hit_sphere_object_callback, sphere_create(100, vec3_create(0, -100.5, -1)), metal_create(vec3_create(0.8, 0.8, 0), 0.3));
     add_hitable_object((HitCallback)hit_sphere_object_callback, sphere_create(0.5, vec3_create(1, 0, -1)), metal_create(vec3_create(0.8, 0.6, 0.2), 0));

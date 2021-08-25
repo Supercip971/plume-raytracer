@@ -14,4 +14,4 @@ typedef struct
 
 Ray get_camera_ray(const Camera *camera, double u, double v);
 
-Camera get_camera_default(void);
+Camera create_camera(Vec3 position, Vec3 lookat, Vec3 up, float vfov, float aspect);
