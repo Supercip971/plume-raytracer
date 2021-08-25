@@ -12,7 +12,6 @@ typedef struct vec3_t
     double z;
 } Vec3;
 
-
 /* may use double later (?)
 
   using inline for better performance with the compiler (less call instruction)*/
@@ -38,7 +37,11 @@ Vec3 vec3_cross(Vec3 vec1, Vec3 vec2);
 Vec3 vec3_unit(Vec3 vec);
 Color vec_to_color(Vec3 from);
 
+bool is_vec3_near_zero(Vec3 vec);
+
 Vec3 random_vec3_unit(void);
+Vec3 random_vec3_unit_in_disk(void);
+Vec3 random_vec3_in_hemisphere(Vec3 normal);
 
 Vec3 reflect(Vec3 vec1, Vec3 vec2);
 bool refract(Vec3 *result, Vec3 vec1, Vec3 vec2, double ni_over_nt);

@@ -52,3 +52,9 @@ void hit_destroy_all_objects(void)
         }
     }
 }
+
+void set_face_normal(const Ray *r, const Vec3 outward, HitRecord *self)
+{
+    self->front_face = vec3_dot(r->direction, outward) < 0;
+    self->normal = self->front_face ? outward : vec3_inv(outward);
+}

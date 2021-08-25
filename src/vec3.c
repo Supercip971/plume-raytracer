@@ -100,9 +100,25 @@ Color vec_to_color(Vec3 from)
 Vec3 random_vec3_unit(void)
 {
 
-    return vec3_unit(vec3_create(random_double() * 2 - 1, random_double() * 2 - 1, random_double() * 2 - 1));
+    while (true)
+    {
+        Vec3 p = vec3_create(random_double() * 2 - 1, random_double() * 2 - 1, random_double() * 2 - 1);
+        if (vec3_squared_length(p) >= 1)
+            continue;
+        return p;
+    }
 }
 
+Vec3 random_vec3_unit_in_disk(void)
+{
+    while (true)
+    {
+        Vec3 p = vec3_create(random_double() * 2 - 1, random_double() * 2 - 1, 0);
+        if (vec3_squared_length(p) >= 1)
+            continue;
+        return p;
+    }
+}
 Vec3 reflect(Vec3 vec1, Vec3 vec2)
 {
     return vec3_sub(vec1, vec3_mul_val(vec2, (vec3_dot(vec1, vec2) * 2.0)));
@@ -110,6 +126,7 @@ Vec3 reflect(Vec3 vec1, Vec3 vec2)
 
 bool refract(Vec3 *result, Vec3 vec1, Vec3 vec2, double ni_over_nt)
 {
+    /*
     Vec3 uv = vec3_unit(vec1);
     double dt = vec3_dot(uv, vec2);
     double discriminant = 1 - ni_over_nt * ni_over_nt * (1 - dt * dt);
@@ -122,4 +139,29 @@ bool refract(Vec3 *result, Vec3 vec1, Vec3 vec2, double ni_over_nt)
     }
 
     return false;
+*/
+
+    double cos_theta = fmin(vec3_dot(vec3_inv(vec1), vec2), 1.0);
+    Vec3 r_out_perp = vec3_mul_val(vec3_add(vec1, vec3_mul_val(vec2, cos_theta)), ni_over_nt);
+    Vec3 r_out_parl = vec3_mul_val(vec2, -fast_sqrt(fabs(1.0 - vec3_squared_length(r_out_perp))));
+
+    *result = vec3_add(r_out_perp, r_out_parl);
+    return true;
+}
+
+Vec3 random_vec3_in_hemisphere(Vec3 normal)
+{
+    Vec3 in_unit = random_vec3_unit();
+    if (vec3_dot(in_unit, normal) > 0.0)
+    {
+        return in_unit;
+    }
+    return vec3_inv(in_unit);
+}
+
+bool is_vec3_near_zero(Vec3 vec)
+{
+    const double precision = 1e-8;
+
+    return (fabs(vec.x) < precision) && (fabs(vec.y) < precision) && (fabs(vec.z) < precision);
 }

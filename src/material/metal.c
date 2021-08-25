@@ -9,7 +9,7 @@ bool metal_callback(const Ray *r_in, const HitRecord *record, Vec3 *attenuation,
     scattered->direction = (vec3_add(target, vec3_mul_val(random_vec3_unit(), self->fuzzy)));
     *attenuation = self->albedo;
     /* return (vec3_dot(scattered->direction, record->normal) > 0); */
-    return 1;
+    return vec3_dot(scattered->direction, record->normal) > 0;
 }
 
 Material metal_create(Vec3 albedo, double fuzzy)

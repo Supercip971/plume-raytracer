@@ -7,7 +7,8 @@ CC = gcc
 CFLAGS =  -march=native -ansi -Ofast -g -Isrc/  \
 	-std=gnu89 -Wall -Wextra  \
 	-pedantic -Wmissing-prototypes -Wstrict-prototypes \
-    -Wold-style-definition -Werror -flto -pg
+    -Wold-style-definition -Werror -flto      \
+	 -ffast-math
 
 BUILD_DIR = build
 

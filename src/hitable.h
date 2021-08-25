@@ -21,6 +21,7 @@ struct hit_record
     Vec3 pos;
     Vec3 normal;
     Material material;
+    bool front_face;
 };
 
 typedef struct
@@ -36,3 +37,5 @@ void add_hitable_object(HitCallback callback, const void *object, Material mater
 void hit_destroy_all_objects(void);
 
 bool hit_call_all_object(Ray r, double t_min, double t_max, HitRecord *result);
+
+void set_face_normal(const Ray *r, const Vec3 outward, HitRecord *self);

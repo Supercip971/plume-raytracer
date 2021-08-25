@@ -8,11 +8,12 @@ static bool hit_sphere_object_callback2(double discriminant, double a, double b,
     double discriminent_root = sqrt(discriminant);
 
     temp = (-b - discriminent_root) / a;
+
     if (temp < t_max && temp > t_min)
     {
         record->t = temp;
         record->pos = ray_point_param(ray, temp);
-        record->normal = vec3_div_val(vec3_sub(record->pos, self->pos), self->radius);
+        set_face_normal(&ray, vec3_div_val(vec3_sub(record->pos, self->pos), self->radius), record);
         return true;
     }
 
@@ -22,7 +23,7 @@ static bool hit_sphere_object_callback2(double discriminant, double a, double b,
     {
         record->t = temp;
         record->pos = ray_point_param(ray, temp);
-        record->normal = vec3_div_val(vec3_sub(record->pos, self->pos), self->radius);
+        set_face_normal(&ray, vec3_div_val(vec3_sub(record->pos, self->pos), self->radius), record);
         return true;
     }
     return false;
@@ -37,7 +38,7 @@ bool hit_sphere_object_callback(Ray ray, double t_min, double t_max, HitRecord *
     double c = vec3_squared_length(oc) - (self->radius * self->radius);
 
     double discriminant = b * b - a * c; /* ^ = b^2 - 4ac */
-    if (discriminant > 0)
+    if (discriminant > 0.f && a != 0)
     {
         return hit_sphere_object_callback2(discriminant, a, b, ray, t_min, t_max, record, self);
     }

@@ -1,4 +1,5 @@
 #include <SDL2/SDL.h>
+#include <math.h>
 #include <stdlib.h>
 #include <unistd.h>
 #include "boolean.h"
@@ -19,14 +20,26 @@ struct raw_color
     uint8_t r;
 } __attribute__((packed));
 
+static double color_clamp(double value)
+{
+    if (value > 0.999)
+    {
+        return 1;
+    }
+    else if (value < 0.0)
+    {
+        return 0;
+    }
+    return value;
+}
 static struct raw_color
 color_f_to_int(Color color)
 {
     struct raw_color res;
-    res.a = (uint8_t)(color.a * 255.99);
-    res.g = (uint8_t)(color.g * 255.99);
-    res.b = (uint8_t)(color.b * 255.99);
-    res.r = (uint8_t)(color.r * 255.99);
+    res.a = (uint8_t)(255);
+    res.g = (uint8_t)(color_clamp(sqrt(color.g)) * 255);
+    res.b = (uint8_t)(color_clamp(sqrt(color.b)) * 255);
+    res.r = (uint8_t)(color_clamp(sqrt(color.r)) * 255);
     return res;
 }
 static void
@@ -34,12 +47,14 @@ swap_buffer(void)
 {
     size_t x;
     size_t y;
-    for (x = 0; x < SCRN_WIDTH; x++)
+    for (y = 0; y < SCRN_HEIGHT; y++)
     {
-        for (y = 0; y < SCRN_HEIGHT; y++)
+        framebuffer_lock();
+        for (x = 0; x < SCRN_WIDTH; x++)
         {
-            raw_pixels[x + (y * SCRN_WIDTH)] = color_f_to_int(pixels[x + (y * SCRN_WIDTH)]);
+            raw_pixels[x + ((SCRN_HEIGHT - y - 1) * SCRN_WIDTH)] = color_f_to_int(pixels[x + (y * SCRN_WIDTH)]);
         }
+        framebuffer_unlock();
     }
 }
 
@@ -61,8 +76,8 @@ static bool event_update(void)
 
 static void framebuffer_init(void)
 {
-    raw_pixels = malloc(sizeof(struct raw_color) * SCRN_WIDTH * SCRN_HEIGHT);
-    pixels = malloc(sizeof(struct color) * SCRN_WIDTH * SCRN_HEIGHT);
+    raw_pixels = malloc(sizeof(struct raw_color) * SCRN_WIDTH * (SCRN_HEIGHT * 2));
+    pixels = malloc(sizeof(struct color) * SCRN_WIDTH * (SCRN_HEIGHT * 2));
 }
 
 static void framebuffer_deinit(void)

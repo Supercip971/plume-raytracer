@@ -11,7 +11,6 @@ uint32_t fast_rand(void)
     return (g_seed >> 16) & 0x7FFF;
 }
 
-#pragma GCC diagnostic ignored "-Wstrict-aliasing"
 #ifdef NOT_USE_SSE
 
 float Q_rsqrt(float number)
@@ -33,7 +32,7 @@ float Q_rsqrt(float number)
     return y;
 }
 #else
-inline float Q_rsqrt(float number)
+ float Q_rsqrt(float number)
 {
     float a;
     float b = number;
@@ -43,7 +42,6 @@ inline float Q_rsqrt(float number)
 }
 
 #endif
-#pragma GCC diagnostic pop
 
 float fast_sqrt(float number)
 {
