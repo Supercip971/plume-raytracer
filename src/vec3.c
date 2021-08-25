@@ -120,7 +120,7 @@ Vec3 refract(Vec3 vec1, Vec3 vec2, rt_float ni_over_nt)
 {
     rt_float cos_theta = fmin(vec3_dot(vec3_inv(vec1), vec2), 1.0);
     Vec3 r_out_perp = vec3_mul_val(vec3_add(vec1, vec3_mul_val(vec2, cos_theta)), ni_over_nt);
-    Vec3 r_out_parl = vec3_mul_val(vec2, -fast_sqrt(fabs(1.0 - vec3_squared_length(r_out_perp))));
+    Vec3 r_out_parl = vec3_mul_val(vec2, -fast_sqrt(fabs((double)(1.0 - vec3_squared_length(r_out_perp)))));
 
     return vec3_add(r_out_perp, r_out_parl);
 }
@@ -140,7 +140,7 @@ bool is_vec3_near_zero(Vec3 vec)
 {
     const rt_float precision = 1e-8;
 
-    return (fabs(vec.x) < precision) && (fabs(vec.y) < precision) && (fabs(vec.z) < precision);
+    return (fabs((double)vec.x) < precision) && (fabs((double)vec.y) < precision) && (fabs((double)vec.z) < precision);
 }
 
 Vec3 vec_from_color(Color col)

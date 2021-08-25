@@ -4,14 +4,13 @@
 
 size_t hitable_count = 0;
 Hitable hitable_table[512];
-void add_hitable_object(HitCallback callback, const void *self, Material mat)
+void add_hitable_object(Object object, Material material)
 {
     Hitable res;
 
     res.active = true;
-    res.callback = callback;
-    res.object = self;
-    res.material = mat;
+    res.object = object;
+    res.material = material;
 
     hitable_table[hitable_count] = res;
     hitable_count++;
@@ -27,7 +26,7 @@ bool hit_call_all_object(Ray r, rt_float t_min, rt_float t_max, HitRecord *resul
 
     for (i = 0; i < hitable_count; i++)
     {
-        if (hitable_table[i].callback(r, t_min, closest, &temp, hitable_table[i].object))
+        if (hitable_table[i].object.collide(r, t_min, closest, &temp, hitable_table[i].object.data))
         {
             hit_anything = true;
 
@@ -46,9 +45,9 @@ void hit_destroy_all_objects(void)
     size_t i;
     for (i = 0; i < hitable_count; i++)
     {
-        if (hitable_table[i].object)
+        if (hitable_table[i].object.data)
         {
-            free((void *)hitable_table[i].object);
+            free((void *)hitable_table[i].object.data);
         }
 
         if (hitable_table[i].material.data)

@@ -119,7 +119,7 @@ void render_loop(void)
         {
             frames = 0;
             fps = 1000 / (SDL_GetTicks() - prev_ticks);
-            printf("fps: %f \n", fps);
+            printf("fps: %f \n", (double)fps);
         }
         frames++;
     }

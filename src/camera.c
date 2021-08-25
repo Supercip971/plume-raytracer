@@ -1,5 +1,5 @@
 #include "camera.h"
-
+#include "utils.h"
 Ray get_camera_ray(const Camera *camera, rt_float u, rt_float v)
 {
     Ray result;
@@ -18,6 +18,7 @@ Ray get_camera_ray(const Camera *camera, rt_float u, rt_float v)
             vec3_mul_val(camera->vertical, v)),
         (result.origin));
 
+    result.time = random_rt_float() * (camera->time_end - camera->time_start) + camera->time_start;
     return result;
 }
 
@@ -29,6 +30,9 @@ Camera create_camera(struct camera_config config)
     rt_float theta = config.vfov * M_PI / 180;
     rt_float half_height = tan(theta / 2);
     rt_float half_width = config.aspect * half_height;
+
+    result.time_end = config.time_end;
+    result.time_start = config.time_start;
 
     w = vec3_unit(vec3_sub(config.position, config.lookat));
     u = vec3_unit(vec3_cross(config.up, w));

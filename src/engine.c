@@ -144,7 +144,7 @@ static void *render_update_part_thread(void *arg)
 {
     struct render_thread_args *args = arg;
     struct render_part_args render_argument;
-
+    size_t tick_start = SDL_GetTicks();
     rt_float u = (rt_float)args->s_x;
     rt_float v = (rt_float)args->s_y;
 
@@ -157,13 +157,13 @@ static void *render_update_part_thread(void *arg)
     render_argument.x_max = sample_step_x + u;
     render_argument.y_max = sample_step_y + v;
 
-    while (render_argument.sample_count < 10000)
+    while (render_argument.sample_count < 256)
     {
         render_update_part(render_argument);
         render_argument.sample_count++;
     }
 
-    printf("thread ended [!] \n");
+    printf("thread ended [!] %li \n", SDL_GetTicks() - tick_start);
 
     return NULL;
 }
@@ -209,7 +209,7 @@ static void random_scene(void)
 
     int a, b;
 
-    add_hitable_object((HitCallback)hit_sphere_object_callback, sphere_create(1000, vec3_create(0, -1000, -1)), lambertian_create(vec3_create(0.5, 0.5, 0.5)));
+    add_hitable_object(sphere_create(1000, vec3_create(0, -1000, -1)), lambertian_create(vec3_create(0.5, 0.5, 0.5)));
 
     for (a = -11; a < 11; a++)
     {
@@ -238,14 +238,14 @@ static void random_scene(void)
                     result_material = dieletric_create(1.5);
                 }
 
-                add_hitable_object((HitCallback)hit_sphere_object_callback, sphere_create(0.2, center), result_material);
+                add_hitable_object(sphere_create(0.2, center), result_material);
             }
         }
     }
 
-    add_hitable_object((HitCallback)hit_sphere_object_callback, sphere_create(1.0, vec3_create(0, 1, 0)), dieletric_create(1.5));
-    add_hitable_object((HitCallback)hit_sphere_object_callback, sphere_create(1.0, vec3_create(-4, 1, 0)), lambertian_create(vec3_create(0.4, 0.2, 0.1)));
-    add_hitable_object((HitCallback)hit_sphere_object_callback, sphere_create(1.0, vec3_create(4, 1, 0)), metal_create(vec3_create(0.7, 0.6, 0.5), 0));
+    add_hitable_object(sphere_create(1.0, vec3_create(0, 1, 0)), dieletric_create(1.5));
+    add_hitable_object(sphere_create(1.0, vec3_create(-4, 1, 0)), lambertian_create(vec3_create(0.4, 0.2, 0.1)));
+    add_hitable_object(sphere_create(1.0, vec3_create(4, 1, 0)), metal_create(vec3_create(0.7, 0.6, 0.5), 0));
 }
 void render_init(void)
 {
@@ -259,6 +259,8 @@ void render_init(void)
     camera_config.vfov = 20;
     camera_config.aperture = 0.1;
     camera_config.focus_distance = 10;
+    camera_config.time_end = 0.0;
+    camera_config.time_start = 1.0;
 
     camera = create_camera(camera_config);
 

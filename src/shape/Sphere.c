@@ -1,6 +1,7 @@
-#include "shapes.h"
 #include <stdlib.h>
-#include "utils.h"
+#include "../shapes.h"
+#include "../utils.h"
+#include "Sphere.h"
 
 /* this is so bad there is too much arg >:()*/
 static bool hit_sphere_object_callback2(rt_float discriminant, rt_float a, rt_float b, rt_float t_min, rt_float t_max, HitRecord *record)
@@ -47,10 +48,15 @@ FLATTEN bool hit_sphere_object_callback(Ray ray, rt_float t_min, rt_float t_max,
     return false;
 }
 
-Sphere *sphere_create(rt_float radius, Vec3 pos)
+Object sphere_create(rt_float radius, Vec3 pos)
 {
+    Object result;
     Sphere *sphere = malloc(sizeof(Sphere));
     sphere->radius = radius;
     sphere->pos = pos;
-    return sphere;
+
+    result.collide = (ObjectCallback)hit_sphere_object_callback;
+    result.data = sphere;
+
+    return result;
 }

@@ -10,4 +10,4 @@
 
 #define MAX_BOUNCE_DEPTH 64
 
-typedef double rt_float;
+typedef float rt_float;

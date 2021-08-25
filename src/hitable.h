@@ -7,13 +7,19 @@ typedef struct hit_record HitRecord;
 
 typedef bool (*MaterialCallback)(const Ray *r_in, const HitRecord *record, Vec3 *attenuation, Ray *scattered, const void *self);
 
-typedef bool (*HitCallback)(Ray r, rt_float t_min, rt_float t_max, HitRecord *record, const void *self);
+typedef bool (*ObjectCallback)(Ray r, rt_float t_min, rt_float t_max, HitRecord *record, const void *self);
 
 typedef struct material
 {
     MaterialCallback material_callback;
     void *data;
 } Material;
+
+typedef struct object
+{
+    ObjectCallback collide;
+    void *data;
+} Object;
 
 struct hit_record
 {
@@ -26,13 +32,12 @@ struct hit_record
 
 typedef struct
 {
-    HitCallback callback;
+    Object object;
     Material material;
     bool active;
-    const void *object;
 } Hitable;
 
-void add_hitable_object(HitCallback callback, const void *object, Material material);
+void add_hitable_object(Object object, Material material);
 
 void hit_destroy_all_objects(void);
 
