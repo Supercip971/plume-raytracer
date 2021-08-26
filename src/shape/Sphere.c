@@ -37,6 +37,7 @@ FLATTEN bool hit_sphere_object_callback(Ray ray, rt_float t_min, rt_float t_max,
 {
     /* the vec from the ray to the sphere (that must be under sphere.radius to be in collision) */
     Vec3 oc = vec3_sub(ray.origin, self->pos);
+    Vec3 outward = {0};
 
     rt_float a = vec3_squared_length(ray.direction); /* ray length^2*/
     rt_float b = vec3_dot(oc, ray.direction);
@@ -49,8 +50,11 @@ FLATTEN bool hit_sphere_object_callback(Ray ray, rt_float t_min, rt_float t_max,
         if (hit_sphere_object_callback2(discriminant, a, b, t_min, t_max, record))
         {
             record->pos = ray_point_param(ray, record->t);
-            set_face_normal(&ray, vec3_div_val(vec3_sub(record->pos, self->pos), self->radius), record);
+            outward = vec3_div_val(vec3_sub(record->pos, self->pos), self->radius);
+
+            set_face_normal(&ray, outward, record);
             record->material = self->self_material;
+            get_sphere_uv(&outward, &record->u, &record->v);
             return true;
         }
     }

@@ -19,6 +19,7 @@
 #include "material/metal.h"
 #include "ray.h"
 #include "shapes.h"
+#include "texture/checker.h"
 #include "utils.h"
 #include "vec3.h"
 
@@ -212,9 +213,13 @@ static void random_scene(void)
 
     int a, b;
     HitableList *lst;
+    Texture checker;
+
     root = create_hitable_list();
 
-    add_hitable_object(&root, sphere_create(1000, vec3_create(0, -1000, -1), lambertian_create(vec3_create(0.5, 0.5, 0.5))));
+    checker = checker_create_col(vec3_create(0.2, 0.3, 0.1), vec3_create(0.9, 0.9, 0.9), 10.f);
+    add_hitable_object(&root, sphere_create(1000, vec3_create(0, -1000, -1),
+                                            lambertian_create_texture(checker)));
 
     for (a = -11; a < 11; a++)
     {
@@ -227,12 +232,25 @@ static void random_scene(void)
 
             if (vec3_length(vec3_sub(center, vec3_create(4, 0.2, 0))) > 0.9)
             {
-                if (material < 0.8)
+                if (material < 0.1)
                 {
                     Vec3 center2 = vec3_create(center.x, center.y + random_rt_float() * 0.5, center.z);
                     Vec3 random_albedo = vec3_create(random_rt_float(), random_rt_float(), random_rt_float());
                     result_material = lambertian_create(vec3_mul(random_albedo, random_albedo));
                     add_hitable_object(&root, moving_sphere_create(0.2, 0, 1, center, center2, result_material));
+                }
+                else if (material < 0.4)
+                {
+                    Vec3 random_albedo = vec3_create(random_rt_float(), random_rt_float(), random_rt_float());
+                    result_material = lambertian_create(random_albedo);
+                    add_hitable_object(&root, sphere_create(0.2, center, result_material));
+                }
+                else if (material < 0.9)
+                {
+                    Vec3 random_albedo1 = vec3_create(random_rt_float(), random_rt_float(), random_rt_float());
+                    Vec3 random_albedo2 = vec3_create(random_rt_float(), random_rt_float(), random_rt_float());
+                    result_material = lambertian_create_texture(checker_create_col(random_albedo1, random_albedo2, 50));
+                    add_hitable_object(&root, sphere_create(0.2, center, result_material));
                 }
                 else if (material < 0.95)
                 {

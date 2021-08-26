@@ -1,4 +1,5 @@
 #include "lambertian.h"
+#include "../texture/solid_color.h"
 #include "../utils.h"
 
 bool lambertian_callback(const Ray *r_in, const HitRecord *record, Vec3 *attenuation, Ray *scattered, const Lambertian *self)
@@ -15,12 +16,15 @@ bool lambertian_callback(const Ray *r_in, const HitRecord *record, Vec3 *attenua
     scattered->direction = direction;
     scattered->time = r_in->time;
 
-    *attenuation = self->albedo;
+    *attenuation = self->albedo.get_pixel(record->u, record->v, &record->pos, self->albedo.data);
 
     return true;
 }
 
-Material lambertian_create(Vec3 albedo)
+Material lambertian_create(Vec3 albedo){
+    return lambertian_create_texture(solid_color_create(albedo));}
+
+Material lambertian_create_texture(Texture albedo)
 {
     Material mat;
     Lambertian *self = malloc(sizeof(Lambertian));

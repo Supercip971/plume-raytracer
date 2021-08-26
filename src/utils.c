@@ -56,3 +56,12 @@ float fast_sqrt(float number)
     _mm_store_ss(&a, _mm_sqrt_ss(in));
     return a;
 }
+
+void get_sphere_uv(const Vec3 *point, rt_float *u, rt_float *v)
+{
+    rt_float theta = acos(-(point->y));
+    rt_float phi = atan2(-(point->z), point->x) + M_PI;
+
+    *u = phi / (2 * M_PI);
+    *v = theta / M_PI;
+}

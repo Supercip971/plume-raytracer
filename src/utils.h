@@ -2,6 +2,7 @@
 #include <stdint.h>
 #include <stdlib.h>
 #include "config.h"
+#include "vec3.h"
 
 uint32_t fast_rand(void);
 
@@ -18,3 +19,5 @@ float fast_sqrt(float number);
 
 #define rt_min(a, b) (((a) < (b)) ? (a) : (b))
 #define rt_max(a, b) (((a) > (b)) ? (a) : (b))
+
+void get_sphere_uv(const Vec3 *point, rt_float *u, rt_float *v);

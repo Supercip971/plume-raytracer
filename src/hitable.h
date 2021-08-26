@@ -34,6 +34,7 @@ struct hit_record
     rt_float t;
     Vec3 pos;
     Vec3 normal;
+    rt_float u, v;
     Material material;
     bool front_face;
 };
@@ -45,7 +46,6 @@ typedef struct hitable_list
 } HitableList;
 
 void add_hitable_object(Object *hitable_list, Object object);
-
 
 void hit_destroy_all_objects(Object *hitable_list);
 
