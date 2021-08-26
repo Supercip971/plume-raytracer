@@ -1,13 +1,18 @@
 #pragma once
+#include "aabb.h"
 #include "boolean.h"
 #include "material.h"
 #include "ray.h"
 
 typedef struct hit_record HitRecord;
+typedef struct object Object;
 
 typedef bool (*MaterialCallback)(const Ray *r_in, const HitRecord *record, Vec3 *attenuation, Ray *scattered, const void *self);
 
 typedef bool (*ObjectCallback)(Ray r, rt_float t_min, rt_float t_max, HitRecord *record, const void *self);
+
+typedef bool (*ObjectGetAABB)(rt_float time_start, rt_float time_end, AABB *output, const void *self);
+typedef bool (*ObjectDestroy)(void *self);
 
 typedef struct material
 {
@@ -15,11 +20,14 @@ typedef struct material
     void *data;
 } Material;
 
-typedef struct object
+struct object
 {
     ObjectCallback collide;
+    ObjectGetAABB get_aabb;
+    ObjectDestroy destroy;
     void *data;
-} Object;
+    bool is_leaf;
+};
 
 struct hit_record
 {
@@ -30,17 +38,19 @@ struct hit_record
     bool front_face;
 };
 
-typedef struct
+typedef struct hitable_list
 {
-    Object object;
-    Material material;
-    bool active;
-} Hitable;
+    Object childs[512]; /* todo dynamically alloc this */
+    size_t child_count;
+} HitableList;
 
-void add_hitable_object(Object object, Material material);
+void add_hitable_object(Object *hitable_list, Object object);
 
-void hit_destroy_all_objects(void);
 
-bool hit_call_all_object(Ray r, rt_float t_min, rt_float t_max, HitRecord *result);
+void hit_destroy_all_objects(Object *hitable_list);
+
+bool hit_call_all_object(Object *hitable_list, Ray r, rt_float t_min, rt_float t_max, HitRecord *record);
 
 void set_face_normal(const Ray *r, const Vec3 outward, HitRecord *self);
+
+Object create_hitable_list(void);

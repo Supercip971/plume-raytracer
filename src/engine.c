@@ -11,6 +11,7 @@
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include "bhv.h"
 #include "camera.h"
 #include "framebuffer_wrapper.h"
 #include "material/dielectric.h"
@@ -21,6 +22,8 @@
 #include "utils.h"
 #include "vec3.h"
 
+Object root;
+Object bhv;
 struct render_thread_args
 {
     Color *framebuffer;
@@ -73,7 +76,7 @@ static Vec3 calculate_ray_color(Ray from, int depth)
         return vec3_create(0, 0, 0);
     }
 
-    if (hit_call_all_object(from, 0.001, __builtin_inff64(), &record))
+    if (bhv.collide(from, 0.001, 100000000, &record, bhv.data))
     {
         Ray forked_ray = from;
         Vec3 attenuation = vec3_create(1, 1, 1);
@@ -125,8 +128,8 @@ static void render_update_part(struct render_part_args arg)
 
                 current_color = vec3_div_val(
                     vec3_add(
-                        vec3_mul_val(vec_from_color(previous_color), arg.sample_count - 1), current_color),
-                    arg.sample_count);
+                        vec3_mul_val(vec_from_color(previous_color), arg.sample_count), current_color),
+                    arg.sample_count + 1);
             }
 
             final_color = vec_to_color(current_color);
@@ -148,7 +151,7 @@ static void *render_update_part_thread(void *arg)
     rt_float u = (rt_float)args->s_x;
     rt_float v = (rt_float)args->s_y;
 
-    render_argument.sample_count = 1;
+    render_argument.sample_count = 0;
     render_argument.width = args->width;
     render_argument.height = args->height;
     render_argument.framebuffer = args->framebuffer;
@@ -157,7 +160,7 @@ static void *render_update_part_thread(void *arg)
     render_argument.x_max = sample_step_x + u;
     render_argument.y_max = sample_step_y + v;
 
-    while (render_argument.sample_count < 256)
+    while (render_argument.sample_count < MAX_SAMPLE)
     {
         render_update_part(render_argument);
         render_argument.sample_count++;
@@ -208,8 +211,10 @@ static void random_scene(void)
 {
 
     int a, b;
+    HitableList *lst;
+    root = create_hitable_list();
 
-    add_hitable_object(sphere_create(1000, vec3_create(0, -1000, -1)), lambertian_create(vec3_create(0.5, 0.5, 0.5)));
+    add_hitable_object(&root, sphere_create(1000, vec3_create(0, -1000, -1), lambertian_create(vec3_create(0.5, 0.5, 0.5))));
 
     for (a = -11; a < 11; a++)
     {
@@ -227,27 +232,30 @@ static void random_scene(void)
                     Vec3 center2 = vec3_create(center.x, center.y + random_rt_float() * 0.5, center.z);
                     Vec3 random_albedo = vec3_create(random_rt_float(), random_rt_float(), random_rt_float());
                     result_material = lambertian_create(vec3_mul(random_albedo, random_albedo));
-                    add_hitable_object(moving_sphere_create(0.2, 0, 1, center, center2), result_material);
+                    add_hitable_object(&root, moving_sphere_create(0.2, 0, 1, center, center2, result_material));
                 }
                 else if (material < 0.95)
                 {
                     Vec3 random_albedo = vec3_create(random_rt_float(), random_rt_float(), random_rt_float());
                     rt_float fuzz = random_rt_float() / 2;
                     result_material = metal_create(random_albedo, fuzz);
-                    add_hitable_object(sphere_create(0.2, center), result_material);
+                    add_hitable_object(&root, sphere_create(0.2, center, result_material));
                 }
                 else
                 {
                     result_material = dieletric_create(1.5);
-                    add_hitable_object(sphere_create(0.2, center), result_material);
+                    add_hitable_object(&root, sphere_create(0.2, center, result_material));
                 }
             }
         }
     }
 
-    add_hitable_object(sphere_create(1.0, vec3_create(0, 1, 0)), dieletric_create(1.5));
-    add_hitable_object(sphere_create(1.0, vec3_create(-4, 1, 0)), lambertian_create(vec3_create(0.4, 0.2, 0.1)));
-    add_hitable_object(sphere_create(1.0, vec3_create(4, 1, 0)), metal_create(vec3_create(0.7, 0.6, 0.5), 0));
+    add_hitable_object(&root, sphere_create(1.0, vec3_create(0, 1, 0), dieletric_create(1.5)));
+    add_hitable_object(&root, sphere_create(1.0, vec3_create(-4, 1, 0), lambertian_create(vec3_create(0.4, 0.2, 0.1))));
+    add_hitable_object(&root, sphere_create(1.0, vec3_create(4, 1, 0), metal_create(vec3_create(0.7, 0.6, 0.5), 0)));
+
+    lst = root.data;
+    bhv = bhv_create(lst, 0, lst->child_count, 0.0, 1.0);
 }
 void render_init(void)
 {
@@ -259,10 +267,10 @@ void render_init(void)
     camera_config.up = vec3_create(0, 1, 0);
     camera_config.aspect = ((rt_float)SCRN_WIDTH / (rt_float)SCRN_HEIGHT);
     camera_config.vfov = 20;
-    camera_config.aperture = 0.1;
+    camera_config.aperture = 0.0001;
     camera_config.focus_distance = 10;
-    camera_config.time_end = 0.0;
-    camera_config.time_start = 1.0;
+    camera_config.time_end = 1;
+    camera_config.time_start = 0.0;
 
     camera = create_camera(camera_config);
 
@@ -283,7 +291,7 @@ void render_deinit(void)
             pthread_join(thr[i], NULL);
     }
 
-    hit_destroy_all_objects();
+    hit_destroy_all_objects(&root);
     pthread_mutex_destroy(&main_mutex);
 }
 

@@ -48,3 +48,29 @@ Vec3 refract(Vec3 vec1, Vec3 vec2, rt_float ni_over_nt);
 
 Color vec_to_color(Vec3 from);
 Vec3 vec_from_color(Color col);
+
+__attribute__((hot)) static inline rt_float vec_axis(Vec3 vec, int axis)
+{
+    if (axis == 0)
+    {
+        return vec.x;
+    }
+    else if (axis == 1)
+    {
+        return vec.y;
+    }
+    return vec.z;
+}
+
+__attribute__((hot)) static inline rt_float *vec_axis_ptr(Vec3 *vec, int axis)
+{
+    if (axis == 0)
+    {
+        return &vec->x;
+    }
+    else if (axis == 1)
+    {
+        return &vec->y;
+    }
+    return &vec->z;
+}

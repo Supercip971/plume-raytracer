@@ -6,6 +6,7 @@
 /* use render_thread ^2 */
 #define RENDER_THREAD 4
 
+#define MAX_SAMPLE 1000
 #define MAX_RENDER_THREAD 256
 
 #define MAX_BOUNCE_DEPTH 64

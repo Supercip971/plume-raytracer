@@ -3,14 +3,14 @@
 #include <stdlib.h>
 #include "../utils.h"
 #include "dielectric.h"
-rt_float schlick(rt_float cosine, rt_float ref_index)
+static rt_float schlick(rt_float cosine, rt_float ref_index)
 {
     rt_float r0 = (1 - ref_index) / (1 + ref_index);
     r0 = r0 * r0;
     return r0 + (1 - r0) * pow(1 - cosine, 5);
 }
 
-bool dieletric_callback(const Ray *r_in, const HitRecord *record, Vec3 *attenuation, Ray *scattered, const Dieletric *self)
+static bool dieletric_callback(const Ray *r_in, const HitRecord *record, Vec3 *attenuation, Ray *scattered, const Dieletric *self)
 {
 
     Vec3 direction;
