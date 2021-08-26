@@ -20,6 +20,7 @@
 #include "ray.h"
 #include "shapes.h"
 #include "texture/checker.h"
+#include "texture/perlin.h"
 #include "utils.h"
 #include "vec3.h"
 
@@ -208,7 +209,20 @@ void render_update(Color *framebuffer, size_t width, size_t height)
 
 pthread_mutex_t main_mutex;
 
-static void random_scene(void)
+static void noise_scene(void)
+{
+    HitableList *lst;
+    Texture per_texture = perlin_create(4);
+    root = create_hitable_list();
+
+    add_hitable_object(&root, sphere_create(1000, vec3_create(0, -1000, 0), lambertian_create_texture(per_texture)));
+    add_hitable_object(&root, sphere_create(2, vec3_create(0, 2, 0), lambertian_create_texture(per_texture)));
+
+    lst = root.data;
+    bhv = bhv_create(lst, 0, lst->child_count, 0.0, 1.0);
+}
+void random_scene(void);
+void random_scene(void)
 {
 
     int a, b;
@@ -292,7 +306,8 @@ void render_init(void)
 
     camera = create_camera(camera_config);
 
-    random_scene();
+    /*random_scene();*/
+    noise_scene();
 
     pthread_mutex_init(&main_mutex, NULL);
 }
