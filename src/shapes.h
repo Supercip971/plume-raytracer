@@ -1,9 +1,0 @@
-#pragma once
-#include "boolean.h"
-#include "config.h"
-#include "hitable.h"
-#include "material.h"
-#include "ray.h"
-#include "shape/Sphere.h"
-#include "shape/moving_sphere.h"
-#include "vec3.h"

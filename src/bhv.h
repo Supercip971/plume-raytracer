@@ -3,7 +3,6 @@
 /* todo: implement a better data structure */
 
 #include "hitable.h"
-
 typedef struct bhv_data
 {
     Object left;

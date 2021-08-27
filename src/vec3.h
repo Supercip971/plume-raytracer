@@ -1,8 +1,6 @@
 #pragma once
-#include <immintrin.h>
 #include <math.h>
-#include <x86intrin.h>
-#include "boolean.h"
+#include <stdbool.h>
 #include "color.h"
 #include "config.h"
 
@@ -43,11 +41,12 @@ Vec3 random_vec3_unit_in_disk(void);
 Vec3 random_vec3_in_hemisphere(Vec3 normal);
 
 Vec3 reflect(Vec3 vec1, Vec3 vec2);
-
 Vec3 refract(Vec3 vec1, Vec3 vec2, rt_float ni_over_nt);
 
 Color vec_to_color(Vec3 from);
 Vec3 vec_from_color(Color col);
+
+/* maybe the attribute hot is totally useless ? todo: check if it is really necessary */
 
 __attribute__((hot)) static inline rt_float vec_axis(Vec3 vec, int axis)
 {

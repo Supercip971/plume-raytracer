@@ -21,8 +21,10 @@ bool lambertian_callback(const Ray *r_in, const HitRecord *record, Vec3 *attenua
     return true;
 }
 
-Material lambertian_create(Vec3 albedo){
-    return lambertian_create_texture(solid_color_create(albedo));}
+Material lambertian_create(Vec3 albedo)
+{
+    return lambertian_create_texture(solid_color_create(albedo));
+}
 
 Material lambertian_create_texture(Texture albedo)
 {

@@ -2,11 +2,16 @@
 #include <stdbool.h>
 #include <stdio.h>
 #include "config.h"
-#include "framebuffer_wrapper.h"
+#include "engine.h"
+#include "impl.h"
 #include "utils.h"
 
 FLATTEN int main(void)
 {
-    render_loop();
+    impl_render_start();
+    render_init();
+    impl_render_loop();
+    render_deinit();
+    impl_render_stop();
     return 0;
 }

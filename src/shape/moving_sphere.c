@@ -1,5 +1,4 @@
 #include <stdlib.h>
-#include "../shapes.h"
 #include "../utils.h"
 #include "moving_sphere.h"
 

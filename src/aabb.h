@@ -2,6 +2,7 @@
 
 #include "ray.h"
 #include "vec3.h"
+#include <stddef.h>
 
 typedef struct aabb
 {

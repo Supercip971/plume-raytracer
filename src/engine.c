@@ -2,30 +2,25 @@
 #include "engine.h"
 #include <limits.h>
 #include <math.h>
-#include "config.h"
-#define __USE_GNU
-#include <SDL2/SDL.h>
-#include <pthread.h>
-#include <stdatomic.h>
 #include <stddef.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include "bhv.h"
 #include "camera.h"
-#include "framebuffer_wrapper.h"
+#include "config.h"
+#include "impl.h"
 #include "material/dielectric.h"
 #include "material/lambertian.h"
 #include "material/metal.h"
 #include "ray.h"
-#include "shapes.h"
+#include "shape/Sphere.h"
+#include "shape/moving_sphere.h"
 #include "texture/checker.h"
 #include "texture/perlin.h"
 #include "utils.h"
 #include "vec3.h"
 
-Object root;
-Object bhv;
 struct render_thread_args
 {
     Color *framebuffer;
@@ -55,8 +50,11 @@ static const int sample_step_y = SCRN_HEIGHT / sample_count_y;
 static bool stop;
 static Camera camera;
 
-struct render_thread_args args[MAX_RENDER_THREAD];
-pthread_t thr[MAX_RENDER_THREAD] = {0};
+static struct render_thread_args args[MAX_RENDER_THREAD];
+static uint64_t thr[MAX_RENDER_THREAD] = {0};
+
+static Object root;
+static Object bhv;
 
 static Vec3 calculate_void_color(Ray from)
 {
@@ -101,9 +99,6 @@ static Vec3 calculate_ray_color(Ray from, int depth)
 
 static void render_update_part(struct render_part_args arg)
 {
-
-    /*ù  uint32_t t = SDL_GetTicks();*/
-
     Vec3 current_color;
     Color final_color;
 
@@ -145,11 +140,12 @@ static void render_update_part(struct render_part_args arg)
         }
     }
 }
+
 static void *render_update_part_thread(void *arg)
 {
     struct render_thread_args *args = arg;
     struct render_part_args render_argument;
-    size_t tick_start = SDL_GetTicks();
+    size_t tick_start = impl_get_tick();
     rt_float u = (rt_float)args->s_x;
     rt_float v = (rt_float)args->s_y;
 
@@ -168,7 +164,7 @@ static void *render_update_part_thread(void *arg)
         render_argument.sample_count++;
     }
 
-    printf("thread ended [!] %li \n", SDL_GetTicks() - tick_start);
+    printf("thread ended [!] %li \n", impl_get_tick() - tick_start);
 
     return NULL;
 }
@@ -190,7 +186,7 @@ void render_update(Color *framebuffer, size_t width, size_t height)
             args[i].s_x = s_x;
             args[i].s_y = s_y;
 
-            pthread_create(&thr[i], NULL, render_update_part_thread, &args[i]);
+            impl_start_thread(&thr[i], render_update_part_thread, &args[i]);
         }
 
         i++;
@@ -207,8 +203,6 @@ void render_update(Color *framebuffer, size_t width, size_t height)
     }
 }
 
-pthread_mutex_t main_mutex;
-
 static void noise_scene(void)
 {
     HitableList *lst;
@@ -221,8 +215,8 @@ static void noise_scene(void)
     lst = root.data;
     bhv = bhv_create(lst, 0, lst->child_count, 0.0, 1.0);
 }
-void random_scene(void);
-void random_scene(void)
+
+static void random_scene(void)
 {
 
     int a, b;
@@ -289,6 +283,28 @@ void random_scene(void)
     lst = root.data;
     bhv = bhv_create(lst, 0, lst->child_count, 0.0, 1.0);
 }
+
+static void scene_init(void)
+{
+    switch (SCENE_SELECT)
+    {
+    case SCENE_RANDOM:
+    {
+        random_scene();
+        break;
+    }
+
+    case SCENE_NOISE:
+    {
+        noise_scene();
+        break;
+    }
+
+    default:
+        break;
+    }
+}
+
 void render_init(void)
 {
     struct camera_config camera_config;
@@ -306,10 +322,7 @@ void render_init(void)
 
     camera = create_camera(camera_config);
 
-    /*random_scene();*/
-    noise_scene();
-
-    pthread_mutex_init(&main_mutex, NULL);
+    scene_init();
 }
 
 void render_deinit(void)
@@ -321,19 +334,8 @@ void render_deinit(void)
     for (i = 0; i < MAX_RENDER_THREAD; i++)
     {
         if (thr[i] != 0)
-            pthread_join(thr[i], NULL);
+            impl_join_thread(thr[i]);
     }
 
     hit_destroy_all_objects(&root);
-    pthread_mutex_destroy(&main_mutex);
-}
-
-void framebuffer_lock(void)
-{
-    pthread_mutex_lock(&main_mutex);
-}
-
-void framebuffer_unlock(void)
-{
-    pthread_mutex_unlock(&main_mutex);
 }

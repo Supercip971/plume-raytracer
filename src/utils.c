@@ -4,6 +4,7 @@
 #include <x86intrin.h>
 #include <xmmintrin.h>
 #include "config.h"
+
 static uint32_t g_seed = 0xfffaa;
 
 uint32_t fast_rand(void)
@@ -12,7 +13,7 @@ uint32_t fast_rand(void)
     return (g_seed >> 16) & 0x7FFF;
 }
 
-/* note: quake squareroot is slower than sse square root */
+/* note: quake inv squareroot is slower than sse square root (+ only for floats)*/
 
 #ifdef USE_QUAKE_INV_SQUAREROOT
 
@@ -37,25 +38,7 @@ rt_float Q_rsqrt(rt_float number)
 
 #else
 
-float Q_rsqrt(float number)
-{
-    float a;
-    float b = number;
-    __m128 in = _mm_load_ss(&b);
-    _mm_store_ss(&a, _mm_rsqrt_ss(in));
-    return a;
-}
-
 #endif
-
-float fast_sqrt(float number)
-{
-    float a;
-    float b = number;
-    __m128 in = _mm_load_ss(&b);
-    _mm_store_ss(&a, _mm_sqrt_ss(in));
-    return a;
-}
 
 void get_sphere_uv(const Vec3 *point, rt_float *u, rt_float *v)
 {

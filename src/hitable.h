@@ -1,7 +1,7 @@
 #pragma once
+#include <stdbool.h>
+#include <stddef.h>
 #include "aabb.h"
-#include "boolean.h"
-#include "material.h"
 #include "ray.h"
 
 typedef struct hit_record HitRecord;

@@ -17,4 +17,4 @@ PerlinNoise noise_create(void);
 
 rt_float noise(const Vec3 *point, const PerlinNoise *self);
 
-rt_float turb(const Vec3* point, int depth, const PerlinNoise* self);
+rt_float turb(const Vec3 *point, int depth, const PerlinNoise *self);
