@@ -12,9 +12,11 @@
 #include "impl.h"
 #include "material/dielectric.h"
 #include "material/lambertian.h"
+#include "material/light.h"
 #include "material/metal.h"
 #include "ray.h"
 #include "shape/Sphere.h"
+#include "shape/aa_rec.h"
 #include "shape/moving_sphere.h"
 #include "texture/checker.h"
 #include "texture/image.h"
@@ -34,6 +36,7 @@ struct render_thread_args
 struct render_part_args
 {
     Color *framebuffer;
+    Vec3 background;
     size_t width;
     size_t height;
     rt_float x_from;
@@ -43,10 +46,8 @@ struct render_part_args
     size_t sample_count;
 };
 
-static const int sample_count_x = RENDER_THREAD;
-static const int sample_step_x = SCRN_WIDTH / sample_count_x;
-static const int sample_count_y = RENDER_THREAD;
-static const int sample_step_y = SCRN_HEIGHT / sample_count_y;
+static int sample_step_x = SCRN_WIDTH / RENDER_THREAD;
+static int sample_step_y = SCRN_HEIGHT / RENDER_THREAD;
 
 static bool stop;
 static Camera camera;
@@ -57,44 +58,42 @@ static uint64_t thr[MAX_RENDER_THREAD] = {0};
 static Object root;
 static Object bhv;
 
-static Vec3 calculate_void_color(Ray from)
-{
-    rt_float t;
-    Vec3 unit_direction;
+static Vec3 background_color;
 
-    unit_direction = vec3_unit(from.direction);
-    t = 0.5 * (unit_direction.y + 1);
-
-    return vec3_add(vec3_mul_val(vec3_create(1, 1, 1), 1 - t), vec3_mul_val(vec3_create(0.5, 0.7, 1), t));
-}
-
-static Vec3 calculate_ray_color(Ray from, int depth)
+static Vec3 calculate_ray_color(Ray from, int depth, const Vec3 *background)
 {
     HitRecord record = {0};
+    Ray forked_ray = from;
+    Vec3 attenuation = vec3_create(1, 1, 1);
+    Vec3 emitted = {0};
+
+    if (stop)
+    {
+        return emitted;
+    }
 
     if (depth > MAX_BOUNCE_DEPTH)
     {
         return vec3_create(0, 0, 0);
     }
-
-    if (bhv.collide(from, 0.001, 100000000, &record, bhv.data))
+    if (!bhv.collide(from, 0.001, 100000000, &record, bhv.data))
     {
-        Ray forked_ray = from;
-        Vec3 attenuation = vec3_create(1, 1, 1);
+        return *background;
+    }
 
-        if (record.material.material_callback(&from, &record, &attenuation, &forked_ray, record.material.data))
-        {
-            Vec3 next = calculate_ray_color(forked_ray, depth + 1);
-            return vec3_mul(attenuation, next);
-        }
-        else
-        {
-            return vec3_create(0, 0, 0);
-        }
+    if (record.material.color_emition != NULL)
+    {
+        record.material.color_emition(record.u, record.v, &record.pos, &emitted, record.material.data);
+    }
+
+    if (record.material.material_callback(&from, &record, &attenuation, &forked_ray, record.material.data))
+    {
+        Vec3 next = calculate_ray_color(forked_ray, depth + 1, background);
+        return vec3_add(vec3_mul(attenuation, next), emitted);
     }
     else
     {
-        return calculate_void_color(from);
+        return emitted;
     }
 }
 
@@ -117,7 +116,7 @@ static void render_update_part(struct render_part_args arg)
 
             r = get_camera_ray(&camera, u, v);
 
-            current_color = (calculate_ray_color(r, 0));
+            current_color = (calculate_ray_color(r, 0, &arg.background));
 
             /* add current sample to sum */
             if (arg.sample_count != 0)
@@ -158,6 +157,7 @@ static void *render_update_part_thread(void *arg)
     render_argument.y_from = v;
     render_argument.x_max = sample_step_x + u;
     render_argument.y_max = sample_step_y + v;
+    render_argument.background = background_color;
 
     while (render_argument.sample_count < MAX_SAMPLE)
     {
@@ -232,6 +232,8 @@ static void noise_scene(void)
     bhv = bhv_create(lst, 0, lst->child_count, 0.0, 1.0);
 
     camera_init(vec3_create(13, 2, 3), vec3_create(0, 0, 0), 20);
+
+    background_color = vec3_create(0.70, 0.80, 1);
 }
 static void earth_scene(void)
 {
@@ -244,6 +246,7 @@ static void earth_scene(void)
     bhv = bhv_create(lst, 0, lst->child_count, 0.0, 1.0);
 
     camera_init(vec3_create(13, 2, 3), vec3_create(0, 0, 0), 20);
+    background_color = vec3_create(0.70, 0.80, 1);
 }
 
 static void random_scene(void)
@@ -314,6 +317,31 @@ static void random_scene(void)
     bhv = bhv_create(lst, 0, lst->child_count, 0.0, 1.0);
 
     camera_init(vec3_create(13, 2, 3), vec3_create(0, 0, 0), 20);
+    background_color = vec3_create(0.70, 0.80, 1);
+}
+static void light_scene(void)
+{
+    HitableList *lst;
+    Material diff_lightred = light_create(vec3_create(16, 0, 0));
+    Material diff_lightgreen = light_create(vec3_create(0, 16, 0));
+    Material diff_lightblue = light_create(vec3_create(0, 0, 16));
+    root = create_hitable_list();
+
+    add_hitable_object(&root, sphere_create(1000, vec3_create(0, -1000, 0), lambertian_create(vec3_create(0.9, 0.9, 0.9))));
+    add_hitable_object(&root, sphere_create(2, vec3_create(0, 2, 0), dieletric_create(1.5)));
+    add_hitable_object(&root, sphere_create(1, vec3_create(-20, 2, 0), diff_lightred));
+    add_hitable_object(&root, sphere_create(1, vec3_create(-20, 2, -10), diff_lightblue));
+    add_hitable_object(&root, sphere_create(1, vec3_create(-20, 2, 10), diff_lightgreen));
+    /* add_hitable_object(&root, sphere_create(2, vec3_create(0, 8, 0), (diff_light)));
+    add_hitable_object(&root, aarect_create(3, 5, 1, 3, -2, diff_light));
+*/
+
+    lst = root.data;
+    bhv = bhv_create(lst, 0, lst->child_count, 0.0, 1.0);
+
+    camera_init(vec3_create(26, 3, 6), vec3_create(0, 2, 0), 20);
+
+    background_color = vec3_create(0, 0, 0);
 }
 
 static void scene_init(void)
@@ -338,6 +366,11 @@ static void scene_init(void)
         break;
     }
 
+    case SCENE_LIGHT:
+    {
+        light_scene();
+        break;
+    }
     default:
         break;
     }

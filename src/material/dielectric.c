@@ -41,7 +41,6 @@ static bool dieletric_callback(const Ray *r_in, const HitRecord *record, Vec3 *a
 }
 
 Material dieletric_create(rt_float red_index)
-
 {
     Material mat;
     Dieletric *self = malloc(sizeof(Dieletric));
@@ -50,5 +49,6 @@ Material dieletric_create(rt_float red_index)
 
     mat.data = self;
     mat.material_callback = (MaterialCallback)dieletric_callback;
+    mat.color_emition = NULL;
     return mat;
 }

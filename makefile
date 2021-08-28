@@ -4,11 +4,15 @@ MKCWD=mkdir -p $(@D)
 PROJECT_NAME = craytracer
 
 CC = gcc
-CFLAGS =  -march=native -ansi -Ofast  -Isrc/  \
-	-std=gnu89 -Wall -Wextra  \
-	-pedantic -Wmissing-prototypes -Wstrict-prototypes \
-    -Wold-style-definition -Werror -flto      \
-	  -ffast-math 
+
+# for TCC
+# CFLAGS =  -DSDL_DISABLE_IMMINTRIN_H=0 -Isrc/ -pedantic  -O3  -std=gnu89
+ CFLAGS =  -march=native -ansi -Ofast  -Isrc/  \
+ 	-std=gnu89 -Wall -Wextra  \
+ 	-pedantic -Wmissing-prototypes -Wstrict-prototypes \
+     -Wold-style-definition -Werror -flto      \
+ 	  -ffast-math  -DUSE_INTRINSIC=0
+
 
 BUILD_DIR = build
 
@@ -24,7 +28,7 @@ OUTPUT = build/$(PROJECT_NAME).elf
 $(OUTPUT): $(OFILES)
 	@$(MKCWD)
 	@echo "[ $@ ] $^"
-	$(CC) $(CFLAGS)  -static-libgcc -lc -lpthread -lm -lSDL2 -o $@ $^ 
+	$(CC) $(CFLAGS) -lc -lpthread -lm -lSDL2 -o $@ $^ 
 
 $(BUILD_DIR)/%.o: src/%.c 
 	@$(MKCWD)

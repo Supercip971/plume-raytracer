@@ -1,11 +1,13 @@
-#pragma once
+#ifndef TEXTURE_H
+#define TEXTURE_H
 
 #include "../vec3.h"
 
 typedef Vec3 (*texture_get)(rt_float u, rt_float v, const Vec3 *point, const void *self);
-typedef struct texture
 
+typedef struct texture
 {
     void *data;
     texture_get get_pixel;
 } Texture;
+#endif

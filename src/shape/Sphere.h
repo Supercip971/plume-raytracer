@@ -5,6 +5,8 @@
 typedef struct sphere
 {
     rt_float radius;
+    rt_float radius_squared;
+    rt_float radius_inv;
     Vec3 pos;
     AABB self_bounding_box; /* put here as we need to calculate it once */
     Material self_material;

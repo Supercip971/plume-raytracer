@@ -1,8 +1,9 @@
-#pragma once
+#ifndef UTILS_H
+#define UTILS_H
+#include <math.h>
 #include <stdint.h>
 #include <stdlib.h>
 #include "config.h"
-#include "vec3.h"
 
 #define rt_float_max (rt_float)((uint64_t)-1)
 
@@ -10,6 +11,7 @@
 
 #define rt_min(a, b) (((a) < (b)) ? (a) : (b))
 #define rt_max(a, b) (((a) > (b)) ? (a) : (b))
+#define rt_abs(a) (((a) < 0) ? -(a) : (a))
 
 #define rt_clamp(a, from, to) rt_max(rt_min(a, to), from)
 uint32_t fast_rand(void);
@@ -21,11 +23,7 @@ static inline float Q_rsqrt(float number);
 
 static inline float fast_sqrt(float number);
 
-void get_sphere_uv(const Vec3 *point, rt_float *u, rt_float *v);
-
 /* you may want to implement here the fastest implementation */
-
-#define USE_INTRINSIC
 
 #ifdef USE_INTRINSIC
 
@@ -61,4 +59,5 @@ static inline float Q_rsqrt(float number)
 {
     return 1 / sqrt(number);
 }
+#endif
 #endif

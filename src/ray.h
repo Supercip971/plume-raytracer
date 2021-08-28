@@ -1,5 +1,5 @@
-#pragma once
-
+#ifndef RAY_H
+#define RAY_H
 #include "config.h"
 #include "vec3.h"
 
@@ -11,3 +11,4 @@ typedef struct ray
 } Ray;
 
 Vec3 ray_point_param(Ray self, rt_float t);
+#endif

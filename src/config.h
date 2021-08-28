@@ -7,7 +7,7 @@
 /* if you put 4 it will use (4^2) 16 threads */
 #define RENDER_THREAD 4
 
-#define MAX_SAMPLE 1000
+#define MAX_SAMPLE 10000000
 #define MAX_RENDER_THREAD 256
 
 #define MAX_BOUNCE_DEPTH 64
@@ -23,4 +23,9 @@ typedef float rt_float;
 /* show basic texture support */
 
 #define SCENE_EARTH 2
-#define SCENE_SELECT SCENE_EARTH
+
+/* show basic noise + light support */
+
+#define SCENE_LIGHT 3
+
+#define SCENE_SELECT SCENE_LIGHT

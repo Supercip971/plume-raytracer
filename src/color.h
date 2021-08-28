@@ -1,5 +1,5 @@
-#pragma once
-
+#ifndef COLOR_H
+#define COLOR_H
 #include "config.h"
 typedef struct color
 {
@@ -10,3 +10,4 @@ typedef struct color
 } Color;
 
 Color color_create(rt_float r, rt_float g, rt_float b);
+#endif

@@ -34,13 +34,15 @@ static FLATTEN bool sphere_get_aabb(rt_float time_start, rt_float time_end, AABB
 }
 FLATTEN bool hit_sphere_object_callback(Ray ray, rt_float t_min, rt_float t_max, HitRecord *record, const Sphere *self)
 {
+
+    
     /* the vec from the ray to the sphere (that must be under sphere.radius to be in collision) */
     Vec3 oc = vec3_sub(ray.origin, self->pos);
     Vec3 outward = {0};
 
     rt_float a = vec3_squared_length(ray.direction); /* ray length^2*/
     rt_float b = vec3_dot(oc, ray.direction);
-    rt_float c = vec3_squared_length(oc) - (self->radius * self->radius);
+    rt_float c = vec3_squared_length(oc) - (self->radius_squared);
 
     rt_float discriminant = b * b - a * c; /* ^ = b^2 - 4ac */
 
@@ -49,7 +51,7 @@ FLATTEN bool hit_sphere_object_callback(Ray ray, rt_float t_min, rt_float t_max,
         if (hit_sphere_object_callback2(discriminant, a, b, t_min, t_max, record))
         {
             record->pos = ray_point_param(ray, record->t);
-            outward = vec3_div_val(vec3_sub(record->pos, self->pos), self->radius);
+            outward = vec3_mul_val(vec3_sub(record->pos, self->pos), self->radius_inv);
 
             set_face_normal(&ray, outward, record);
             record->material = self->self_material;
@@ -69,6 +71,8 @@ Object sphere_create(rt_float radius, Vec3 pos, Material sphere_material)
     sphere->pos = pos;
     sphere->self_bounding_box = aabb_create(vec3_sub(pos, vec3_create(radius, radius, radius)), vec3_add(pos, vec3_create(radius, radius, radius)));
 
+    sphere->radius_inv = 1 / radius;
+    sphere->radius_squared = radius * radius;
     result.collide = (ObjectCallback)hit_sphere_object_callback;
     result.get_aabb = (ObjectGetAABB)sphere_get_aabb;
     result.data = sphere;

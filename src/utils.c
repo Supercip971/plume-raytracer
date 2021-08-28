@@ -1,9 +1,8 @@
 #include "utils.h"
 #include <stdlib.h>
 #include <string.h>
-#include <x86intrin.h>
-#include <xmmintrin.h>
 #include "config.h"
+#include "vec3.h"
 
 static uint32_t g_seed = 0xfffaa;
 

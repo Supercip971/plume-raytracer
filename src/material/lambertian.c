@@ -35,6 +35,7 @@ Material lambertian_create_texture(Texture albedo)
 
     mat.data = self;
     mat.material_callback = (MaterialCallback)lambertian_callback;
+    mat.color_emition = NULL;
 
     return mat;
 }

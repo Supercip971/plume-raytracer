@@ -2,6 +2,7 @@
 
 #include "config.h"
 #include "utils.h"
+#include "vec3.h"
 
 typedef struct perlin_noise
 {

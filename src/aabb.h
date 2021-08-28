@@ -1,5 +1,5 @@
-#pragma once
-
+#ifndef AABB_H
+#define AABB_H
 #include <stddef.h>
 #include "ray.h"
 #include "vec3.h"
@@ -41,3 +41,4 @@ __attribute__((flatten)) static inline bool aabb_hit(const AABB *self, const Ray
 }
 
 AABB aabb_surrounding(const AABB *a, const AABB *b);
+#endif
