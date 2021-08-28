@@ -111,6 +111,10 @@ static void render_update_part(struct render_part_args arg)
     {
         for (y = arg.y_from; y < arg.y_max; y += 1)
         {
+            if (stop)
+            {
+                return;
+            }
             u = ((rt_float)x + random_rt_float()) / (rt_float)(arg.width - 1);
             v = ((rt_float)y + random_rt_float()) / (rt_float)(arg.height - 1);
 
@@ -132,11 +136,6 @@ static void render_update_part(struct render_part_args arg)
             final_color = vec_to_color(current_color);
 
             set_pixel(arg.framebuffer, x, y, arg.width, final_color);
-
-            if (stop)
-            {
-                return;
-            }
         }
     }
 }
@@ -163,6 +162,10 @@ static void *render_update_part_thread(void *arg)
     {
         render_update_part(render_argument);
         render_argument.sample_count++;
+        if (stop)
+        {
+            break;
+        }
     }
 
     printf("thread ended [!] %li \n", impl_get_tick() - tick_start);
@@ -178,7 +181,6 @@ void render_update(Color *framebuffer, size_t width, size_t height)
 
     while (true)
     {
-        i++;
         if (thr[i] == 0)
         {
             args[i].framebuffer = framebuffer;
@@ -189,8 +191,8 @@ void render_update(Color *framebuffer, size_t width, size_t height)
 
             impl_start_thread(&thr[i], render_update_part_thread, &args[i]);
         }
-
         i++;
+
         s_x += sample_step_x;
         if (s_x >= SCRN_WIDTH)
         {
@@ -392,7 +394,10 @@ void render_deinit(void)
     for (i = 0; i < MAX_RENDER_THREAD; i++)
     {
         if (thr[i] != 0)
+        {
+
             impl_join_thread(thr[i]);
+        }
     }
 
     hit_destroy_all_objects(&root);
