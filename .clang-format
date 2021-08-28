@@ -14,7 +14,6 @@ SpaceBeforeInheritanceColon: true
 BreakInheritanceList: AfterColon
 IndentPPDirectives: AfterHash
 ForEachMacros: ["__dummy_foreach"]
-SpaceBeforeParens: ControlStatementsExceptForEachMacros
 IncludeBlocks: Merge
 IncludeCategories:
   - Regex:           '<([A-Za-z0-9.\/-_])+>'
