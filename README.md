@@ -2,6 +2,9 @@
 
 A portable simple ANSI C raytracer on CPU !
 
+### (26/08/2021) optimisation + light 
+![render with light](./pic/28-08-2021.png)
+
 ### (26/08/2021) Rendering texture + moving ball + optimisation  
 ![render with texture](./pic/26-08-2021.png)
 
