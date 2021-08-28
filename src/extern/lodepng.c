@@ -680,6 +680,8 @@ static unsigned readBits(LodePNGBitReader *reader, size_t nbits)
     return result;
 }
 
+unsigned lode_png_test_bitreader(const unsigned char *data, size_t size,
+                                 size_t numsteps, const size_t *steps, unsigned *result);
 /* Public for testing only. steps and result must have numsteps values. */
 unsigned lode_png_test_bitreader(const unsigned char *data, size_t size,
                                  size_t numsteps, const size_t *steps, unsigned *result)
@@ -4435,7 +4437,7 @@ function, do not use to process all pixels of an image. Alpha channel not suppor
 this is for bKGD, supporting alpha may prevent it from finding a color in the palette, from the
 specification it looks like bKGD should ignore the alpha values of the palette since it can use
 any palette index but doesn't have an alpha channel. Idem with ignoring color key. */
-unsigned lodepng_convert_rgb(
+static unsigned lodepng_convert_rgb(
     unsigned *r_out, unsigned *g_out, unsigned *b_out,
     unsigned r_in, unsigned g_in, unsigned b_in,
     const LodePNGColorMode *mode_out, const LodePNGColorMode *mode_in)
@@ -5988,7 +5990,7 @@ static void decodeGeneric(unsigned char **out, unsigned *w, unsigned *h,
         /*IDAT chunk, containing compressed image data*/
         if (lodepng_chunk_type_equals(chunk, "IDAT"))
         {
-            size_t newsize;
+            size_t newsize = 0;
             if (lodepng_addofl(idatsize, chunkLength, &newsize))
                 CERROR_BREAK(state->error, 95);
             if (newsize > insize)
@@ -6259,7 +6261,7 @@ unsigned lodepng_decode_file(unsigned char **out, unsigned *w, unsigned *h, cons
                              LodePNGColorType colortype, unsigned bitdepth)
 {
     unsigned char *buffer = 0;
-    size_t buffersize;
+    size_t buffersize = 0;
     unsigned error;
     /* safe output values in case error happens */
     *out = 0;

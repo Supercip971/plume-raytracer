@@ -17,6 +17,7 @@
 #include "shape/Sphere.h"
 #include "shape/moving_sphere.h"
 #include "texture/checker.h"
+#include "texture/image.h"
 #include "texture/perlin.h"
 #include "utils.h"
 #include "vec3.h"
@@ -203,6 +204,21 @@ void render_update(Color *framebuffer, size_t width, size_t height)
     }
 }
 
+static void camera_init(Vec3 position, Vec3 lookat, rt_float vfov)
+{
+    struct camera_config camera_config;
+
+    camera_config.position = position;
+    camera_config.lookat = lookat;
+    camera_config.up = vec3_create(0, 1, 0);
+    camera_config.aspect = ((rt_float)SCRN_WIDTH / (rt_float)SCRN_HEIGHT);
+    camera_config.vfov = vfov;
+    camera_config.aperture = 0.0001;
+    camera_config.focus_distance = 10;
+    camera_config.time_end = 1;
+    camera_config.time_start = 0.0;
+    camera = create_camera(camera_config);
+}
 static void noise_scene(void)
 {
     HitableList *lst;
@@ -214,6 +230,20 @@ static void noise_scene(void)
 
     lst = root.data;
     bhv = bhv_create(lst, 0, lst->child_count, 0.0, 1.0);
+
+    camera_init(vec3_create(13, 2, 3), vec3_create(0, 0, 0), 20);
+}
+static void earth_scene(void)
+{
+    HitableList *lst;
+    root = create_hitable_list();
+
+    add_hitable_object(&root, sphere_create(2, vec3_create(0, 0, 0), lambertian_create_texture(image_create(image_load("assets/test_colors.png")))));
+
+    lst = root.data;
+    bhv = bhv_create(lst, 0, lst->child_count, 0.0, 1.0);
+
+    camera_init(vec3_create(13, 2, 3), vec3_create(0, 0, 0), 20);
 }
 
 static void random_scene(void)
@@ -282,6 +312,8 @@ static void random_scene(void)
 
     lst = root.data;
     bhv = bhv_create(lst, 0, lst->child_count, 0.0, 1.0);
+
+    camera_init(vec3_create(13, 2, 3), vec3_create(0, 0, 0), 20);
 }
 
 static void scene_init(void)
@@ -300,6 +332,12 @@ static void scene_init(void)
         break;
     }
 
+    case SCENE_EARTH:
+    {
+        earth_scene();
+        break;
+    }
+
     default:
         break;
     }
@@ -307,20 +345,7 @@ static void scene_init(void)
 
 void render_init(void)
 {
-    struct camera_config camera_config;
-
     stop = false;
-    camera_config.position = vec3_create(13, 2, 3);
-    camera_config.lookat = vec3_create(0, 0, 0);
-    camera_config.up = vec3_create(0, 1, 0);
-    camera_config.aspect = ((rt_float)SCRN_WIDTH / (rt_float)SCRN_HEIGHT);
-    camera_config.vfov = 20;
-    camera_config.aperture = 0.0001;
-    camera_config.focus_distance = 10;
-    camera_config.time_end = 1;
-    camera_config.time_start = 0.0;
-
-    camera = create_camera(camera_config);
 
     scene_init();
 }

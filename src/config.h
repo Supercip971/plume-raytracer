@@ -20,4 +20,7 @@ typedef float rt_float;
 /* show off the noise support */
 #define SCENE_NOISE 1
 
-#define SCENE_SELECT SCENE_NOISE
+/* show basic texture support */
+
+#define SCENE_EARTH 2
+#define SCENE_SELECT SCENE_EARTH

@@ -1,13 +1,16 @@
 #include <SDL2/SDL.h>
 #include <math.h>
+#include <stdbool.h>
 #include <stdlib.h>
 #include <unistd.h>
-#include <stdbool.h>
 #include "config.h"
 #include "engine.h"
+#include "extern/lodepng.h"
 #include "hitable.h"
+#include "image.h"
 #include "impl.h"
 #include "pthread.h"
+
 struct color *pixels;
 
 struct raw_color *raw_pixels;
@@ -23,6 +26,13 @@ struct raw_color
     uint8_t g;
     uint8_t r;
 } __attribute__((packed));
+struct raw_le_color
+{
+    uint8_t r;
+    uint8_t g;
+    uint8_t b;
+
+} __attribute__((packed));
 
 static rt_float color_clamp(rt_float value)
 {
@@ -37,8 +47,7 @@ static rt_float color_clamp(rt_float value)
     return value;
 }
 
-static struct raw_color
-color_f_to_int(Color color)
+static struct raw_color color_f_to_int(Color color)
 {
     struct raw_color res;
     res.a = (uint8_t)(255);
@@ -48,8 +57,55 @@ color_f_to_int(Color color)
     return res;
 }
 
-static void
-swap_buffer(void)
+static Color color_int_to_f(struct raw_color color)
+{
+
+    Color res;
+    res.a = 1.f;
+    res.g = (rt_float)color.g / 255.f;
+    res.b = (rt_float)color.g / 255.f;
+    res.r = (rt_float)color.r / 255.f;
+    return res;
+}
+
+__attribute__((unused)) static void convert_raw_to_float(const struct raw_color *color, Color *target, size_t width, size_t height)
+{
+    size_t x;
+    size_t y;
+
+    for (y = 0; y < height; y++)
+    {
+        for (x = 0; x < width; x++)
+        {
+            target[x + (y * width)] = color_int_to_f(color[x + (y * width)]);
+        }
+    }
+}
+static Color color_be_int_to_f(struct raw_le_color color)
+{
+
+    Color res;
+    res.a = 1.f;
+    res.g = (rt_float)color.g / 255.f;
+    res.b = (rt_float)color.b / 255.f;
+    res.r = (rt_float)color.r / 255.f;
+    return res;
+}
+
+static void convert_be_raw_to_float(const struct raw_le_color *color, Color *target, size_t width, size_t height)
+{
+    size_t x;
+    size_t y;
+
+    for (y = 0; y < height; y++)
+    {
+        for (x = 0; x < width; x++)
+        {
+            target[x + (y * width)] = color_be_int_to_f(color[x + (y * width)]);
+        }
+    }
+}
+static void swap_buffer(void)
 {
     size_t x;
     size_t y;
@@ -141,11 +197,22 @@ void impl_render_loop(void)
 Image image_load(const char *path)
 {
     Image result;
-    result.width = 0;
-    result.height = 0;
-    result.source_data = NULL;
-    result.source_data = NULL;
-    (void)path;
+    unsigned error;
+    result.width = 1;
+    result.height = 1;
+    error = lodepng_decode24_file((uint8_t **)&result.source_data, (uint32_t *)&result.width, (uint32_t *)&result.height, path);
+
+    if (error)
+    {
+        printf("decoder error %u: %s\n", error, lodepng_error_text(error));
+    }
+
+    printf("decoded: (%s) %x x %x \n", path, result.width, result.height);
+
+    result.converted_data = malloc(sizeof(Color) * result.width * (result.height + 3));
+
+    convert_be_raw_to_float(result.source_data, result.converted_data, result.width, result.height);
+
     return result;
 }
 

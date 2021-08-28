@@ -11,6 +11,7 @@
 #define rt_min(a, b) (((a) < (b)) ? (a) : (b))
 #define rt_max(a, b) (((a) > (b)) ? (a) : (b))
 
+#define rt_clamp(a, from, to) rt_max(rt_min(a, to), from)
 uint32_t fast_rand(void);
 
 #define random_rt_float() \

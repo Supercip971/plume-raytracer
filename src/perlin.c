@@ -94,6 +94,7 @@ static rt_float perlin_interp(Vec3 c[2][2][2], rt_float u, rt_float v, rt_float 
     }
     return accum;
 }
+
 rt_float noise(const Vec3 *point, const PerlinNoise *self)
 {
     rt_float u, v, w;

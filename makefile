@@ -4,7 +4,7 @@ MKCWD=mkdir -p $(@D)
 PROJECT_NAME = craytracer
 
 CC = gcc
-CFLAGS =  -march=native -ansi -Ofast -Isrc/  \
+CFLAGS =  -march=native -ansi -Ofast  -Isrc/  \
 	-std=gnu89 -Wall -Wextra  \
 	-pedantic -Wmissing-prototypes -Wstrict-prototypes \
     -Wold-style-definition -Werror -flto      \
