@@ -6,7 +6,7 @@
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include "bhv.h"
+#include "bvh.h"
 #include "camera.h"
 #include "config.h"
 #include "impl.h"
@@ -20,7 +20,7 @@
 #include "shape/moving_sphere.h"
 #include "texture/checker.h"
 #include "texture/image.h"
-#include "texture/perlin.h"
+#include "texture/noise.h"
 #include "utils.h"
 #include "vec3.h"
 
@@ -56,7 +56,7 @@ static struct render_thread_args args[MAX_RENDER_THREAD];
 static uint64_t thr[MAX_RENDER_THREAD] = {0};
 
 static Object root;
-static Object bhv;
+static Object bvh;
 
 static Vec3 background_color;
 
@@ -76,7 +76,7 @@ static Vec3 calculate_ray_color(Ray from, int depth, const Vec3 *background)
     {
         return vec3_create(0, 0, 0);
     }
-    if (!bhv.collide(from, 0.001, 100000000, &record, bhv.data))
+    if (!bvh.collide(from, 0.001, 100000000, &record, bvh.data))
     {
         return *background;
     }
@@ -231,7 +231,8 @@ static void noise_scene(void)
     add_hitable_object(&root, sphere_create(2, vec3_create(0, 2, 0), lambertian_create_texture(per_texture)));
 
     lst = root.data;
-    bhv = bhv_create(lst, 0, lst->child_count, 0.0, 1.0);
+    bvh_create_rec(lst, 0.0, 1.0);
+    bvh = lst->childs[0];
 
     camera_init(vec3_create(13, 2, 3), vec3_create(0, 0, 0), 20);
 
@@ -245,7 +246,8 @@ static void earth_scene(void)
     add_hitable_object(&root, sphere_create(2, vec3_create(0, 0, 0), lambertian_create_texture(image_create(image_load("assets/test_colors.png")))));
 
     lst = root.data;
-    bhv = bhv_create(lst, 0, lst->child_count, 0.0, 1.0);
+    bvh_create_rec(lst, 0.0, 1.0);
+    bvh = lst->childs[0];
 
     camera_init(vec3_create(13, 2, 3), vec3_create(0, 0, 0), 20);
     background_color = vec3_create(0.70, 0.80, 1);
@@ -316,7 +318,8 @@ static void random_scene(void)
     add_hitable_object(&root, sphere_create(1.0, vec3_create(4, 1, 0), metal_create(vec3_create(0.7, 0.6, 0.5), 0)));
 
     lst = root.data;
-    bhv = bhv_create(lst, 0, lst->child_count, 0.0, 1.0);
+    bvh_create_rec(lst, 0.0, 1.0);
+    bvh = lst->childs[0];
 
     camera_init(vec3_create(13, 2, 3), vec3_create(0, 0, 0), 20);
     background_color = vec3_create(0.70, 0.80, 1);
@@ -339,7 +342,8 @@ static void light_scene(void)
 */
 
     lst = root.data;
-    bhv = bhv_create(lst, 0, lst->child_count, 0.0, 1.0);
+    bvh_create_rec(lst, 0.0, 1.0);
+    bvh = lst->childs[0];
 
     camera_init(vec3_create(26, 3, 6), vec3_create(0, 2, 0), 20);
 

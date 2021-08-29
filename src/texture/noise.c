@@ -1,6 +1,6 @@
 
 #include <stdlib.h>
-#include "perlin.h"
+#include "noise.h"
 
 static Vec3 perlin_get(rt_float u, rt_float v, const Vec3 *point, const Perlin *self)
 {

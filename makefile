@@ -30,10 +30,10 @@ $(OUTPUT): $(OFILES)
 	@echo "[ $@ ] $^"
 	$(CC) $(CFLAGS) -lc -lpthread -lm -lSDL2 -o $@ $^ 
 
-$(BUILD_DIR)/%.o: src/%.c 
+$(BUILD_DIR)/%.o: src/%.c $(HFILES)
 	@$(MKCWD)
-	@echo "[ $@ ] $^"
-	$(CC) $^ -c -o $@  $(CFLAGS)
+	@echo "[ $@ ] $<"
+	$(CC) $< -c -o $@  $(CFLAGS)
 
 run: $(OUTPUT)
 	$(OUTPUT)

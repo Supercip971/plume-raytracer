@@ -2,12 +2,12 @@
 #include <stddef.h>
 #include <stdlib.h>
 
+size_t uobj = 0;
 void add_hitable_object(Object *hitable_list, Object object)
 {
 
     HitableList *list = (HitableList *)hitable_list->data;
-    list->childs[list->child_count] = object;
-    list->child_count++;
+    add_hitable_list(list, object);
 }
 
 bool hit_call_all_object(Object *hitable_list, Ray r, rt_float t_min, rt_float t_max, HitRecord *record)
@@ -103,4 +103,36 @@ Object create_hitable_list(void)
     result.collide = (ObjectCallback)hitable_list_call_all;
 
     return result;
+}
+
+void hit_remove_object(HitableList *list, Object obj)
+{
+    size_t i;
+    size_t ri = 1024;
+    for (i = 0; i < list->child_count; i++)
+    {
+        if (list->childs[i].uid == obj.uid)
+        {
+            ri = i;
+            break;
+        }
+    }
+    if (ri == 1024)
+    {
+        return;
+    }
+
+    for (i = ri; i < list->child_count - 1; i++)
+    {
+        list->childs[i] = list->childs[i + 1];
+    }
+    list->child_count -= 1;
+}
+
+void add_hitable_list(HitableList *hitable_list, Object object)
+{
+
+    object.uid = uobj++;
+    hitable_list->childs[hitable_list->child_count] = object;
+    hitable_list->child_count++;
 }

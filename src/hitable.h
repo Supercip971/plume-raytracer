@@ -30,6 +30,7 @@ struct object
     ObjectDestroy destroy;
     void *data;
     bool is_leaf;
+    uint32_t uid;
 };
 
 struct hit_record
@@ -57,4 +58,8 @@ bool hit_call_all_object(Object *hitable_list, Ray r, rt_float t_min, rt_float t
 void set_face_normal(const Ray *r, const Vec3 outward, HitRecord *self);
 
 Object create_hitable_list(void);
+
+void hit_remove_object(HitableList *list, Object obj);
+void add_hitable_list(HitableList *hitable_list, Object object);
+
 #endif

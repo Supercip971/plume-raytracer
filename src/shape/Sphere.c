@@ -35,7 +35,6 @@ static FLATTEN bool sphere_get_aabb(rt_float time_start, rt_float time_end, AABB
 FLATTEN bool hit_sphere_object_callback(Ray ray, rt_float t_min, rt_float t_max, HitRecord *record, const Sphere *self)
 {
 
-    
     /* the vec from the ray to the sphere (that must be under sphere.radius to be in collision) */
     Vec3 oc = vec3_sub(ray.origin, self->pos);
     Vec3 outward = {0};

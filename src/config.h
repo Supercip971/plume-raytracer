@@ -5,12 +5,12 @@
 
 /* use render_thread ^2 */
 /* if you put 4 it will use (4^2) 16 threads */
-#define RENDER_THREAD 4
+#define RENDER_THREAD 1
 
-#define MAX_SAMPLE 10000000
+#define MAX_SAMPLE 3
 #define MAX_RENDER_THREAD 256
 
-#define MAX_BOUNCE_DEPTH 64
+#define MAX_BOUNCE_DEPTH 128
 
 typedef float rt_float;
 
@@ -28,4 +28,6 @@ typedef float rt_float;
 
 #define SCENE_LIGHT 3
 
-#define SCENE_SELECT SCENE_LIGHT
+#define SCENE_SELECT SCENE_RANDOM
+
+#define MAX_OBJECTS 256

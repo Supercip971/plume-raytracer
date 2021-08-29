@@ -19,3 +19,5 @@ A portable simple ANSI C raytracer on CPU !
   - new: [raytracing in a weekend](https://raytracing.github.io/books/RayTracingInOneWeekend.html)
 
 - [Raytracing the next week](https://raytracing.github.io/books/RayTracingTheNextWeek.html#boundingvolumehierarchies)
+
+- [Efficient BVH construction via Approximate Agglomerative Clustering](http://graphics.cs.cmu.edu/projects/aac/aac_build.pdf)
