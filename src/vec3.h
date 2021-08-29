@@ -13,8 +13,6 @@ typedef struct vec3_t
     rt_float z;
 } Vec3;
 
-void get_sphere_uv(const Vec3 *point, rt_float *u, rt_float *v);
-
 static inline Vec3 vec3_create(rt_float x, rt_float y, rt_float z)
 {
     Vec3 res;
@@ -184,5 +182,13 @@ __attribute__((hot)) static inline rt_float *vec_axis_ptr(Vec3 *vec, int axis)
         return &vec->y;
     }
     return &vec->z;
+}
+static inline void get_sphere_uv(const Vec3 *point, rt_float *u, rt_float *v)
+{
+    rt_float theta = fast_acos(-(point->y));
+    rt_float phi = fast_atan2(-(point->z), point->x);
+
+    *u = phi * (M_2_PI) + 0.5;
+    *v = theta * M_1_PI;
 }
 #endif

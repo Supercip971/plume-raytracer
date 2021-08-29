@@ -166,6 +166,7 @@ void impl_render_loop(void)
     int frames = 0;
     rt_float fps;
     uint32_t prev_ticks = 0;
+    int32_t wait_tick;
 
     while (event_update())
     {
@@ -181,7 +182,12 @@ void impl_render_loop(void)
         SDL_RenderPresent(renderer);
         SDL_RenderClear(renderer);
 
-        SDL_Delay(17 - (prev_ticks - impl_get_tick()));
+        wait_tick = 17 - (impl_get_tick() - prev_ticks);
+
+        if (wait_tick > 0)
+        {
+            SDL_Delay(17 - (impl_get_tick() - prev_ticks));
+        }
 
         if (frames > 20)
         {

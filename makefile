@@ -28,7 +28,7 @@ OUTPUT = build/$(PROJECT_NAME).elf
 $(OUTPUT): $(OFILES)
 	@$(MKCWD)
 	@echo "[ $@ ] $^"
-	$(CC) $(CFLAGS) -lc -lpthread -lm -lSDL2 -o $@ $^ 
+	$(CC) $(CFLAGS) -o $@ $^  -lc -lpthread -lm -lSDL2 
 
 $(BUILD_DIR)/%.o: src/%.c $(HFILES)
 	@$(MKCWD)

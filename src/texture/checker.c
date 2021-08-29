@@ -5,7 +5,7 @@
 
 static Vec3 checker_get(rt_float u, rt_float v, const Vec3 *point, const CheckerTexture *self)
 {
-    rt_float sines = sin(self->size * point->x) * sin(self->size * point->y) * sin(self->size * point->z);
+    rt_float sines = fast_sin(self->size * point->x) * fast_sin(self->size * point->y) * fast_sin(self->size * point->z);
     if (sines < 0)
     {
         return self->odd_color.get_pixel(u, v, point, self->odd_color.data);

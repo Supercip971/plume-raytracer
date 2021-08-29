@@ -18,7 +18,7 @@ static bool dieletric_callback(const Ray *r_in, const HitRecord *record, Vec3 *a
     rt_float refraction_ratio = record->front_face ? (1 / self->ref_index) : self->ref_index;
     Vec3 unit_direction = vec3_unit(r_in->direction);
 
-    rt_float cos_theta = fmin(vec3_dot(vec3_inv(unit_direction), record->normal), 1);
+    rt_float cos_theta = rt_min(vec3_dot(vec3_inv(unit_direction), record->normal), 1);
     rt_float sin_theta = fast_sqrt(1 - cos_theta * cos_theta);
 
     bool cannot_refract = (refraction_ratio * sin_theta) > 1;
