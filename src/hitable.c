@@ -26,7 +26,6 @@ static bool hitable_list_destroy(HitableList *self)
             {
                 self->childs[i].destroy(self->childs[i].data);
             }
-            free((void *)self->childs[i].data);
         }
     }
 

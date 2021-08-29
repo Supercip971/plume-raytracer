@@ -39,13 +39,13 @@ static bool bvh_destroy(bvhData *self)
         destroy_left = true;
     }
 
-    if (destroy_left)
-    {
-        self->right.destroy(self->right.data);
-    }
-    if (destroy_right)
+    if (destroy_left && self->left.destroy != NULL)
     {
         self->left.destroy(self->left.data);
+    }
+    if (destroy_right && self->right.destroy != NULL)
+    {
+        self->right.destroy(self->right.data);
     }
     free(self);
     return true;
