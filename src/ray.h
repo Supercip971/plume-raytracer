@@ -10,5 +10,9 @@ typedef struct ray
     rt_float time; /* using double for more precision (todo: check if we can use float) */
 } Ray;
 
-Vec3 ray_point_param(Ray self, rt_float t);
+static inline Vec3 ray_point_param(Ray self, rt_float t)
+{
+    return vec3_add(self.origin, vec3_mul_val(self.direction, t));
+}
+
 #endif

@@ -51,9 +51,9 @@ static struct raw_color color_f_to_int(Color color)
 {
     struct raw_color res;
     res.a = (uint8_t)(255);
-    res.g = (uint8_t)(color_clamp(sqrt(color.g)) * 255);
-    res.b = (uint8_t)(color_clamp(sqrt(color.b)) * 255);
-    res.r = (uint8_t)(color_clamp(sqrt(color.r)) * 255);
+    res.g = (uint8_t)(color_clamp(fast_sqrt(color.g)) * 255);
+    res.b = (uint8_t)(color_clamp(fast_sqrt(color.b)) * 255);
+    res.r = (uint8_t)(color_clamp(fast_sqrt(color.r)) * 255);
     return res;
 }
 

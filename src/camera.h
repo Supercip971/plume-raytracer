@@ -12,6 +12,7 @@ typedef struct
     Vec3 u, v, w;
     rt_float lens_radius;
     rt_float time_start, time_end;
+    bool moving_obj;
 } Camera;
 
 struct camera_config
@@ -24,6 +25,7 @@ struct camera_config
     rt_float aperture;
     rt_float focus_distance;
     rt_float time_start, time_end;
+    bool moving_obj;
 };
 
 Ray get_camera_ray(const Camera *camera, rt_float u, rt_float v);

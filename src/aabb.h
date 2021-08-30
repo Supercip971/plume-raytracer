@@ -12,7 +12,7 @@ typedef struct aabb
 
 AABB aabb_create(Vec3 min, Vec3 max);
 
-__attribute__((flatten)) static inline bool aabb_hit(const AABB *self, const Ray *ray, rt_float t_min, rt_float t_max)
+static inline bool aabb_hit(const AABB *self, const Ray *ray, rt_float t_min, rt_float t_max)
 {
     size_t axis;
     rt_float invd, t0, t1;

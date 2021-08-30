@@ -1,4 +1,5 @@
 #include "camera.h"
+#include <stdio.h>
 #include "utils.h"
 Ray get_camera_ray(const Camera *camera, rt_float u, rt_float v)
 {
@@ -18,7 +19,13 @@ Ray get_camera_ray(const Camera *camera, rt_float u, rt_float v)
             vec3_mul_val(camera->vertical, v)),
         (result.origin));
 
-    result.time = random_rt_float() * (camera->time_end - camera->time_start) + camera->time_start;
+    if (camera->moving_obj)
+    {
+        result.time = random_rt_float() * (camera->time_end - camera->time_start) + camera->time_start;
+    }
+    else
+        result.time = 0;
+
     return result;
 }
 
@@ -55,7 +62,6 @@ Camera create_camera(struct camera_config config)
     result.v = v;
     result.w = w;
 
-    /*result.low_left = vec3_sub(position, vec3_add(vec3_mul_val(result.horizontal, 0.5), vec3_add(vec3_mul_val(result.vertical, 0.5), w)));
-    */
+    result.moving_obj = config.moving_obj;
     return result;
 }

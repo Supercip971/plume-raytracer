@@ -5,7 +5,7 @@
 #include "../ray.h"
 #include "../vec3.h"
 
-typedef struct aa_rec
+typedef struct xy_rec
 {
     rt_float x_0;
     rt_float y_0;
@@ -15,8 +15,32 @@ typedef struct aa_rec
     Material self_material;
     AABB self_box;
 
-} AARect;
+} XYrec;
+typedef struct xz_rec
+{
+    rt_float x_0;
+    rt_float z_0;
+    rt_float x_1;
+    rt_float z_1;
+    rt_float k;
+    Material self_material;
+    AABB self_box;
 
-Object aarect_create(rt_float x_0, rt_float x_1, rt_float y_0, rt_float y_1, rt_float k, Material rect_material);
+} XZrec;
+typedef struct yz_rec
+{
+    rt_float y_0;
+    rt_float z_0;
+    rt_float y_1;
+    rt_float z_1;
+    rt_float k;
+    Material self_material;
+    AABB self_box;
+
+} YZrec;
+
+Object aaxyrect_create(rt_float x_0, rt_float x_1, rt_float y_0, rt_float y_1, rt_float k, Material rect_material);
+Object aaxzrect_create(rt_float x_0, rt_float x_1, rt_float z_0, rt_float z_1, rt_float k, Material rect_material);
+Object aayzrect_create(rt_float y_0, rt_float y_1, rt_float z_0, rt_float z_1, rt_float k, Material rect_material);
 
 #endif

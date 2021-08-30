@@ -7,7 +7,7 @@
 
 #define rt_float_max (rt_float)((uint64_t)-1)
 
-#define FLATTEN __attribute__((flatten))
+#define FLATTEN
 
 #define rt_min(a, b) (((a) < (b)) ? (a) : (b))
 #define rt_max(a, b) (((a) > (b)) ? (a) : (b))

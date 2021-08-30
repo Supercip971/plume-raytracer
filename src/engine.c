@@ -17,6 +17,7 @@
 #include "ray.h"
 #include "shape/Sphere.h"
 #include "shape/aa_rec.h"
+#include "shape/box.h"
 #include "shape/moving_sphere.h"
 #include "texture/checker.h"
 #include "texture/image.h"
@@ -106,6 +107,10 @@ static void render_update_part(struct render_part_args arg)
     Ray r;
     size_t x, y;
     rt_float u, v;
+    rt_float offx, offy;
+
+    offx = random_rt_float() / (rt_float)(arg.width - 1);
+    offy = random_rt_float() / (rt_float)(arg.height - 1);
 
     for (x = arg.x_from; x < arg.x_max; x += 1)
     {
@@ -115,8 +120,8 @@ static void render_update_part(struct render_part_args arg)
             {
                 return;
             }
-            u = ((rt_float)x + random_rt_float()) / (rt_float)(arg.width - 1);
-            v = ((rt_float)y + random_rt_float()) / (rt_float)(arg.height - 1);
+            u = ((rt_float)x) / (rt_float)(arg.width - 1) + offx;
+            v = ((rt_float)y) / (rt_float)(arg.height - 1) + offy;
 
             r = get_camera_ray(&camera, u, v);
 
@@ -206,7 +211,7 @@ void render_update(Color *framebuffer, size_t width, size_t height)
     }
 }
 
-static void camera_init(Vec3 position, Vec3 lookat, rt_float vfov)
+static void camera_init(Vec3 position, Vec3 lookat, rt_float vfov, bool moving_obj)
 {
     struct camera_config camera_config;
 
@@ -219,6 +224,7 @@ static void camera_init(Vec3 position, Vec3 lookat, rt_float vfov)
     camera_config.focus_distance = 10;
     camera_config.time_end = 1;
     camera_config.time_start = 0.0;
+    camera_config.moving_obj = moving_obj;
     camera = create_camera(camera_config);
 }
 static void noise_scene(void)
@@ -234,7 +240,7 @@ static void noise_scene(void)
     bvh_create_rec(lst, 0.0, 1.0);
     bvh = lst->childs[0];
 
-    camera_init(vec3_create(13, 2, 3), vec3_create(0, 0, 0), 20);
+    camera_init(vec3_create(13, 2, 3), vec3_create(0, 0, 0), 20, false);
 
     background_color = vec3_create(0.70, 0.80, 1);
 }
@@ -249,7 +255,7 @@ static void earth_scene(void)
     bvh_create_rec(lst, 0.0, 1.0);
     bvh = lst->childs[0];
 
-    camera_init(vec3_create(13, 2, 3), vec3_create(0, 0, 0), 20);
+    camera_init(vec3_create(13, 2, 3), vec3_create(0, 0, 0), 20, false);
     background_color = vec3_create(0.70, 0.80, 1);
 }
 
@@ -321,7 +327,7 @@ static void random_scene(void)
     bvh_create_rec(lst, 0.0, 1.0);
     bvh = lst->childs[0];
 
-    camera_init(vec3_create(13, 2, 3), vec3_create(0, 0, 0), 20);
+    camera_init(vec3_create(13, 2, 3), vec3_create(0, 0, 0), 20, false);
     background_color = vec3_create(0.70, 0.80, 1);
 }
 static void light_scene(void)
@@ -338,14 +344,44 @@ static void light_scene(void)
     add_hitable_object(&root, sphere_create(1, vec3_create(-20, 2, -10), diff_lightblue));
     add_hitable_object(&root, sphere_create(1, vec3_create(-20, 2, 10), diff_lightgreen));
     /* add_hitable_object(&root, sphere_create(2, vec3_create(0, 8, 0), (diff_light)));
-    add_hitable_object(&root, aarect_create(3, 5, 1, 3, -2, diff_light));
+    add_hitable_object(&root, aaxyrect_create(3, 5, 1, 3, -2, diff_light));
 */
 
     lst = root.data;
     bvh_create_rec(lst, 0.0, 1.0);
     bvh = lst->childs[0];
 
-    camera_init(vec3_create(26, 3, 6), vec3_create(0, 2, 0), 20);
+    camera_init(vec3_create(26, 3, 6), vec3_create(0, 2, 0), 20, false);
+
+    background_color = vec3_create(0, 0, 0);
+}
+
+static void cornell_box(void)
+{
+
+    HitableList *lst;
+    Material red = lambertian_create(vec3_create(0.65, 0.05, 0.05));
+    Material green = lambertian_create(vec3_create(0.12, 0.45, 0.15));
+    Material light = light_create(vec3_create(15, 15, 15));
+    Material white = lambertian_create(vec3_create(0.73, 0.73, 0.73));
+
+    root = create_hitable_list();
+
+    add_hitable_object(&root, aayzrect_create(0, 555, 0, 555, 555, green));
+    add_hitable_object(&root, aayzrect_create(0, 555, 0, 555, 0, red));
+    add_hitable_object(&root, aaxzrect_create(213, 343, 227, 332, 554, light));
+    add_hitable_object(&root, aaxzrect_create(0, 555, 0, 555, 0, white));
+    add_hitable_object(&root, aaxzrect_create(0, 555, 0, 555, 555, white));
+    add_hitable_object(&root, aaxyrect_create(0, 555, 0, 555, 555, white));
+
+    add_hitable_object(&root, box_create(vec3_create(130, 0, 65), vec3_create(295, 165, 230), white));
+    add_hitable_object(&root, box_create(vec3_create(265, 0, 295), vec3_create(430, 330, 460), white));
+
+    lst = root.data;
+    bvh_create_rec(lst, 0.0, 1.0);
+    bvh = lst->childs[0];
+
+    camera_init(vec3_create(278, 278, -800), vec3_create(278, 278, 0), 40, false);
 
     background_color = vec3_create(0, 0, 0);
 }
@@ -375,6 +411,11 @@ static void scene_init(void)
     case SCENE_LIGHT:
     {
         light_scene();
+        break;
+    }
+    case SCENE_CORNELL_BOX:
+    {
+        cornell_box();
         break;
     }
     default:

@@ -151,9 +151,9 @@ static inline Vec3 vec_from_color(Color col)
 static inline Color vec_to_color(Vec3 from)
 {
     return color_create(
-        from.x,
-        from.y,
-        from.z);
+        rt_min(from.x, 1),
+        rt_min(from.y, 1),
+        rt_min(from.z, 1));
 }
 
 /* maybe the attribute hot is totally useless ? todo: check if it is really necessary */

@@ -14,6 +14,7 @@ bool hit_call_all_object(Object *hitable_list, Ray r, rt_float t_min, rt_float t
 {
     return hitable_list->collide(r, t_min, t_max, record, hitable_list->data);
 }
+
 static bool hitable_list_destroy(HitableList *self)
 {
 
@@ -53,6 +54,10 @@ static bool hitable_list_call_all(Ray r, rt_float t_min, rt_float t_max, HitReco
     return at_least_one_collided;
 }
 
+bool hit_call_all_list(const HitableList *hitable_list, Ray r, rt_float t_min, rt_float t_max, HitRecord *record)
+{
+    return hitable_list_call_all(r, t_min, t_max, record, hitable_list);
+}
 static bool hitable_get_aabb(rt_float time_start, rt_float time_end, AABB *output, const HitableList *self)
 {
     size_t i;
