@@ -57,7 +57,7 @@ vec_axis
 */
 #endif
 
-AABB aabb_surrounding(const AABB *a, const AABB *b)
+AABB aabb_surrounding(const AABB *__restrict a, const AABB *__restrict b)
 {
     Vec3 min = vec3_create(rt_min(a->min.x, b->min.x), rt_min(a->min.y, b->min.y), rt_min(a->min.z, b->min.z));
     Vec3 max = vec3_create(rt_max(a->max.x, b->max.x), rt_max(a->max.y, b->max.y), rt_max(a->max.z, b->max.z));

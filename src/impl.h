@@ -10,6 +10,8 @@ int impl_start_thread(uint64_t *id, void *(*func)(void *), void *args);
 
 int impl_join_thread(uint64_t id);
 
+int impl_is_thread_ended(uint64_t id);
+
 #endif
 /* here is the implementation of every needed function */
 

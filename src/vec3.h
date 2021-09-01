@@ -183,7 +183,7 @@ __attribute__((hot)) static inline rt_float *vec_axis_ptr(Vec3 *vec, int axis)
     }
     return &vec->z;
 }
-static inline void get_sphere_uv(const Vec3 *point, rt_float *u, rt_float *v)
+static inline void get_sphere_uv(const Vec3 *point, rt_float *__restrict u, rt_float *__restrict v)
 {
     rt_float theta = fast_acos(-(point->y));
     rt_float phi = fast_atan2(-(point->z), point->x);

@@ -101,7 +101,7 @@ static inline rt_float fast_sin(rt_float x)
 }
 static inline rt_float fast_cos(rt_float x)
 {
-    return fast_cos(M_PI_2 + x);
+    return fast_sin(M_PI_2 + x);
 }
 
 void init_sin_table(void);

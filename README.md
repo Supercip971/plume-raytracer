@@ -1,6 +1,6 @@
-# ANSI C raytracer
+# C raytracer
 
-A portable simple ANSI C raytracer on CPU !
+A portable simple C raytracer on CPU !
 
 ### (26/08/2021) optimisation + light 
 ![render with light](./pic/28-08-2021.png)

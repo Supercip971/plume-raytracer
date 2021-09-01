@@ -2,6 +2,8 @@
 #include <math.h>
 #include <stdbool.h>
 #include <stdlib.h>
+#define __USE_GNU
+#include <pthread.h>
 #include <unistd.h>
 #include "config.h"
 #include "engine.h"
@@ -166,19 +168,30 @@ void impl_render_loop(void)
     int frames = 0;
     rt_float fps;
     uint32_t prev_ticks = 0;
+    uint32_t start_tick = impl_get_tick();
     int32_t wait_tick;
+    SDL_Rect target;
 
     while (event_update())
     {
         prev_ticks = impl_get_tick();
 
-        render_update(pixels, SCRN_WIDTH, SCRN_HEIGHT);
+        if (!render_update(pixels, SCRN_WIDTH, SCRN_HEIGHT))
+        {
+            swap_buffer();
+            printf(" ended [!] %li \n", impl_get_tick() - start_tick);
+            return;
+        }
         swap_buffer();
 
         SDL_UpdateTexture(framebuffer, NULL, raw_pixels,
                           SCRN_WIDTH * sizeof(struct raw_color));
 
-        SDL_RenderCopy(renderer, framebuffer, NULL, NULL);
+        target.x = 0;
+        target.y = 0;
+        target.w = ASCRN_WIDTH;
+        target.h = ASCRN_HEIGHT;
+        SDL_RenderCopy(renderer, framebuffer, NULL, &target);
         SDL_RenderPresent(renderer);
         SDL_RenderClear(renderer);
 
@@ -198,6 +211,7 @@ void impl_render_loop(void)
 
         frames++;
     }
+    printf(" ended [!] %li \n", impl_get_tick() - start_tick);
 }
 
 Image image_load(const char *path)
@@ -237,7 +251,7 @@ void image_destroy(Image *img)
 void impl_render_start(void)
 {
     SDL_Init(SDL_INIT_EVERYTHING);
-    screen = SDL_CreateWindow("c raytracer", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SCRN_WIDTH, SCRN_HEIGHT, SDL_WINDOW_VULKAN);
+    screen = SDL_CreateWindow("c raytracer", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, ASCRN_WIDTH, ASCRN_HEIGHT, SDL_WINDOW_VULKAN);
     renderer = SDL_CreateRenderer(screen, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
     framebuffer = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_STREAMING, SCRN_WIDTH, SCRN_HEIGHT);
 
@@ -262,4 +276,10 @@ int impl_start_thread(uint64_t *id, void *(*func)(void *), void *args)
 int impl_join_thread(uint64_t id)
 {
     return pthread_join(id, NULL);
+}
+
+int impl_is_thread_ended(uint64_t id)
+{
+
+    return pthread_tryjoin_np(id, NULL) != 0;
 }

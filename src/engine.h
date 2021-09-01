@@ -1,9 +1,10 @@
 #pragma once
 
+#include <stdbool.h>
 #include <stddef.h>
 #include "color.h"
 
-void render_update(Color *framebuffer, size_t width, size_t height);
+bool render_update(Color *framebuffer, size_t width, size_t height);
 
 void render_init(void);
 

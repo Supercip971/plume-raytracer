@@ -7,11 +7,11 @@ CC = gcc
 
 # for TCC
 # CFLAGS =  -DSDL_DISABLE_IMMINTRIN_H=0 -Isrc/ -pedantic  -O3  -std=gnu89
- CFLAGS =  -march=native -ansi -Ofast  -Isrc/  \
+ CFLAGS =  -march=native -ansi -Ofast -Isrc/  \
  	-std=gnu89 -Wall -Wextra  \
- 	-pedantic -Wmissing-prototypes -Wstrict-prototypes \
-     -Wold-style-definition -Werror -flto      \
- 	  -ffast-math  -DUSE_INTRINSIC=0
+ 	-Wmissing-prototypes -Wstrict-prototypes \
+    -Wold-style-definition -Werror -flto=auto     \
+ 	-ffast-math  -DUSE_INTRINSIC=0 -fno-semantic-interposition -ffunction-sections -fdata-sections 
 
 
 BUILD_DIR = build
@@ -28,7 +28,7 @@ OUTPUT = build/$(PROJECT_NAME).elf
 $(OUTPUT): $(OFILES)
 	@$(MKCWD)
 	@echo "[ $@ ] $^"
-	$(CC) $(CFLAGS) -o $@ $^  -lc -lpthread -lm -lSDL2 
+	$(CC) $(CFLAGS) -o $@ $^ -lc -lpthread -lm -lSDL2  -Wl,--gc-sections 
 
 $(BUILD_DIR)/%.o: src/%.c $(HFILES)
 	@$(MKCWD)
