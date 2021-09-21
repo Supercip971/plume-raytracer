@@ -44,11 +44,11 @@ static inline bool aabb_hit(const AABB *self, const Ray *ray, rt_float t_min, rt
 static inline bool aabb_hit(const AABB *self, const Ray *ray, rt_float t_min, rt_float t_max)
 {
 
-    Vec3 invd = vec3_div(vec3_create(1,1,1), ray->direction);
+    Vec3 invd = vec3_div(vec3_create(1, 1, 1), ray->direction);
     Vec3 t0 = vec3_mul(vec3_sub(self->min, ray->origin), invd);
     Vec3 t1 = vec3_mul(vec3_sub(self->max, ray->origin), invd);
-  
-      if (invd.x < 0.0f)
+
+    if (invd.x < 0.0f)
     {
         rt_float _temp = t0.x;
         t0.x = t1.x;
@@ -66,8 +66,6 @@ static inline bool aabb_hit(const AABB *self, const Ray *ray, rt_float t_min, rt
         t0.z = t1.z;
         t1.z = _temp;
     }
-
-
 
     t_min = t0.x > t_min ? t0.x : t_min;
     t_max = t1.x < t_max ? t1.x : t_max;
@@ -91,6 +89,13 @@ static inline bool aabb_hit(const AABB *self, const Ray *ray, rt_float t_min, rt
     return true;
 }
 #endif
+
+static inline bool aabb_intersect(const AABB *a, const AABB *b)
+{
+    return (a->min.x <= b->max.x && a->max.x >= b->min.x) &&
+           (a->min.y <= b->max.y && a->max.y >= b->min.y) &&
+           (a->min.z <= b->max.z && a->max.z >= b->min.z);
+}
 
 AABB aabb_surrounding(const AABB *a, const AABB *b);
 #endif

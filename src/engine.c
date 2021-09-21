@@ -7,7 +7,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "bvh.h"
 #include "camera.h"
 #include "config.h"
 #include "impl.h"
@@ -21,6 +20,7 @@
 #include "shape/aa_rec.h"
 #include "shape/box.h"
 #include "shape/moving_sphere.h"
+#include "octree.h"
 #include "texture/checker.h"
 #include "texture/image.h"
 #include "texture/noise.h"
@@ -74,7 +74,7 @@ struct render_thread_args *args;
 static uint64_t thr[MAX_RENDER_THREAD] = {0};
 
 static Object root;
-static Object bvh;
+static Octree* tree;
 
 static Vec3 background_color;
 
@@ -94,7 +94,8 @@ static Vec3 calculate_ray_color(Ray from, int depth, const Vec3 *background)
     {
         return vec3_create(0, 0, 0);
     }
-    if (!bvh.collide(from, 0.001, 100000000, &record, bvh.data))
+    float t_max = 10000000;
+    if(!octree_hit(from, 0.001,&t_max , &record, tree)) 
     {
         return *background;
     }
@@ -316,9 +317,7 @@ static void noise_scene(void)
     add_hitable_object(&root, sphere_create(2, vec3_create(0, 2, 0), lambertian_create_texture(per_texture)));
 
     lst = root.data;
-    bvh_create_rec(lst, 0.0, 1.0);
-    bvh = lst->childs[0];
-
+    tree = octree_create(lst, 1,0); 
     camera_init(vec3_create(13, 2, 3), vec3_create(0, 0, 0), 20, false);
 
     background_color = vec3_create(0.70, 0.80, 1);
@@ -331,8 +330,7 @@ static void earth_scene(void)
     add_hitable_object(&root, sphere_create(2, vec3_create(0, 0, 0), lambertian_create_texture(image_create(image_load("assets/test_colors.png")))));
 
     lst = root.data;
-    bvh_create_rec(lst, 0.0, 1.0);
-    bvh = lst->childs[0];
+    tree = octree_create(lst, 1,0); 
 
     camera_init(vec3_create(13, 2, 3), vec3_create(0, 0, 0), 20, false);
     background_color = vec3_create(0.70, 0.80, 1);
@@ -363,10 +361,9 @@ static void random_scene(void)
             {
                 if (material < 0.1)
                 {
-                    Vec3 center2 = vec3_create(center.x, center.y + random_rt_float() * 0.5, center.z);
                     Vec3 random_albedo = vec3_create(random_rt_float(), random_rt_float(), random_rt_float());
                     result_material = lambertian_create(vec3_mul(random_albedo, random_albedo));
-                    add_hitable_object(&root, moving_sphere_create(0.2, 0, 1, center, center2, result_material));
+                    add_hitable_object(&root, sphere_create(0.2, center,  result_material));
                 }
                 else if (material < 0.4)
                 {
@@ -402,8 +399,7 @@ static void random_scene(void)
     add_hitable_object(&root, sphere_create(1.0, vec3_create(4, 1, 0), metal_create(vec3_create(0.7, 0.6, 0.5), 0)));
 
     lst = root.data;
-    bvh_create_rec(lst, 0.0, 1.0);
-    bvh = lst->childs[0];
+    tree = octree_create(lst, 1,0); 
 
     camera_init(vec3_create(13, 2, 3), vec3_create(0, 0, 0), 20, false);
     background_color = vec3_create(0.70, 0.80, 1);
@@ -426,8 +422,7 @@ static void light_scene(void)
 */
 
     lst = root.data;
-    bvh_create_rec(lst, 0.0, 1.0);
-    bvh = lst->childs[0];
+    tree = octree_create(lst, 1,0); 
 
     camera_init(vec3_create(26, 3, 6), vec3_create(0, 2, 0), 20, false);
 
@@ -455,9 +450,7 @@ static void cornell_box(void)
     add_hitable_object(&root, box_create(vec3_create(265, 0, 295), vec3_create(430, 330, 460), white));
 
     lst = root.data;
-    bvh_create_rec(lst, 0.0, 1.0);
-    bvh = lst->childs[0];
-
+    tree = octree_create(lst, 1,0); 
     camera_init(vec3_create(278, 278, -800), vec3_create(278, 278, 0), 40, false);
 
     background_color = vec3_create(0, 0, 0);

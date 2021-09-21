@@ -75,7 +75,7 @@ static rt_float bvh_distance(Object *left, Object *right, rt_float tstart, rt_fl
     a_center = vec3_add(a.min, vec3_mul_val(vec3_sub(a.max, a.min), 0.5));
     b_center = vec3_add(b.min, vec3_mul_val(vec3_sub(b.max, b.min), 0.5));
 
-    return vec3_length(vec3_sub(b_center, a_center));
+    return vec3_squared_length(vec3_sub(b_center, a_center));
 }
 
 void bvh_create_rec(HitableList *list, rt_float tstart, rt_float tend)
@@ -102,7 +102,6 @@ void bvh_create_rec(HitableList *list, rt_float tstart, rt_float tend)
                     continue;
                 }
                 dist = bvh_distance(&list->childs[i], &list->childs[j], tstart, tend);
-
                 if (dist < best_dist)
                 {
                     best_dist = dist;

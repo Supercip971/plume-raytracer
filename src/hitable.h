@@ -35,6 +35,7 @@ struct object
 
 struct hit_record
 {
+    int depth;
     rt_float t;
     Vec3 pos;
     Vec3 normal;

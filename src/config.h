@@ -11,7 +11,7 @@
 #define RENDER_THREAD (5)
 #define MULTIPLE_THREAD (11)
 
-#define MAX_SAMPLE 8
+#define MAX_SAMPLE 10
 #define SAMPLE_PER_THREAD 3
 #define MAX_RENDER_THREAD 256
 
@@ -37,6 +37,6 @@ typedef float rt_float;
 
 #define SCENE_CORNELL_BOX 4
 
-#define SCENE_SELECT SCENE_LIGHT
+#define SCENE_SELECT SCENE_RANDOM
 
 #define MAX_OBJECTS 256

@@ -7,7 +7,7 @@ CC = gcc
 
 # for TCC
 # CFLAGS =  -DSDL_DISABLE_IMMINTRIN_H=0 -Isrc/ -pedantic  -O3  -std=gnu89
- CFLAGS =  -march=native -ansi -Ofast -Isrc/  \
+ CFLAGS =  -march=native -ansi -Ofast -g -Isrc/  \
  	-std=gnu89 -Wall -Wextra  \
  	-Wmissing-prototypes -Wstrict-prototypes \
     -Wold-style-definition -Werror -flto=auto     \
