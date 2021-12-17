@@ -10,6 +10,11 @@ typedef struct aabb
     Vec3 max;
 } AABB;
 
+typedef struct aabb_plane
+{
+    Vec3 normal;
+    rt_float dist;
+} AABBPlane;
 AABB aabb_create(Vec3 min, Vec3 max);
 
 #ifdef USE_NON_AVX_AABB
@@ -98,4 +103,44 @@ static inline bool aabb_intersect(const AABB *a, const AABB *b)
 }
 
 AABB aabb_surrounding(const AABB *a, const AABB *b);
+
+static inline void get_aabb_plane(AABBPlane *result, const AABB *from)
+{
+    Vec3 center = vec3_add(from->min, vec3_mul_val(vec3_sub(from->max, from->min), 0.5));
+    size_t i; 
+    for ( i = 0; i < 3; i++)
+    {
+        result[i].dist = vec_axis(center, i);
+        result[i].normal = vec3_create(0, 0, 0);
+        *vec_axis_ptr(&result[i].normal, i) = 1.f;
+    }
+}
+
+static inline Vec3 get_aabb_size(const AABB *self)
+{
+    return vec3_sub(self->max, self->min);
+}
+
+static inline rt_float aabb_ray_plane_dist(const Ray *r, const AABBPlane *plane)
+{
+    rt_float dot = vec3_dot(plane->normal, r->direction);
+    if( dot < 0.0001f)
+    {
+        return 10000000000;
+    }
+    return (plane->dist - vec3_dot(plane->normal, r->origin)) / dot;
+}
+
+static inline bool aabb_contain(const AABB *self, Vec3 pos)
+{
+    return (self->min.x <= pos.x && self->max.x >= pos.x) &&
+           (self->min.y <= pos.y && self->max.y >= pos.y) &&
+           (self->min.z <= pos.z && self->max.z >= pos.z);
+}
+static inline Vec3 aabb_center(const AABB* self)
+{
+    Vec3 box_center = get_aabb_size(self);
+
+    return vec3_add(self->min, vec3_mul_val(box_center, 0.5));
+}
 #endif

@@ -1,5 +1,6 @@
 #include "octree.h"
-
+#include <math.h>
+#include <stdio.h>
 static AABB get_hitable_surrounding(HitableList *hitable, rt_float t_end, rt_float t_start)
 {
     AABB current;
@@ -7,7 +8,7 @@ static AABB get_hitable_surrounding(HitableList *hitable, rt_float t_end, rt_flo
     for (i = 0; i < hitable->child_count; i++)
     {
         AABB temp;
-        if(hitable->childs[i].get_aabb(t_start, t_end, &temp, hitable->childs[i].data) == false)
+        if (hitable->childs[i].get_aabb(t_start, t_end, &temp, hitable->childs[i].data) == false)
         {
             exit(1);
         }
@@ -26,7 +27,7 @@ static AABB get_hitable_surrounding(HitableList *hitable, rt_float t_end, rt_flo
 static bool octree_setup(Octree *target, AABB box, HitableList *hitable, int subdivide)
 {
     size_t object_count = 0;
-    Object *v[512];
+    int v[512];
     size_t x, y, z, i;
 
     int box_id = 0;
@@ -42,28 +43,36 @@ static bool octree_setup(Octree *target, AABB box, HitableList *hitable, int sub
 
         if (aabb_intersect(&temp, &box))
         {
-            v[object_count] = &hitable->childs[i];
+            v[object_count] = i;
             object_count++;
         }
     }
 
-    if (object_count == 1 || subdivide > 8) 
+    if ((object_count == 1) || subdivide > 8)
+
     {
         target->obj_count = object_count;
         target->objects = malloc(sizeof(Object *) * object_count);
 
         for (i = 0; i < object_count; i++)
         {
-            target->objects[i] = v[i];
+            target->objects[i] = &hitable->childs[v[i]];
         }
 
         return true;
     }
     else if (object_count == 0)
     {
+        target->obj_count = 0;
         return false;
     }
-
+    target->obj_count = 0;
+    target->childs = malloc(sizeof(Octree *) * 9);
+    if (target->childs == NULL)
+    {
+        printf("failed to alloc ! \n");
+    }
+    bool at_least_one = false;
     for (x = 0; x < 2; x++)
     {
         for (y = 0; y < 2; y++)
@@ -73,6 +82,7 @@ static bool octree_setup(Octree *target, AABB box, HitableList *hitable, int sub
                 AABB current;
                 Octree final = {0};
 
+                box_id = x + y * 2 + z * 4;
                 current.min = box.min;
                 current.max = box.max;
                 if (x == 0)
@@ -102,20 +112,19 @@ static bool octree_setup(Octree *target, AABB box, HitableList *hitable, int sub
 
                 if (octree_setup(&final, current, hitable, subdivide + 1))
                 {
-                    target->childs[box_id] = calloc(sizeof(Octree), 1);
+                    target->childs[box_id] = calloc(1, sizeof(Octree));
                     *target->childs[box_id] = final;
+                    at_least_one = true;
                 }
                 else
                 {
                     target->childs[box_id] = NULL;
                 }
-
-                box_id++;
             }
         }
     }
 
-    return true;
+    return at_least_one;
 }
 Octree *octree_create(HitableList *hitable, rt_float t_end, rt_float t_start)
 {
@@ -127,40 +136,9 @@ Octree *octree_create(HitableList *hitable, rt_float t_end, rt_float t_start)
 
     return target;
 }
-bool octree_hit(Ray r, rt_float t_min, rt_float* t_max, HitRecord *record, const Octree *self)
+
+bool octree_hit(Ray r, rt_float t_min, rt_float *t_max, HitRecord *record, const Octree *self)
 {
-      
-    rt_float prev_t = *t_max;
-    size_t i;
-    if (self->obj_count != 0)
-    {
-        bool result = false;
-        for (i = 0; i < self->obj_count; i++)
-        {
-            bool temp = self->objects[i]->collide(r, t_min, *t_max, record, self->objects[i]->data);
 
-            if (temp)
-            {
-                *t_max = record->t;
-            }
-            result |= temp;
-        }
-        return result;
-    }
-
-    for (i = 0; i < 8; i++)
-    {
-
-        if (self->childs[i] == NULL)
-        {
-            continue;
-        }
-        if (aabb_hit(&self->childs[i]->self_box, &r, t_min, *t_max))
-        {
-            octree_hit(r, t_min, t_max, record, self->childs[i]);
-            
-        }
-    }
-
-    return prev_t != *t_max;
+    return ray_cast_octree(self, r, t_min, *t_max, record);
 }

@@ -3,12 +3,12 @@
 #include "hitable.h"
 typedef struct octree 
 {
-    struct octree* childs[8];
+    struct octree** childs;
     Object** objects;
-    size_t obj_count;
+    uint16_t obj_count;
 
     AABB self_box;
-} Octree;
+} Octree ;
 
 Octree* octree_create(HitableList* hitable, rt_float t_end, rt_float t_start);
 
