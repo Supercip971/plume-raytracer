@@ -16,11 +16,13 @@
 #include "material/lambertian.h"
 #include "material/light.h"
 #include "material/metal.h"
+#include "matrix4x4.h"
 #include "ray.h"
 #include "shape/Sphere.h"
 #include "shape/aa_rec.h"
 #include "shape/box.h"
 #include "shape/moving_sphere.h"
+#include "shape/transform.h"
 #include "texture/checker.h"
 #include "texture/image.h"
 #include "texture/noise.h"
@@ -145,7 +147,7 @@ FLATTEN static void render_update_part(struct render_part_args *arg)
 
                 current_color = vec3_div_val(
                     vec3_add(
-                        vec3_mul_val(vec_from_color(previous_color), arg->sample_count), current_color),
+                        vec3_mul_val(vec_from_color(previous_color), (rt_float)arg->sample_count), current_color),
                     arg->sample_count + 1);
             }
 
@@ -426,6 +428,16 @@ static void light_scene(void)
 static void cornell_box(void)
 {
     HitableList *lst;
+    Object box;
+    Matrix4x4 diff;
+    Matrix4x4 diff_rot;
+    Matrix4x4 diff_mov;
+    Object translated_box;
+    Object box2;
+    Matrix4x4 diff2;
+    Matrix4x4 diff2_rot;
+    Matrix4x4 diff2_mov;
+    Object translated_box2;
     Material red = lambertian_create(vec3_create(0.65, 0.05, 0.05));
     Material green = lambertian_create(vec3_create(0.12, 0.45, 0.15));
     Material light = light_create(vec3_create(15, 15, 15));
@@ -440,8 +452,20 @@ static void cornell_box(void)
     add_hitable_object(&root, aaxzrect_create(0, 555, 0, 555, 555, white));
     add_hitable_object(&root, aaxyrect_create(0, 555, 0, 555, 555, white));
 
-    add_hitable_object(&root, box_create(vec3_create(130, 0, 65), vec3_create(295, 165, 230), white));
-    add_hitable_object(&root, box_create(vec3_create(265, 0, 295), vec3_create(430, 330, 460), white));
+    box = box_create(vec3_create(0, 0, 0), vec3_create(165, 330, 165), white);
+    create_matrix_translate(&diff_mov, 265, 0, 295);
+    create_matrix_rotate_y(&diff_rot, DEG2RAD(15));
+    matrix_multiply(&diff_mov, &diff_rot, &diff);
+    translated_box = transform(box, diff);
+
+    add_hitable_object(&root, translated_box);
+
+    box2 = box_create(vec3_create(0, 0, 0), vec3_create(165, 165, 165), white);
+    create_matrix_translate(&diff2_mov, 130, 0, 65);
+    create_matrix_rotate_y(&diff2_rot, DEG2RAD(-18));
+    matrix_multiply(&diff2_mov, &diff2_rot, &diff2);
+    translated_box2 = transform(box2, diff2);
+    add_hitable_object(&root, translated_box2);
 
     lst = root.data;
     bvh_create_rec(lst, 1, 0);

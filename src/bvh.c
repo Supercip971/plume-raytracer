@@ -22,6 +22,10 @@ bool bvh_hit(Ray r, rt_float t_min, rt_float t_max, HitRecord *record, const bvh
     hit_left = object_collide(r, t_min, t_max, record, (Object *)&self->left);
     hit_right = object_collide(r, t_min, hit_left ? record->t : t_max, record, (Object *)&self->right);
 
+    if (hit_left || hit_right)
+    {
+        record->oc_depth += 1;
+    }
     return hit_left || hit_right;
 }
 

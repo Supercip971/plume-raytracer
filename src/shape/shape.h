@@ -15,6 +15,7 @@ typedef enum
     SHAPE_TRANSLATE,
     SHAPE_BVH,
     SHAPE_HITABLE_LIST,
+    SHAPE_TRANSFORM
 
 } ShapeTypes;
 

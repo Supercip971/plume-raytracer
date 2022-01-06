@@ -5,6 +5,7 @@
 #include "aa_rec.h"
 #include "box.h"
 #include "moving_sphere.h"
+#include "transform.h"
 #include "translate.h"
 
 bool object_collide(Ray r, rt_float t_min, rt_float t_max, HitRecord *record, Object *self)
@@ -15,6 +16,8 @@ bool object_collide(Ray r, rt_float t_min, rt_float t_max, HitRecord *record, Ob
         return bvh_hit(r, t_min, t_max, record, self->data);
     case SHAPE_HITABLE_LIST:
         return hitable_list_call_all(r, t_min, t_max, record, self->data);
+    case SHAPE_TRANSFORM:
+        return hit_transform_object_callback(r, t_min, t_max, record, self->data);
     case SHAPE_BOX:
         return hit_box_object_callback(r, t_min, t_max, record, self->data);
     case SHAPE_MOVING_SPHERE:
@@ -42,6 +45,8 @@ bool object_get_aabb(rt_float time_start, rt_float time_end, AABB *output, Objec
         return bvh_get_aabb(time_start, time_end, output, self->data);
     case SHAPE_HITABLE_LIST:
         return hitable_get_aabb(time_start, time_end, output, self->data);
+    case SHAPE_TRANSFORM:
+        return transform_get_aabb(time_start, time_end, output, self->data);
 
     case SHAPE_BOX:
         return box_get_aabb(time_start, time_end, output, self->data);
@@ -57,6 +62,7 @@ bool object_get_aabb(rt_float time_start, rt_float time_end, AABB *output, Objec
         return aaxzrect_get_aabb(time_start, time_end, output, self->data);
     case SHAPE_AAREC_YZ:
         return aayzrect_get_aabb(time_start, time_end, output, self->data);
+
     default:
         return false;
     }
@@ -73,6 +79,8 @@ bool object_destroy(Object *self)
         return box_destroy(self->data);
     case SHAPE_TRANSLATE:
         return translate_destroy(self->data);
+    case SHAPE_TRANSFORM:
+        return transform_destroy(self->data);
     default:
         return false;
     }

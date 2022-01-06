@@ -16,6 +16,9 @@
 
 #define rt_clamp(a, from, to) rt_max(rt_min(a, to), from)
 
+#define RAD2DEG(x) (x) * (180.0f / M_PI)
+#define DEG2RAD(x) (x) * (M_PI / 180.0f)
+
 static inline uint32_t fast_rand(void)
 {
     static uint32_t shuffle_table[4] = {

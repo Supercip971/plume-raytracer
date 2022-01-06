@@ -12,6 +12,7 @@ typedef struct hit_record HitRecord;
 struct hit_record
 {
     int depth;
+    int oc_depth;
     rt_float t;
     Vec3 pos;
     Vec3 normal;
