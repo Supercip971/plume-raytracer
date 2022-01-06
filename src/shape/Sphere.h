@@ -15,3 +15,5 @@ typedef struct sphere
 bool hit_sphere_object_callback(Ray ray, rt_float t_min, rt_float t_max, HitRecord *record, const Sphere *self);
 
 Object sphere_create(rt_float radius, Vec3 pos, Material sphere_material);
+
+bool sphere_get_aabb(rt_float time_start, rt_float time_end, AABB *output, const Sphere *self);

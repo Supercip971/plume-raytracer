@@ -38,6 +38,13 @@ typedef struct yz_rec
     AABB self_box;
 
 } YZrec;
+bool hit_aaxyrect_callback(Ray ray, rt_float t_min, rt_float t_max, HitRecord *record, const XYrec *self);
+bool hit_aaxzrect_callback(Ray ray, rt_float t_min, rt_float t_max, HitRecord *record, const XZrec *self);
+bool hit_aayzrect_callback(Ray ray, rt_float t_min, rt_float t_max, HitRecord *record, const YZrec *self);
+
+bool aaxyrect_get_aabb(rt_float time_start, rt_float time_end, AABB *output, const XYrec *self);
+bool aaxzrect_get_aabb(rt_float time_start, rt_float time_end, AABB *output, const XZrec *self);
+bool aayzrect_get_aabb(rt_float time_start, rt_float time_end, AABB *output, const YZrec *self);
 
 Object aaxyrect_create(rt_float x_0, rt_float x_1, rt_float y_0, rt_float y_1, rt_float k, Material rect_material);
 Object aaxzrect_create(rt_float x_0, rt_float x_1, rt_float z_0, rt_float z_1, rt_float k, Material rect_material);

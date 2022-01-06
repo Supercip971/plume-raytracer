@@ -12,27 +12,21 @@ void add_hitable_object(Object *hitable_list, Object object)
 
 bool hit_call_all_object(Object *hitable_list, Ray r, rt_float t_min, rt_float t_max, HitRecord *record)
 {
-    return hitable_list->collide(r, t_min, t_max, record, hitable_list->data);
+    return object_collide(r, t_min, t_max, record, hitable_list);
 }
 
-static bool hitable_list_destroy(HitableList *self)
+bool hitable_list_destroy(HitableList *self)
 {
 
     size_t i;
     for (i = 0; i < self->child_count; i++)
     {
-        if (self->childs[i].data)
-        {
-            if (self->childs[i].destroy)
-            {
-                self->childs[i].destroy(self->childs[i].data);
-            }
-        }
+        object_destroy(&self->childs[i]);
     }
 
     return true;
 }
-static bool hitable_list_call_all(Ray r, rt_float t_min, rt_float t_max, HitRecord *record, const HitableList *self)
+bool hitable_list_call_all(Ray r, rt_float t_min, rt_float t_max, HitRecord *record, const HitableList *self)
 {
     HitRecord temp;
     bool at_least_one_collided = false;
@@ -42,7 +36,7 @@ static bool hitable_list_call_all(Ray r, rt_float t_min, rt_float t_max, HitReco
 
     for (i = 0; i < self->child_count; i++)
     {
-        if (self->childs[i].collide(r, t_min, closest, &temp, self->childs[i].data))
+        if (object_collide(r, t_min, closest, &temp, (Object *)&self->childs[i]))
         {
             at_least_one_collided = true;
 
@@ -58,7 +52,7 @@ bool hit_call_all_list(const HitableList *hitable_list, Ray r, rt_float t_min, r
 {
     return hitable_list_call_all(r, t_min, t_max, record, hitable_list);
 }
-static bool hitable_get_aabb(rt_float time_start, rt_float time_end, AABB *output, const HitableList *self)
+bool hitable_get_aabb(rt_float time_start, rt_float time_end, AABB *output, const HitableList *self)
 {
     size_t i;
     AABB temp;
@@ -71,7 +65,7 @@ static bool hitable_get_aabb(rt_float time_start, rt_float time_end, AABB *outpu
 
     for (i = 0; i < self->child_count; i++)
     {
-        if (!self->childs[i].get_aabb(time_start, time_end, &temp, self->childs[i].data))
+        if (object_get_aabb(time_start, time_end, &temp, (Object *)&self->childs[i]))
         {
             continue;
         }
@@ -85,7 +79,7 @@ static bool hitable_get_aabb(rt_float time_start, rt_float time_end, AABB *outpu
 
 void hit_destroy_all_objects(Object *hitable_list)
 {
-    hitable_list->destroy(hitable_list->data);
+    object_destroy(hitable_list);
     free(hitable_list->data);
 }
 
@@ -102,10 +96,7 @@ Object create_hitable_list(void)
     list->child_count = 0;
     result.data = list;
     result.is_leaf = false;
-    result.destroy = (ObjectDestroy)hitable_list_destroy;
-    result.get_aabb = (ObjectGetAABB)hitable_get_aabb;
-    result.collide = (ObjectCallback)hitable_list_call_all;
-
+    result.type = SHAPE_HITABLE_LIST;
     return result;
 }
 

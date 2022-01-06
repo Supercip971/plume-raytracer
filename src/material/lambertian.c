@@ -16,7 +16,7 @@ bool lambertian_callback(const Ray *r_in, const HitRecord *record, Vec3 *attenua
     scattered->direction = direction;
     scattered->time = r_in->time;
 
-    *attenuation = self->albedo.get_pixel(record->u, record->v, &record->pos, self->albedo.data);
+    *attenuation = texture_get(record->u, record->v, &record->pos, &self->albedo);
 
     return true;
 }
@@ -34,8 +34,6 @@ Material lambertian_create_texture(Texture albedo)
     self->albedo = albedo;
 
     mat.data = self;
-    mat.material_callback = (MaterialCallback)lambertian_callback;
-    mat.color_emition = NULL;
-
+    mat.type = MATERIAL_LAMBERTIAN;
     return mat;
 }

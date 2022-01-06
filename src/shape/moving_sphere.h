@@ -13,3 +13,5 @@ typedef struct moving_sphere
 bool hit_moving_sphere_object_callback(Ray ray, rt_float t_min, rt_float t_max, HitRecord *record, const MovingSphere *self);
 
 Object moving_sphere_create(rt_float radius, rt_float time_start, rt_float time_end, Vec3 pos_start, Vec3 pos_end, Material sphere_material);
+bool hit_moving_sphere_object_callback(Ray ray, rt_float t_min, rt_float t_max, HitRecord *record, const MovingSphere *self);
+bool moving_sphere_get_aabb(rt_float time_start, rt_float time_end, AABB *output, const MovingSphere *self);

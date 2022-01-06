@@ -13,5 +13,7 @@ typedef struct translate
 } Translate;
 
 Object translate(Object translated, Vec3 displacement, Vec3 rotation);
-
+bool hit_translate_object_callback(Ray ray, rt_float t_min, rt_float t_max, HitRecord *record, const Translate *self);
+bool translate_get_aabb(rt_float time_start, rt_float time_end, AABB *output, const Translate *self);
+bool translate_destroy(Translate *self);
 #endif

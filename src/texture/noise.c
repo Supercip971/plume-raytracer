@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include "noise.h"
 
-static Vec3 perlin_get(rt_float u, rt_float v, const Vec3 *point, const Perlin *self)
+Vec3 perlin_get(rt_float u, rt_float v, const Vec3 *point, const Perlin *self)
 {
 
     /* Vec3 scaled_point = vec3_mul_val(*point, self->scale);*/
@@ -23,7 +23,7 @@ Texture perlin_create(rt_float scale)
 
     perl->scale = scale;
     result.data = perl;
-    result.get_pixel = (texture_get)perlin_get;
+    result.type = TEXTURE_NOISE;
 
     return result;
 }

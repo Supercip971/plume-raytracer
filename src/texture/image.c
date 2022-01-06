@@ -3,7 +3,7 @@
 #include <stdlib.h>
 #include "../utils.h"
 
-static Vec3 image_tex_get(rt_float u, rt_float v, const Vec3 *point, const ImageTexture *self)
+Vec3 image_tex_get(rt_float u, rt_float v, const Vec3 *point, const ImageTexture *self)
 {
 
     int i;
@@ -39,7 +39,7 @@ Texture image_create(Image image)
     tex->bytes_per_scan_lines = image.width;
 
     result.data = tex;
-    result.get_pixel = (texture_get)image_tex_get;
+    result.type = TEXTURE_IMAGE;
 
     return result;
 }

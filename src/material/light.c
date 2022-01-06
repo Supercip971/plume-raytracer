@@ -2,23 +2,12 @@
 #include <stdlib.h>
 #include "../texture/solid_color.h"
 
-static bool light_emit(rt_float u, rt_float v, Vec3 *point, Vec3 *emit, const Light *self)
+bool light_emit(rt_float u, rt_float v, const Vec3 *point, Vec3 *emit, const Light *self)
 {
-
-    *emit = self->emition.get_pixel(u, v, point, self->emition.data);
+    *emit = texture_get(u, v, point, &self->emition);
 
     return true;
 }
-static bool light_callback(const Ray *r_in, const HitRecord *record, Vec3 *attenuation, Ray *scattered, const Light *self)
-{
-    (void)r_in;
-    (void)record;
-    (void)attenuation;
-    (void)scattered;
-    (void)self;
-    return false;
-}
-
 Material light_create_texture(Texture emition)
 {
     Material mat;
@@ -26,9 +15,7 @@ Material light_create_texture(Texture emition)
 
     light->emition = emition;
     mat.data = light;
-    mat.color_emition = (MaterialColorEmit)light_emit;
-    mat.material_callback = (MaterialCallback)light_callback;
-
+    mat.type = MATERIAL_LIGHT;
     return mat;
 }
 

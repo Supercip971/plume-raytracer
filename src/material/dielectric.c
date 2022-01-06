@@ -10,7 +10,7 @@ static rt_float schlick(rt_float cosine, rt_float ref_index)
     return r0 + (1 - r0) * pow(1 - cosine, 5);
 }
 
-static bool dieletric_callback(const Ray *r_in, const HitRecord *record, Vec3 *attenuation, Ray *scattered, const Dieletric *self)
+bool dieletric_callback(const Ray *r_in, const HitRecord *record, Vec3 *attenuation, Ray *scattered, const Dieletric *self)
 {
 
     Vec3 direction;
@@ -48,7 +48,6 @@ Material dieletric_create(rt_float red_index)
     self->ref_index = red_index;
 
     mat.data = self;
-    mat.material_callback = (MaterialCallback)dieletric_callback;
-    mat.color_emition = NULL;
+    mat.type = MATERIAL_DIELETRIC;
     return mat;
 }

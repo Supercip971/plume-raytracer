@@ -57,7 +57,7 @@ bool hit_moving_sphere_object_callback(Ray ray, rt_float t_min, rt_float t_max, 
     }
     return false;
 }
-static FLATTEN bool moving_sphere_get_aabb(rt_float time_start, rt_float time_end, AABB *output, const MovingSphere *self)
+FLATTEN bool moving_sphere_get_aabb(rt_float time_start, rt_float time_end, AABB *output, const MovingSphere *self)
 {
     AABB box_start, box_end;
     Vec3 radius_unit = vec3_create(self->radius, self->radius, self->radius);
@@ -80,11 +80,8 @@ Object moving_sphere_create(rt_float radius, rt_float time_start, rt_float time_
     sphere->pos_start = pos_start;
     sphere->pos_end = pos_end;
     sphere->self_material = sphere_material;
-
-    result.collide = (ObjectCallback)hit_moving_sphere_object_callback;
-    result.get_aabb = (ObjectGetAABB)moving_sphere_get_aabb;
+    result.type = SHAPE_MOVING_SPHERE;
     result.data = sphere;
-    result.destroy = NULL;
     result.is_leaf = true;
 
     return result;

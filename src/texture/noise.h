@@ -10,3 +10,4 @@ typedef struct perlin
 } Perlin;
 
 Texture perlin_create(rt_float scale);
+Vec3 perlin_get(rt_float u, rt_float v, const Vec3 *point, const Perlin *self);

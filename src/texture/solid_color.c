@@ -2,7 +2,7 @@
 #include "solid_color.h"
 #include <stdlib.h>
 
-static Vec3 solid_color_get(rt_float u, rt_float v, const Vec3 *point, const SolidColor *self)
+Vec3 solid_color_get(rt_float u, rt_float v, const Vec3 *point, const SolidColor *self)
 {
     (void)u;
     (void)v;
@@ -18,7 +18,7 @@ Texture solid_color_create(Vec3 color)
     col->color = color;
 
     result.data = col;
-    result.get_pixel = (texture_get)solid_color_get;
+    result.type = TEXTURE_SOLID_COLOR;
 
     return result;
 }

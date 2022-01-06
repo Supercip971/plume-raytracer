@@ -8,11 +8,12 @@
 
 /* use render_thread ^2 */
 /* if you put 4 it will use (4^2) 16 threads */
-#define RENDER_THREAD (5)
+#define RENDER_THREAD (4)
 #define MULTIPLE_THREAD (11)
 
 #define MAX_SAMPLE 10
 #define SAMPLE_PER_THREAD 3
+#define MAX_RENDER_THREAD 256
 #define MAX_RENDER_THREAD 256
 
 #define MAX_BOUNCE_DEPTH 64
@@ -36,7 +37,6 @@ typedef float rt_float;
 /* the popular cowornel bowox */
 
 #define SCENE_CORNELL_BOX 4
-
 #define SCENE_SELECT SCENE_RANDOM
 
 #define MAX_OBJECTS 256

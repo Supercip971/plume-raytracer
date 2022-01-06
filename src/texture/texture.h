@@ -3,11 +3,20 @@
 
 #include "../vec3.h"
 
-typedef Vec3 (*texture_get)(rt_float u, rt_float v, const Vec3 *point, const void *self);
+typedef enum
+{
+    TEXTURE_NONE,
+    TEXTURE_CHECKER,
+    TEXTURE_IMAGE,
+    TEXTURE_NOISE,
+    TEXTURE_SOLID_COLOR,
+} TextureTypes;
 
 typedef struct texture
 {
     void *data;
-    texture_get get_pixel;
+    TextureTypes type;
 } Texture;
+Vec3 texture_get(rt_float u, rt_float v, const Vec3 *point, const Texture *texture);
+
 #endif

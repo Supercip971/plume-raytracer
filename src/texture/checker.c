@@ -3,16 +3,16 @@
 #include "checker.h"
 #include "solid_color.h"
 
-static Vec3 checker_get(rt_float u, rt_float v, const Vec3 *point, const CheckerTexture *self)
+Vec3 checker_get(rt_float u, rt_float v, const Vec3 *point, const CheckerTexture *self)
 {
     rt_float sines = fast_sin(self->size * point->x) * fast_sin(self->size * point->y) * fast_sin(self->size * point->z);
     if (sines < 0)
     {
-        return self->odd_color.get_pixel(u, v, point, self->odd_color.data);
+        return texture_get(u, v, point, &self->odd_color);
     }
     else
     {
-        return self->even_color.get_pixel(u, v, point, self->even_color.data);
+        return texture_get(u, v, point, &self->even_color);
     }
 }
 
@@ -26,7 +26,7 @@ Texture checker_create(Texture even, Texture odd, rt_float size)
     col->size = size;
 
     result.data = col;
-    result.get_pixel = (texture_get)checker_get;
+    result.type = TEXTURE_CHECKER;
 
     return result;
 }

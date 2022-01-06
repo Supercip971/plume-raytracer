@@ -24,7 +24,7 @@ static bool hit_sphere_object_callback2(rt_float discriminant, rt_float a, rt_fl
 
     return true;
 }
-static FLATTEN bool sphere_get_aabb(rt_float time_start, rt_float time_end, AABB *output, const Sphere *self)
+bool sphere_get_aabb(rt_float time_start, rt_float time_end, AABB *output, const Sphere *self)
 {
     (void)time_start;
     (void)time_end;
@@ -72,10 +72,8 @@ Object sphere_create(rt_float radius, Vec3 pos, Material sphere_material)
 
     sphere->radius_inv = 1 / radius;
     sphere->radius_squared = radius * radius;
-    result.collide = (ObjectCallback)hit_sphere_object_callback;
-    result.get_aabb = (ObjectGetAABB)sphere_get_aabb;
     result.data = sphere;
-    result.destroy = NULL;
+    result.type = SHAPE_SPHERE;
     result.is_leaf = true;
 
     return result;

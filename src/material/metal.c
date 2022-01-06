@@ -22,7 +22,6 @@ Material metal_create(Vec3 albedo, rt_float fuzzy)
     self->fuzzy = fuzzy;
 
     mat.data = self;
-    mat.material_callback = (MaterialCallback)metal_callback;
-    mat.color_emition = NULL;
+    mat.type = MATERIAL_METAL;
     return mat;
 }

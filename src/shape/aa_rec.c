@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include "../utils.h"
 
-static FLATTEN bool hit_aaxyrect_callback(Ray ray, rt_float t_min, rt_float t_max, HitRecord *record, const XYrec *self)
+FLATTEN bool hit_aaxyrect_callback(Ray ray, rt_float t_min, rt_float t_max, HitRecord *record, const XYrec *self)
 {
     rt_float t;
     rt_float x, y;
@@ -36,7 +36,7 @@ static FLATTEN bool hit_aaxyrect_callback(Ray ray, rt_float t_min, rt_float t_ma
     return true;
 }
 
-static FLATTEN bool aaxyrect_get_aabb(rt_float time_start, rt_float time_end, AABB *output, const XYrec *self)
+FLATTEN bool aaxyrect_get_aabb(rt_float time_start, rt_float time_end, AABB *output, const XYrec *self)
 {
     (void)time_start;
     (void)time_end;
@@ -59,10 +59,8 @@ Object aaxyrect_create(rt_float x_0, rt_float x_1, rt_float y_0, rt_float y_1, r
     rect->y_0 = y_0;
     rect->y_1 = y_1;
 
-    result.collide = (ObjectCallback)hit_aaxyrect_callback;
-    result.get_aabb = (ObjectGetAABB)aaxyrect_get_aabb;
     result.data = rect;
-    result.destroy = NULL;
+    result.type = SHAPE_AAREC_XY;
     result.is_leaf = true;
 
     return result;
@@ -70,7 +68,7 @@ Object aaxyrect_create(rt_float x_0, rt_float x_1, rt_float y_0, rt_float y_1, r
 
 /* xz rect */
 
-static FLATTEN bool hit_aaxzrect_callback(Ray ray, rt_float t_min, rt_float t_max, HitRecord *record, const XZrec *self)
+FLATTEN bool hit_aaxzrect_callback(Ray ray, rt_float t_min, rt_float t_max, HitRecord *record, const XZrec *self)
 {
     rt_float t;
     rt_float z, x;
@@ -104,7 +102,7 @@ static FLATTEN bool hit_aaxzrect_callback(Ray ray, rt_float t_min, rt_float t_ma
     return true;
 }
 
-static FLATTEN bool aaxzrect_get_aabb(rt_float time_start, rt_float time_end, AABB *output, const XZrec *self)
+FLATTEN bool aaxzrect_get_aabb(rt_float time_start, rt_float time_end, AABB *output, const XZrec *self)
 {
     (void)time_start;
     (void)time_end;
@@ -126,18 +124,15 @@ Object aaxzrect_create(rt_float x_0, rt_float x_1, rt_float z_0, rt_float z_1, r
     rect->z_1 = z_1;
     rect->x_0 = x_0;
     rect->x_1 = x_1;
-
-    result.collide = (ObjectCallback)hit_aaxzrect_callback;
-    result.get_aabb = (ObjectGetAABB)aaxzrect_get_aabb;
+    result.type = SHAPE_AAREC_XZ;
     result.data = rect;
-    result.destroy = NULL;
     result.is_leaf = true;
 
     return result;
 }
 /* yz rect */
 
-static FLATTEN bool hit_aayzrect_callback(Ray ray, rt_float t_min, rt_float t_max, HitRecord *record, const YZrec *self)
+FLATTEN bool hit_aayzrect_callback(Ray ray, rt_float t_min, rt_float t_max, HitRecord *record, const YZrec *self)
 {
     rt_float t;
     rt_float z, y;
@@ -171,7 +166,7 @@ static FLATTEN bool hit_aayzrect_callback(Ray ray, rt_float t_min, rt_float t_ma
     return true;
 }
 
-static FLATTEN bool aayzrect_get_aabb(rt_float time_start, rt_float time_end, AABB *output, const YZrec *self)
+FLATTEN bool aayzrect_get_aabb(rt_float time_start, rt_float time_end, AABB *output, const YZrec *self)
 {
     (void)time_start;
     (void)time_end;
@@ -193,11 +188,8 @@ Object aayzrect_create(rt_float y_0, rt_float y_1, rt_float z_0, rt_float z_1, r
     rect->z_1 = z_1;
     rect->y_0 = y_0;
     rect->y_1 = y_1;
-
-    result.collide = (ObjectCallback)hit_aayzrect_callback;
-    result.get_aabb = (ObjectGetAABB)aayzrect_get_aabb;
+    result.type = SHAPE_AAREC_YZ;
     result.data = rect;
-    result.destroy = NULL;
     result.is_leaf = true;
 
     return result;
