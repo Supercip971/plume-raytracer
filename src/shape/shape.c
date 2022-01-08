@@ -4,6 +4,7 @@
 #include "Sphere.h"
 #include "aa_rec.h"
 #include "box.h"
+#include "constant_medium.h"
 #include "moving_sphere.h"
 #include "transform.h"
 #include "translate.h"
@@ -32,7 +33,8 @@ bool object_collide(Ray r, rt_float t_min, rt_float t_max, HitRecord *record, Ob
         return hit_aaxzrect_callback(r, t_min, t_max, record, self->data);
     case SHAPE_AAREC_YZ:
         return hit_aayzrect_callback(r, t_min, t_max, record, self->data);
-
+    case SHAPE_CONSTANT_MEDIUM:
+        return hit_constant_object_callback(r, t_min, t_max, record, self->data);
     default:
         return false;
     }
@@ -62,7 +64,8 @@ bool object_get_aabb(rt_float time_start, rt_float time_end, AABB *output, Objec
         return aaxzrect_get_aabb(time_start, time_end, output, self->data);
     case SHAPE_AAREC_YZ:
         return aayzrect_get_aabb(time_start, time_end, output, self->data);
-
+    case SHAPE_CONSTANT_MEDIUM:
+        return constant_get_aabb(time_start, time_end, output, self->data);
     default:
         return false;
     }
@@ -81,6 +84,8 @@ bool object_destroy(Object *self)
         return translate_destroy(self->data);
     case SHAPE_TRANSFORM:
         return transform_destroy(self->data);
+    case SHAPE_CONSTANT_MEDIUM:
+        return constant_destroy(self->data);
     default:
         return false;
     }
