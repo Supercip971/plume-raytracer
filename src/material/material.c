@@ -1,5 +1,6 @@
 #include "material.h"
 #include "dielectric.h"
+#include "isotropic.h"
 #include "lambertian.h"
 #include "light.h"
 #include "metal.h"
@@ -14,6 +15,8 @@ FLATTEN bool material_get(const Ray *r_in, const HitRecord *record, Vec3 *attenu
         return metal_callback(r_in, record, attenuation, scattered, self->data);
     case MATERIAL_DIELETRIC:
         return dieletric_callback(r_in, record, attenuation, scattered, self->data);
+    case MATERIAL_ISOTROPIC:
+        return isotropic_callback(r_in, record, attenuation, scattered, self->data);
     default:
         return false;
     }

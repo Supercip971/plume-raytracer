@@ -9,6 +9,7 @@ typedef enum
     MATERIAL_LAMBERTIAN,
     MATERIAL_LIGHT,
     MATERIAL_METAL,
+    MATERIAL_ISOTROPIC,
 } MaterialTypes;
 
 typedef struct material
