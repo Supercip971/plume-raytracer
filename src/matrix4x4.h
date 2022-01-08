@@ -21,6 +21,6 @@ void matrix_transpose(const Matrix4x4 *matrix, Matrix4x4 *result);
 void matrix_multiply(const Matrix4x4 *a, const Matrix4x4 *b, Matrix4x4 *result);
 
 void matrix_apply_ray(const Matrix4x4 *matrix, Ray *ray);
-void matrix_apply_vector(const Matrix4x4* matrix, Vec3 *vector);
-void matrix_apply_point(const Matrix4x4* matrix, Vec3 *point);
+void matrix_apply_vector(const Matrix4x4 *matrix, Vec3 *vector);
+void matrix_apply_point(const Matrix4x4 *matrix, Vec3 *point);
 #endif /* FE439C8D_4B4A_492C_81C7_2F76373A7F98 */

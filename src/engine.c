@@ -13,6 +13,7 @@
 #include "impl.h"
 #include "lock.h"
 #include "material/dielectric.h"
+#include "material/isotropic.h"
 #include "material/lambertian.h"
 #include "material/light.h"
 #include "material/metal.h"
@@ -21,11 +22,13 @@
 #include "shape/Sphere.h"
 #include "shape/aa_rec.h"
 #include "shape/box.h"
+#include "shape/constant_medium.h"
 #include "shape/moving_sphere.h"
 #include "shape/transform.h"
 #include "texture/checker.h"
 #include "texture/image.h"
 #include "texture/noise.h"
+#include "texture/solid_color.h"
 #include "utils.h"
 #include "vec3.h"
 
@@ -475,6 +478,58 @@ static void cornell_box(void)
     background_color = vec3_create(0, 0, 0);
 }
 
+static void smoky_cornell_box(void)
+{
+    HitableList *lst;
+    Object box;
+    Matrix4x4 diff;
+    Matrix4x4 diff_rot;
+    Matrix4x4 diff_mov;
+    Object translated_box;
+    Object box2;
+    Matrix4x4 diff2;
+    Matrix4x4 diff2_rot;
+    Matrix4x4 diff2_mov;
+    Object translated_box2;
+    Material red = lambertian_create(vec3_create(0.65, 0.05, 0.05));
+    Material green = lambertian_create(vec3_create(0.12, 0.45, 0.15));
+    Material light = light_create(vec3_create(15, 15, 15));
+    Material white = lambertian_create(vec3_create(0.73, 0.73, 0.73));
+    Material smoky_white = isotropic_create(solid_color_create(vec3_create(0.73, 0.73, 0.73)));
+    Material smoky_black = isotropic_create(solid_color_create(vec3_create(0.02, 0.02, 0.02)));
+
+    root = create_hitable_list();
+
+    add_hitable_object(&root, aayzrect_create(0, 555, 0, 555, 555, green));
+    add_hitable_object(&root, aayzrect_create(0, 555, 0, 555, 0, red));
+    add_hitable_object(&root, aaxzrect_create(113, 443, 127, 432, 554, light));
+    add_hitable_object(&root, aaxzrect_create(0, 555, 0, 555, 0, white));
+    add_hitable_object(&root, aaxzrect_create(0, 555, 0, 555, 555, white));
+    add_hitable_object(&root, aaxyrect_create(0, 555, 0, 555, 555, white));
+
+    box = box_create(vec3_create(0, 0, 0), vec3_create(165, 330, 165), white);
+    create_matrix_translate(&diff_mov, 265, 0, 295);
+    create_matrix_rotate_y(&diff_rot, DEG2RAD(15));
+    matrix_multiply(&diff_mov, &diff_rot, &diff);
+    translated_box = transform(box, diff);
+
+    add_hitable_object(&root, make_constant_medium(translated_box, 0.01, smoky_black));
+
+    box2 = box_create(vec3_create(0, 0, 0), vec3_create(165, 165, 165), white);
+    create_matrix_translate(&diff2_mov, 130, 0, 65);
+    create_matrix_rotate_y(&diff2_rot, DEG2RAD(-18));
+    matrix_multiply(&diff2_mov, &diff2_rot, &diff2);
+    translated_box2 = transform(box2, diff2);
+    add_hitable_object(&root, make_constant_medium(translated_box2, 0.01, smoky_white));
+
+    lst = root.data;
+    bvh_create_rec(lst, 1, 0);
+
+    camera_init(vec3_create(278, 278, -800), vec3_create(278, 278, 0), 40, false);
+
+    background_color = vec3_create(0, 0, 0);
+}
+
 static void scene_init(void)
 {
     switch (SCENE_SELECT)
@@ -505,6 +560,11 @@ static void scene_init(void)
     case SCENE_CORNELL_BOX:
     {
         cornell_box();
+        break;
+    }
+    case SCENE_SMOKY_CORNELL_BOX:
+    {
+        smoky_cornell_box();
         break;
     }
     default:
