@@ -23,8 +23,10 @@ struct hit_record
 
 typedef struct hitable_list
 {
-    Object childs[512]; /* todo dynamically alloc this */
+    Object *childs; /* todo dynamically alloc this */
+    size_t allocated_childs;
     size_t child_count;
+    AABB bounding_box;
 } HitableList;
 
 void add_hitable_object(Object *hitable_list, Object object);

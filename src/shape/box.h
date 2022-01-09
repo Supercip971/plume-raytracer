@@ -7,7 +7,8 @@
 typedef struct box
 {
     AABB self_bounding_box; /* put here as we need to calculate it once */
-    HitableList list;
+
+    Object list;
 } Box;
 bool box_get_aabb(rt_float time_start, rt_float time_end, AABB *output, const Box *self);
 

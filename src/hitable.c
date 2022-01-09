@@ -23,7 +23,7 @@ bool hitable_list_destroy(HitableList *self)
     {
         object_destroy(&self->childs[i]);
     }
-
+    free(self->childs);
     return true;
 }
 bool hitable_list_call_all(Ray r, rt_float t_min, rt_float t_max, HitRecord *record, const HitableList *self)
@@ -52,7 +52,8 @@ bool hit_call_all_list(const HitableList *hitable_list, Ray r, rt_float t_min, r
 {
     return hitable_list_call_all(r, t_min, t_max, record, hitable_list);
 }
-bool hitable_get_aabb(rt_float time_start, rt_float time_end, AABB *output, const HitableList *self)
+
+static bool hitable_get_all_aabb(rt_float time_start, rt_float time_end, AABB *output, const HitableList *self)
 {
     size_t i;
     AABB temp;
@@ -65,7 +66,7 @@ bool hitable_get_aabb(rt_float time_start, rt_float time_end, AABB *output, cons
 
     for (i = 0; i < self->child_count; i++)
     {
-        if (object_get_aabb(time_start, time_end, &temp, (Object *)&self->childs[i]))
+        if (!object_get_aabb(time_start, time_end, &temp, (Object *)&self->childs[i]))
         {
             continue;
         }
@@ -74,6 +75,13 @@ bool hitable_get_aabb(rt_float time_start, rt_float time_end, AABB *output, cons
         first = false;
     }
 
+    return true;
+}
+bool hitable_get_aabb(rt_float time_start, rt_float time_end, AABB *output, const HitableList *self)
+{
+    (void)time_start;
+    (void)time_end;
+    *output = self->bounding_box;
     return true;
 }
 
@@ -94,6 +102,8 @@ Object create_hitable_list(void)
     Object result;
     HitableList *list = malloc(sizeof(HitableList));
     list->child_count = 0;
+    list->childs = malloc(sizeof(Object) * 64);
+    list->allocated_childs = 64;
     result.data = list;
     result.is_leaf = false;
     result.type = SHAPE_HITABLE_LIST;
@@ -103,7 +113,7 @@ Object create_hitable_list(void)
 void hit_remove_object(HitableList *list, Object obj)
 {
     size_t i;
-    size_t ri = 1024;
+    size_t ri = (size_t)-1;
     for (i = 0; i < list->child_count; i++)
     {
         if (list->childs[i].uid == obj.uid)
@@ -112,7 +122,7 @@ void hit_remove_object(HitableList *list, Object obj)
             break;
         }
     }
-    if (ri == 1024)
+    if (ri == (size_t)-1)
     {
         return;
     }
@@ -122,6 +132,7 @@ void hit_remove_object(HitableList *list, Object obj)
         list->childs[i] = list->childs[i + 1];
     }
     list->child_count -= 1;
+    hitable_get_all_aabb(0, 10000, &list->bounding_box, list);
 }
 
 void add_hitable_list(HitableList *hitable_list, Object object)
@@ -130,4 +141,10 @@ void add_hitable_list(HitableList *hitable_list, Object object)
     object.uid = uobj++;
     hitable_list->childs[hitable_list->child_count] = object;
     hitable_list->child_count++;
+    if (hitable_list->child_count == hitable_list->allocated_childs)
+    {
+        hitable_list->allocated_childs *= 2;
+        hitable_list->childs = realloc(hitable_list->childs, hitable_list->allocated_childs * sizeof(Object));
+    }
+    hitable_get_all_aabb(0, 100000, &hitable_list->bounding_box, hitable_list);
 }
