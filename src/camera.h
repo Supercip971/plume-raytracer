@@ -15,7 +15,7 @@ typedef struct
     bool moving_obj;
 } Camera;
 
-struct camera_config
+typedef struct camera_config
 {
     Vec3 position;
     Vec3 lookat;
@@ -26,8 +26,8 @@ struct camera_config
     rt_float focus_distance;
     rt_float time_start, time_end;
     bool moving_obj;
-};
+} CameraConfig;
 
 Ray get_camera_ray(const Camera *camera, rt_float u, rt_float v);
 
-Camera create_camera(struct camera_config config);
+Camera create_camera(CameraConfig config);

@@ -8,6 +8,7 @@ typedef struct
     Matrix4x4 matrix;
     Matrix4x4 inv_matrix;
     Object target;
+    AABB transformed_aabb;
 } Transform;
 
 Object transform(Object translated, Matrix4x4 matrix);

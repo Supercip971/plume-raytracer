@@ -14,6 +14,10 @@ Object transform(Object translated, Matrix4x4 matrix)
     res.type = SHAPE_TRANSFORM;
     res.is_leaf = true;
 
+    object_get_aabb(-1000, 1000, &b->transformed_aabb, &translated);
+    matrix_apply_point(&matrix, &b->transformed_aabb.min);
+    matrix_apply_point(&matrix, &b->transformed_aabb.max);
+
     return res;
 }
 bool hit_transform_object_callback(Ray ray, rt_float t_min, rt_float t_max, HitRecord *record, const Transform *self)
@@ -32,12 +36,9 @@ bool hit_transform_object_callback(Ray ray, rt_float t_min, rt_float t_max, HitR
 }
 bool transform_get_aabb(rt_float time_start, rt_float time_end, AABB *output, const Transform *self)
 {
-    if (object_get_aabb(time_start, time_end, output, (Object *)&self->target))
-    {
-
-        matrix_apply_point(&self->matrix, &output->min);
-        matrix_apply_point(&self->matrix, &output->max);
-    }
+    (void)time_start;
+    (void)time_end;
+    *output = self->transformed_aabb;
 
     return true;
 }

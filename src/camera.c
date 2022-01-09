@@ -29,7 +29,7 @@ Ray get_camera_ray(const Camera *camera, rt_float u, rt_float v)
     return result;
 }
 
-Camera create_camera(struct camera_config config)
+Camera create_camera(CameraConfig config)
 {
     Camera result;
     Vec3 u, v, w;
