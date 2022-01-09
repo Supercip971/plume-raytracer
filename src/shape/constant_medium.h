@@ -10,7 +10,8 @@ typedef struct
     Material phase_material;
 } ConstantMedium;
 
-Object make_constant_medium(Object obj, rt_float d, Material mat);
+Object make_constant_medium(Object obj, rt_float d, Vec3 albedo);
+Object make_constant_medium_mat(Object obj, rt_float d, Material mat);
 
 bool constant_get_aabb(rt_float time_start, rt_float time_end, AABB *output, const ConstantMedium *self);
 

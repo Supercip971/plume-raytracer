@@ -1,6 +1,13 @@
 #include "constant_medium.h"
 #include <stdlib.h>
-Object make_constant_medium(Object obj, rt_float d, Material mat)
+#include "../material/isotropic.h"
+#include "../texture/solid_color.h"
+
+Object make_constant_medium(Object obj, rt_float d, Vec3 albedo)
+{
+    return make_constant_medium_mat(obj, d, isotropic_create(solid_color_create(albedo)));
+}
+Object make_constant_medium_mat(Object obj, rt_float d, Material mat)
 {
     Object res = {};
     res.type = SHAPE_CONSTANT_MEDIUM;
