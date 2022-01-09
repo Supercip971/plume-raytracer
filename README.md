@@ -2,6 +2,11 @@
 
 A portable simple C raytracer on CPU !
 
+### (09/01/2022) cornell box with constant medium
+
+![noisy cornell box](./pic/09-01-2022.png)
+
+
 ### (26/08/2021) optimisation + light 
 ![render with light](./pic/28-08-2021.png)
 

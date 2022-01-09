@@ -8,9 +8,9 @@ CC = gcc
 # for TCC
 # CFLAGS =  -DSDL_DISABLE_IMMINTRIN_H=0 -Isrc/ -pedantic  -O3  -std=gnu89
 CFLAGS =  -march=native -ansi -Ofast -g -Isrc/  \
- 	-std=gnu89 -Wall -Wextra  \
+ 	-std=gnu89 -Wall -Wextra -Wshadow -Werror  \
  	-Wmissing-prototypes -Wstrict-prototypes \
-    -Wold-style-definition -Werror -flto=auto     \
+    -Wold-style-definition -flto=auto     \
  	-ffast-math  -DUSE_INTRINSIC=0 -fno-semantic-interposition -ffunction-sections -fdata-sections 
 
 
