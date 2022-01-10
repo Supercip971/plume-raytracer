@@ -12,7 +12,7 @@ bool box_get_aabb(rt_float time_start, rt_float time_end, AABB *output, const Bo
 
 bool box_destroy(Box *self)
 {
-    hit_destroy_all_objects(self->list.data);
+    hit_destroy_all_objects(&self->list);
     return true;
 }
 FLATTEN bool hit_box_object_callback(Ray ray, rt_float t_min, rt_float t_max, HitRecord *record, const Box *self)
