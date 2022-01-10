@@ -275,6 +275,18 @@ bool render_update(Color *framebuffer, size_t width, size_t height)
     return true;
 }
 
+void render_wait_all_thread(void)
+{
+    while (true)
+    {
+        if (running_thread_count == 0)
+        {
+            break;
+        }
+        increase_running_thread();
+        decrease_running_thread();
+    }
+}
 void render_init(void)
 {
     size_t i = 0;

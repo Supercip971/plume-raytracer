@@ -212,6 +212,7 @@ void impl_render_loop(void)
         frames++;
     }
     printf(" ended [!] %li \n", impl_get_tick() - start_tick);
+    render_wait_all_thread();
 }
 
 Image image_load(const char *path)
