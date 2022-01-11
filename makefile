@@ -5,12 +5,19 @@ PROJECT_NAME = craytracer
 
 CC = gcc
 
+SANTIZERS = \
+	-fsanitize=address \
+	-fsanitize=leak \
+	-fsanitize=undefined \
+	-fsanitize=float-divide-by-zero \
+	-fsanitize=signed-integer-overflow \
+
 # for TCC
 # CFLAGS =  -DSDL_DISABLE_IMMINTRIN_H=0 -Isrc/ -pedantic  -O3  -std=gnu89
 CFLAGS =  -march=native -ansi -Ofast -g -Isrc/  \
  	-std=gnu89 -Wall -Wextra -Wshadow -Werror  \
  	-Wmissing-prototypes -Wstrict-prototypes \
-    -Wold-style-definition -flto=auto     \
+    -Wold-style-definition -flto=auto $(SANTIZERS)    \
  	-ffast-math  -DUSE_INTRINSIC=0 -fno-semantic-interposition -ffunction-sections -fdata-sections 
 
 
