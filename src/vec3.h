@@ -48,7 +48,7 @@ static inline Vec3 vec3_sub(Vec3 vec1, Vec3 vec2)
     return vec3_create(vec1.x - vec2.x, vec1.y - vec2.y, vec1.z - vec2.z);
 }
 
-#ifndef USE_INTRINSIC
+#ifdef USE_INTRINSIC
 #    include <immintrin.h>
 #    include <x86intrin.h>
 
@@ -233,6 +233,19 @@ static inline void get_sphere_uv(const Vec3 *point, rt_float *__restrict u, rt_f
 
     *u = phi * (M_2_PI) + 0.5;
     *v = theta * M_1_PI;
+}
+
+static inline Vec3 random_vec3_cosine_direction(void)
+{
+    rt_float r1 = random_rt_float();
+    rt_float r2 = random_rt_float();
+    rt_float z = fast_sqrt(1.0 - r2);
+
+    rt_float phi = r1 * M_PI * 2;
+    rt_float x = fast_cos(phi) * fast_sqrt(r2);
+    rt_float y = fast_sin(phi) * fast_sqrt(r2);
+
+    return vec3_create(x, y, z);
 }
 
 #endif

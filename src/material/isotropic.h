@@ -10,5 +10,5 @@ typedef struct
 } Isotropic;
 
 Material isotropic_create(Texture albedo);
-bool isotropic_callback(const Ray *r_in, const HitRecord *record, Vec3 *attenuation, Ray *scattered, const Isotropic *self);
+bool isotropic_callback(const Ray *r_in, const HitRecord *record, MaterialRecord *mat_record, const Isotropic *self);
 #endif

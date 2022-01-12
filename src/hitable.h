@@ -46,4 +46,8 @@ bool hit_call_all_list(const HitableList *hitable_list, Ray r, rt_float t_min, r
 bool hitable_list_call_all(Ray r, rt_float t_min, rt_float t_max, HitRecord *record, const HitableList *self);
 bool hitable_list_destroy(HitableList *self);
 bool hitable_get_aabb(rt_float time_start, rt_float time_end, AABB *output, const HitableList *self);
+
+Vec3 hitable_random(Vec3 origin, const HitableList *self);
+rt_float hitable_pdf_value(Vec3 origin, Vec3 direction, const HitableList *self);
+
 #endif

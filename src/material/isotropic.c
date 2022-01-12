@@ -13,15 +13,16 @@ Material isotropic_create(Texture albedo)
     return res;
 }
 
-bool isotropic_callback(const Ray *r_in, const HitRecord *record, Vec3 *attenuation, Ray *scattered, const Isotropic *self)
+bool isotropic_callback(const Ray *r_in, const HitRecord *record, MaterialRecord *mat_record, const Isotropic *self)
 {
 
-    *scattered = (Ray){
+    mat_record->scattered = (Ray){
         .direction = random_vec3_unit_in_disk(),
         .origin = record->pos,
         .time = r_in->time,
     };
-
-    *attenuation = texture_get(record->u, record->v, &record->pos, &self->albedo);
+    mat_record->is_specular = false;
+    mat_record->pdf.type = PDF_NONE;
+    mat_record->attenuation = texture_get(record->u, record->v, &record->pos, &self->albedo);
     return true;
 }

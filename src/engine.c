@@ -13,6 +13,9 @@
 #include "impl.h"
 #include "lock.h"
 #include "matrix4x4.h"
+#include "pdf/cosine.h"
+#include "pdf/hitable.h"
+#include "pdf/mixture.h"
 #include "ray.h"
 #include "utils.h"
 #include "vec3.h"
@@ -64,7 +67,9 @@ static Camera camera;
 struct render_thread_args *args;
 static uint64_t thr[MAX_RENDER_THREAD] = {0};
 
+/* handling this as a global variable is utterly retarded */
 static Object root;
+static Object lights;
 
 static Vec3 background_color;
 
@@ -72,8 +77,9 @@ static Vec3 calculate_ray_color(Ray from, int depth, const Vec3 *background)
 {
     HitRecord record = {0};
     Ray forked_ray = from;
-    Vec3 attenuation = vec3_create(1, 1, 1);
     Vec3 emitted = {0};
+    rt_float pdf = 0;
+    MaterialRecord mat_record = {0};
 
     if (stop)
     {
@@ -90,14 +96,34 @@ static Vec3 calculate_ray_color(Ray from, int depth, const Vec3 *background)
         return *background;
     }
 
-    material_color_emit(record.u, record.v, &record.pos, &emitted, &record.material);
+    material_color_emit(&record, &emitted, &record.material);
 
-    if (material_get(&from, &record, &attenuation, &forked_ray, &record.material))
+    if (!material_get(&from, &record, &mat_record, &record.material))
     {
-        Vec3 next = calculate_ray_color(forked_ray, depth + 1, background);
-        return vec3_add(vec3_mul(attenuation, next), emitted);
+        return emitted;
     }
-    return emitted;
+
+    Pdf hitable_pdf = make_pdf_hitable(&lights, record.pos);
+    Pdf mixture_pdf = make_mixture_pdf(&hitable_pdf, &mat_record.pdf);
+
+    forked_ray.origin = record.pos;
+    forked_ray.direction = pdf_generate(&mixture_pdf);
+    forked_ray.time = from.time;
+    pdf = pdf_value(forked_ray.direction, &mixture_pdf) + 0.0001;
+    /* quick and dirty code end */
+    // emmited + (albedo * mat_pdf) * (raycol / pdf)
+    (void)pdf;
+    return vec3_add(
+        emitted,
+
+        vec3_mul(
+            vec3_mul_val(
+                mat_record.attenuation,
+                material_get_pdf(&from, &record, &forked_ray, &record.material)),
+
+            vec3_div_val(
+                calculate_ray_color(forked_ray, depth + 1, background),
+                pdf)));
 }
 
 FLATTEN static void render_update_part(struct render_part_args *arg)
@@ -292,7 +318,7 @@ void render_init(void)
     size_t i = 0;
     WorldConfig conf = {};
     stop = false;
-    scene_init(&root, &conf);
+    scene_init(&root, &lights, &conf);
     camera = create_camera(conf.cam_config);
     background_color = conf.sky_color;
 

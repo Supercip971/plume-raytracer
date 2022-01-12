@@ -42,6 +42,9 @@ static inline float fast_sqrt(float number);
 
 #define random_rt_float() \
     (rt_float)((rt_float)fast_rand() / (rt_float)4294967296)
+
+#define random_rt_range(a, b) \
+    (random_rt_float() * ((b) - (a)) + (a))
 /* you may want to implement here the fastest implementation */
 
 #ifdef USE_INTRINSIC

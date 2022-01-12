@@ -36,4 +36,8 @@ bool object_get_aabb(rt_float time_start, rt_float time_end, AABB *output, Objec
 
 bool object_destroy(Object *self);
 
+rt_float object_pdf_value(Vec3 origin, Vec3 direction, const Object *self);
+
+Vec3 object_random(Vec3 origin, const Object *self);
+
 #endif /* B0BAA9D8_C3FE_4855_9A2C_59A9028F887C */

@@ -14,11 +14,11 @@ SANTIZERS = \
 
 # for TCC
 # CFLAGS =  -DSDL_DISABLE_IMMINTRIN_H=0 -Isrc/ -pedantic  -O3  -std=gnu89
-CFLAGS =  -march=native -ansi -Ofast -g -Isrc/  \
+CFLAGS = -DUSE_INTRINSIC -march=native -ansi -O0 -g -Isrc/  \
  	-std=gnu89 -Wall -Wextra -Wshadow -Werror  \
  	-Wmissing-prototypes -Wstrict-prototypes \
     -Wold-style-definition -flto=auto $(SANTIZERS)    \
- 	-ffast-math  -DUSE_INTRINSIC=0 -fno-semantic-interposition -ffunction-sections -fdata-sections 
+ 	-ffast-math -fno-semantic-interposition -ffunction-sections -fdata-sections 
 
 
 BUILD_DIR = build

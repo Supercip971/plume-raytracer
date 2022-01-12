@@ -1,5 +1,6 @@
 #include "hitable.h"
 #include <stddef.h>
+#include <stdio.h>
 #include <stdlib.h>
 
 size_t uobj = 0;
@@ -17,7 +18,6 @@ bool hit_call_all_object(Object *hitable_list, Ray r, rt_float t_min, rt_float t
 
 bool hitable_list_destroy(HitableList *self)
 {
-
     size_t i;
     for (i = 0; i < self->child_count; i++)
     {
@@ -26,6 +26,7 @@ bool hitable_list_destroy(HitableList *self)
     free(self->childs);
     return true;
 }
+
 bool hitable_list_call_all(Ray r, rt_float t_min, rt_float t_max, HitRecord *record, const HitableList *self)
 {
     HitRecord temp;
@@ -88,7 +89,6 @@ bool hitable_get_aabb(rt_float time_start, rt_float time_end, AABB *output, cons
 void hit_destroy_all_objects(Object *hitable_list)
 {
     object_destroy(hitable_list);
-    free(hitable_list->data);
 }
 
 void set_face_normal(const Ray *r, const Vec3 outward, HitRecord *self)
@@ -147,4 +147,31 @@ void add_hitable_list(HitableList *hitable_list, Object object)
         hitable_list->childs = realloc(hitable_list->childs, hitable_list->allocated_childs * sizeof(Object));
     }
     hitable_get_all_aabb(0, 100000, &hitable_list->bounding_box, hitable_list);
+}
+Vec3 hitable_random(Vec3 origin, const HitableList *self)
+{
+    if (self->child_count == 0)
+    {
+        return vec3_create(0, 0, 1);
+    }
+
+    return object_random(origin, &self->childs[(int)random_rt_range(0, self->child_count - 1)]);
+}
+
+rt_float hitable_pdf_value(Vec3 origin, Vec3 direction, const HitableList *self)
+{
+    rt_float res = 0;
+    rt_float weight = 1.0 / self->child_count;
+    size_t i;
+
+    if (self->child_count == 0)
+    {
+        return 0;
+    }
+
+    for (i = 0; i < self->child_count; i++)
+    {
+        res += object_pdf_value(origin, direction, (Object *)&self->childs[i]) * weight;
+    }
+    return res;
 }

@@ -44,11 +44,12 @@ static struct camera_config camera_config_init(Vec3 position, Vec3 lookat, rt_fl
     return camera_config;
 }
 
-static void noise_scene(Object *root, WorldConfig *config)
+static void noise_scene(Object *root, Object *lights, WorldConfig *config)
 {
     HitableList *lst;
     Texture per_texture = perlin_create(4);
     *root = create_hitable_list();
+    *lights = create_hitable_list();
 
     add_hitable_object(root, sphere_create(1000, vec3_create(0, -1000, 0), lambertian_create_texture(per_texture)));
     add_hitable_object(root, sphere_create(2, vec3_create(0, 2, 0), lambertian_create_texture(per_texture)));
@@ -61,10 +62,11 @@ static void noise_scene(Object *root, WorldConfig *config)
     config->sky_color = vec3_create(0.70, 0.80, 1);
 }
 
-static void earth_scene(Object *root, WorldConfig *config)
+static void earth_scene(Object *root, Object *lights, WorldConfig *config)
 {
     HitableList *lst;
     *root = create_hitable_list();
+    *lights = create_hitable_list();
 
     add_hitable_object(root, sphere_create(2, vec3_create(0, 0, 0), lambertian_create_texture(image_create(image_load("assets/test_colors.png")))));
 
@@ -75,13 +77,14 @@ static void earth_scene(Object *root, WorldConfig *config)
     config->sky_color = vec3_create(0.70, 0.80, 1);
 }
 
-static void random_scene(Object *root, WorldConfig *config)
+static void random_scene(Object *root, Object *lights, WorldConfig *config)
 {
     int a, b;
     HitableList *lst;
     Texture checker;
 
     *root = create_hitable_list();
+    *lights = create_hitable_list();
 
     checker = checker_create_col(vec3_create(0.2, 0.3, 0.1), vec3_create(0.9, 0.9, 0.9), 10.f);
     add_hitable_object(root, sphere_create(1000, vec3_create(0, -1000, -1),
@@ -144,13 +147,14 @@ static void random_scene(Object *root, WorldConfig *config)
     config->sky_color = vec3_create(0.70, 0.80, 1);
 }
 
-static void light_scene(Object *root, WorldConfig *config)
+static void light_scene(Object *root, Object *lights, WorldConfig *config)
 {
     HitableList *lst;
     Material diff_lightred = light_create(vec3_create(16, 0, 0));
     Material diff_lightgreen = light_create(vec3_create(0, 16, 0));
     Material diff_lightblue = light_create(vec3_create(0, 0, 16));
     *root = create_hitable_list();
+    *lights = create_hitable_list();
 
     add_hitable_object(root, sphere_create(1000, vec3_create(0, -1000, 0), lambertian_create(vec3_create(0.9, 0.9, 0.9))));
     add_hitable_object(root, sphere_create(2, vec3_create(0, 2, 0), dieletric_create(1.5)));
@@ -169,7 +173,7 @@ static void light_scene(Object *root, WorldConfig *config)
     config->sky_color = vec3_create(0, 0, 0);
 }
 
-static void cornell_box(Object *root, WorldConfig *config)
+static void cornell_box(Object *root, Object *lights, WorldConfig *config)
 {
     HitableList *lst;
     Object box;
@@ -180,18 +184,23 @@ static void cornell_box(Object *root, WorldConfig *config)
     Object box2;
     Matrix4x4 diff2;
     Matrix4x4 diff2_rot;
+    Matrix4x4 diff_light;
     Matrix4x4 diff2_mov;
     Object translated_box2;
     Material red = lambertian_create(vec3_create(0.65, 0.05, 0.05));
     Material green = lambertian_create(vec3_create(0.12, 0.45, 0.15));
     Material light = light_create(vec3_create(15, 15, 15));
     Material white = lambertian_create(vec3_create(0.73, 0.73, 0.73));
-
+    *lights = create_hitable_list();
     *root = create_hitable_list();
 
     add_hitable_object(root, aayzrect_create(0, 555, 0, 555, 555, green));
     add_hitable_object(root, aayzrect_create(0, 555, 0, 555, 0, red));
-    add_hitable_object(root, aaxzrect_create(213, 343, 227, 332, 554, light));
+
+    create_matrix_scale(&diff_light, 1, 1, 1);
+    add_hitable_object(root, transform(aaxzrect_create(213, 343, 227, 332, 554, light), diff_light));
+    add_hitable_object(lights, transform(aaxzrect_create(213, 343, 227, 332, 554, light), diff_light));
+    add_hitable_object(lights, sphere_create(90, vec3_create(190, 90, 190), light));
     add_hitable_object(root, aaxzrect_create(0, 555, 0, 555, 0, white));
     add_hitable_object(root, aaxzrect_create(0, 555, 0, 555, 555, white));
     add_hitable_object(root, aaxyrect_create(0, 555, 0, 555, 555, white));
@@ -219,7 +228,7 @@ static void cornell_box(Object *root, WorldConfig *config)
     config->sky_color = vec3_create(0, 0, 0);
 }
 
-static void smoky_cornell_box(Object *root, WorldConfig *config)
+static void smoky_cornell_box(Object *root, Object *lights, WorldConfig *config)
 {
     HitableList *lst;
     Object box;
@@ -236,6 +245,7 @@ static void smoky_cornell_box(Object *root, WorldConfig *config)
     Material green = lambertian_create(vec3_create(0.12, 0.45, 0.15));
     Material light = light_create(vec3_create(15, 15, 15));
     Material white = lambertian_create(vec3_create(0.73, 0.73, 0.73));
+    *lights = create_hitable_list();
 
     *root = create_hitable_list();
 
@@ -268,7 +278,7 @@ static void smoky_cornell_box(Object *root, WorldConfig *config)
     config->sky_color = vec3_create(0, 0, 0);
 }
 
-static void rand_chap2_scene(Object *root, WorldConfig *config)
+static void rand_chap2_scene(Object *root, Object *lights, WorldConfig *config)
 {
     Object box2_list;
     Object box_ground;
@@ -289,6 +299,8 @@ static void rand_chap2_scene(Object *root, WorldConfig *config)
     const int box_per_side = 20;
     int i, j;
     *root = create_hitable_list();
+    *lights = create_hitable_list();
+
     box_ground = create_hitable_list();
     box2_list = create_hitable_list();
     for (i = 0; i < box_per_side; i++)
@@ -354,46 +366,46 @@ static void rand_chap2_scene(Object *root, WorldConfig *config)
 
     config->sky_color = vec3_create(0, 0, 0);
 }
-void scene_init(Object *root, WorldConfig *config)
+void scene_init(Object *root, Object *light, WorldConfig *config)
 {
     switch (SCENE_SELECT)
     {
     case SCENE_RANDOM:
     {
-        random_scene(root, config);
+        random_scene(root, light, config);
         break;
     }
 
     case SCENE_NOISE:
     {
-        noise_scene(root, config);
+        noise_scene(root, light, config);
         break;
     }
 
     case SCENE_EARTH:
     {
-        earth_scene(root, config);
+        earth_scene(root, light, config);
         break;
     }
 
     case SCENE_LIGHT:
     {
-        light_scene(root, config);
+        light_scene(root, light, config);
         break;
     }
     case SCENE_CORNELL_BOX:
     {
-        cornell_box(root, config);
+        cornell_box(root, light, config);
         break;
     }
     case SCENE_SMOKY_CORNELL_BOX:
     {
-        smoky_cornell_box(root, config);
+        smoky_cornell_box(root, light, config);
         break;
     }
     case SCENE_RAND_CHAP_2:
     {
-        rand_chap2_scene(root, config);
+        rand_chap2_scene(root, light, config);
         break;
     }
     default:

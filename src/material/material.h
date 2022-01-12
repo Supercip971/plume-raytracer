@@ -1,7 +1,9 @@
 #ifndef __MATERIAL_H__
 #define __MATERIAL_H__
 #include "../aabb.h"
+#include "../pdf/pdf.h"
 #include "../ray.h"
+
 typedef enum
 {
     MATERIAL_NONE,
@@ -18,9 +20,18 @@ typedef struct material
     void *data;
 } Material;
 
+typedef struct
+{
+    Ray scattered;
+    bool is_specular;
+    Vec3 attenuation;
+    Pdf pdf;
+} MaterialRecord;
+
 typedef struct hit_record HitRecord;
 
-bool material_get(const Ray *r_in, const HitRecord *record, Vec3 *attenuation, Ray *scattered, const Material *self);
-bool material_color_emit(rt_float u, rt_float v, const Vec3 *point, Vec3 *emit, const Material *self);
+rt_float material_get_pdf(const Ray *r_in, const HitRecord *record, const Ray *scattered, const Material *self);
+bool material_get(const Ray *r_in, const HitRecord *record, MaterialRecord *mat_record, const Material *self);
+bool material_color_emit(const HitRecord *record, Vec3 *emit, const Material *self);
 
 #endif /* */

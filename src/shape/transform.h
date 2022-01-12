@@ -11,6 +11,9 @@ typedef struct
     AABB transformed_aabb;
 } Transform;
 
+rt_float transform_pdf_value(Vec3 origin, Vec3 direction, const Transform *self);
+Vec3 transform_pdf_random(Vec3 origin, const Transform *self);
+
 Object transform(Object translated, Matrix4x4 matrix);
 bool hit_transform_object_callback(Ray ray, rt_float t_min, rt_float t_max, HitRecord *record, const Transform *self);
 bool transform_get_aabb(rt_float time_start, rt_float time_end, AABB *output, const Transform *self);

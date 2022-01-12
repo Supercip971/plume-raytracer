@@ -7,6 +7,6 @@ typedef struct
     rt_float fuzzy;
 } Metal;
 
-bool metal_callback(const Ray *r_in, const HitRecord *record, Vec3 *attenuation, Ray *scattered, const Metal *self);
+bool metal_callback(const Ray *r_in, const HitRecord *record, MaterialRecord *mat_record, const Metal *self);
 
 Material metal_create(Vec3 albedo, rt_float fuzzy);

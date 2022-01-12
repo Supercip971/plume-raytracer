@@ -2,13 +2,101 @@
 #include <stdlib.h>
 #include "../utils.h"
 
+/* TODO: make this code better because it's shit for now */
+
+rt_float aa_xyrect_pdf_value(Vec3 origin, Vec3 direction, XYrec *self)
+{
+    HitRecord rec = {};
+    Ray r = {.origin = origin, .direction = direction, .time = 0};
+    rt_float area;
+    rt_float distance_squared;
+    rt_float cosine;
+
+    if (!hit_aaxyrect_callback(r, 0.001, 10000000, &rec, self))
+    {
+        return 0;
+    }
+
+    area = (self->x_1 - self->x_0) * (self->y_1 - self->y_0);
+
+    distance_squared = rec.t * rec.t * vec3_squared_length(direction);
+
+    cosine = rt_abs(vec3_dot(direction, rec.normal) / vec3_length(direction));
+
+    return distance_squared / (cosine * area);
+}
+
+rt_float aa_xzrect_pdf_value(Vec3 origin, Vec3 direction, XZrec *self)
+{
+    HitRecord rec = {};
+    Ray r = {.origin = origin, .direction = direction, .time = 0};
+    rt_float area;
+    rt_float distance_squared;
+    rt_float cosine;
+
+    if (!hit_aaxzrect_callback(r, 0.001, 1000000, &rec, self))
+    {
+        return 0;
+    }
+
+    area = (self->x_1 - self->x_0) * (self->z_1 - self->z_0);
+
+    distance_squared = rec.t * rec.t * vec3_squared_length(direction);
+
+    cosine = rt_abs(vec3_dot(direction, rec.normal) / vec3_length(direction));
+
+    return distance_squared / (cosine * area);
+}
+rt_float aa_yzrect_pdf_value(Vec3 origin, Vec3 direction, YZrec *self)
+{
+    HitRecord rec = {};
+    Ray r = {.origin = origin, .direction = direction, .time = 0};
+    rt_float area;
+    rt_float distance_squared;
+    rt_float cosine;
+
+    if (!hit_aayzrect_callback(r, 0.001, 100000, &rec, self))
+    {
+        return 0;
+    }
+
+    area = (self->y_1 - self->y_0) * (self->z_1 - self->z_0);
+
+    distance_squared = rec.t * rec.t * vec3_squared_length(direction);
+
+    cosine = rt_abs(vec3_dot(direction, rec.normal) / vec3_length(direction));
+
+    return distance_squared / (cosine * area);
+}
+
+Vec3 aa_xyrect_pdf_random(Vec3 origin, XYrec *self)
+{
+    Vec3 direction = vec3_create(random_rt_range(self->x_0, self->x_1), random_rt_range(self->y_0, self->y_1), self->k);
+
+    return vec3_sub(direction, origin);
+}
+
+Vec3 aa_xzrect_pdf_random(Vec3 origin, XZrec *self)
+{
+    Vec3 direction = vec3_create(random_rt_range(self->x_0, self->x_1), self->k, random_rt_range(self->z_0, self->z_1));
+
+    return vec3_sub(direction, origin);
+}
+
+Vec3 aa_yzrect_pdf_random(Vec3 origin, YZrec *self)
+{
+    Vec3 direction = vec3_create(self->k, random_rt_range(self->y_0, self->y_1), random_rt_range(self->z_0, self->z_1));
+
+    return vec3_sub(direction, origin);
+}
+
 FLATTEN bool hit_aaxyrect_callback(Ray ray, rt_float t_min, rt_float t_max, HitRecord *record, const XYrec *self)
 {
     rt_float t;
     rt_float x, y;
     Vec3 outward;
 
-    t = (self->k - ray.origin.z) / (ray.direction.z);
+    t = (self->k - ray.origin.z) / (ray.direction.z + 0.0001);
 
     if (t < t_min || t > t_max)
     {
@@ -74,7 +162,7 @@ FLATTEN bool hit_aaxzrect_callback(Ray ray, rt_float t_min, rt_float t_max, HitR
     rt_float z, x;
     Vec3 outward;
 
-    t = (self->k - ray.origin.y) / (ray.direction.y);
+    t = (self->k - ray.origin.y) / (ray.direction.y + 0.0001);
 
     if (t < t_min || t > t_max)
     {
@@ -138,7 +226,7 @@ FLATTEN bool hit_aayzrect_callback(Ray ray, rt_float t_min, rt_float t_max, HitR
     rt_float z, y;
     Vec3 outward;
 
-    t = (self->k - ray.origin.x) / (ray.direction.x);
+    t = (self->k - ray.origin.x) / (ray.direction.x + 0.0001);
 
     if (t < t_min || t > t_max)
     {

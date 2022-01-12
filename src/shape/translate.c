@@ -32,6 +32,7 @@ bool translate_destroy(Translate *self)
 {
     return object_destroy(&self->target);
 }
+
 Object translate(Object translated, Vec3 displacement, Vec3 rotation)
 {
     Object res;

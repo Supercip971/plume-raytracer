@@ -128,3 +128,23 @@ void bvh_create_rec(HitableList *list, rt_float tstart, rt_float tend)
         add_hitable_list(list, result_obj);
     }
 }
+
+rt_float bvh_pdf_value(Vec3 origin, Vec3 direction, const bvhData *self)
+{
+    rt_float val_left, val_right;
+    val_left = object_pdf_value(origin, direction, (Object *)&self->left);
+    val_right = object_pdf_value(origin, direction, (Object *)&self->right);
+    return (val_left + val_right) / 2;
+}
+Vec3 bvh_random(Vec3 origin, const bvhData *self)
+{
+
+    if (random_rt_float() > 0.5)
+    {
+        return object_random(origin, &self->left);
+    }
+    else
+    {
+        return object_random(origin, &self->right);
+    }
+}

@@ -10,11 +10,12 @@ static rt_float schlick(rt_float cosine, rt_float ref_index)
     return r0 + (1 - r0) * pow(1 - cosine, 5);
 }
 
-bool dieletric_callback(const Ray *r_in, const HitRecord *record, Vec3 *attenuation, Ray *scattered, const Dieletric *self)
+bool dieletric_callback(const Ray *r_in, const HitRecord *record, MaterialRecord *mat_record,
+                        const Dieletric *self)
 {
 
     Vec3 direction;
-
+    mat_record->pdf.type = PDF_NONE;
     rt_float refraction_ratio = record->front_face ? (1 / self->ref_index) : self->ref_index;
     Vec3 unit_direction = vec3_unit(r_in->direction);
 
@@ -32,11 +33,11 @@ bool dieletric_callback(const Ray *r_in, const HitRecord *record, Vec3 *attenuat
         direction = refract(unit_direction, record->normal, refraction_ratio);
     }
 
-    scattered->direction = direction;
-    scattered->origin = record->pos;
-    scattered->time = r_in->time;
-
-    *attenuation = vec3_create(1, 1, 1);
+    mat_record->scattered.direction = direction;
+    mat_record->scattered.origin = record->pos;
+    mat_record->scattered.time = r_in->time;
+    mat_record->is_specular = false;
+    mat_record->attenuation = vec3_create(1, 1, 1);
     return 1;
 }
 

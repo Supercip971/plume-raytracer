@@ -10,5 +10,5 @@ typedef struct
     CameraConfig cam_config;
 } WorldConfig;
 
-void scene_init(Object *root, WorldConfig *config);
+void scene_init(Object *root, Object *light, WorldConfig *config);
 #endif // WORLDS_H

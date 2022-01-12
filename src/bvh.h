@@ -14,3 +14,6 @@ bool bvh_destroy(bvhData *self);
 bool bvh_hit(Ray r, rt_float t_min, rt_float t_max, HitRecord *record, const bvhData *self);
 
 void bvh_create_rec(HitableList *list, rt_float tstart, rt_float tend);
+
+rt_float bvh_pdf_value(Vec3 origin, Vec3 direction, const bvhData *self);
+Vec3 bvh_random(Vec3 origin, const bvhData *self);

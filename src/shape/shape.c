@@ -72,6 +72,10 @@ bool object_get_aabb(rt_float time_start, rt_float time_end, AABB *output, Objec
 }
 bool object_destroy(Object *self)
 {
+    if (self == NULL || self->data == NULL)
+    {
+        return false;
+    }
     switch (self->type)
     {
     case SHAPE_HITABLE_LIST:
@@ -88,5 +92,49 @@ bool object_destroy(Object *self)
         return constant_destroy(self->data);
     default:
         return false;
+    }
+}
+
+rt_float object_pdf_value(Vec3 origin, Vec3 direction, const Object *self)
+{
+    switch (self->type)
+    {
+    case SHAPE_AAREC_XY:
+        return aa_xyrect_pdf_value(origin, direction, self->data);
+    case SHAPE_AAREC_XZ:
+        return aa_xzrect_pdf_value(origin, direction, self->data);
+
+    case SHAPE_AAREC_YZ:
+        return aa_yzrect_pdf_value(origin, direction, self->data);
+    case SHAPE_TRANSFORM:
+        return transform_pdf_value(origin, direction, self->data);
+    case SHAPE_BVH:
+        return bvh_pdf_value(origin, direction, self->data);
+    case SHAPE_HITABLE_LIST:
+        return hitable_pdf_value(origin, direction, self->data);
+
+    default:
+        return 0;
+    }
+}
+Vec3 object_random(Vec3 origin, const Object *self)
+{
+    switch (self->type)
+    {
+    case SHAPE_AAREC_XY:
+        return aa_xyrect_pdf_random(origin, self->data);
+    case SHAPE_AAREC_XZ:
+        return aa_xzrect_pdf_random(origin, self->data);
+
+    case SHAPE_AAREC_YZ:
+        return aa_yzrect_pdf_random(origin, self->data);
+    case SHAPE_TRANSFORM:
+        return transform_pdf_random(origin, self->data);
+    case SHAPE_HITABLE_LIST:
+        return hitable_random(origin, self->data);
+    case SHAPE_BVH:
+        return bvh_random(origin, self->data);
+    default:
+        return vec3_create(1, 0, 0);
     }
 }

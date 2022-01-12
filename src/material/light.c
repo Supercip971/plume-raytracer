@@ -2,9 +2,15 @@
 #include <stdlib.h>
 #include "../texture/solid_color.h"
 
-bool light_emit(rt_float u, rt_float v, const Vec3 *point, Vec3 *emit, const Light *self)
+bool light_emit(const HitRecord *record, Vec3 *emit, const Light *self)
 {
-    *emit = texture_get(u, v, point, &self->emition);
+
+    if (!record->front_face)
+    {
+        *emit = vec3_create(0, 0, 0);
+        return true;
+    }
+    *emit = texture_get(record->u, record->v, &record->pos, &self->emition);
 
     return true;
 }

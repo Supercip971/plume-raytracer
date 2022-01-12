@@ -8,15 +8,15 @@
 
 /* use render_thread ^2 */
 /* if you put 4 it will use (4^2) 16 threads */
-#define RENDER_THREAD (4)
+#define RENDER_THREAD (8)
 #define MULTIPLE_THREAD (12)
 
-#define MAX_SAMPLE 500000000
-#define SAMPLE_PER_THREAD 5
+#define MAX_SAMPLE 5000000
+#define SAMPLE_PER_THREAD 4
 #define MAX_RENDER_THREAD 256
 #define MAX_RENDER_THREAD 256
 
-#define MAX_BOUNCE_DEPTH 32 
+#define MAX_BOUNCE_DEPTH 128
 
 typedef float rt_float;
 
@@ -42,6 +42,9 @@ typedef float rt_float;
 
 #define SCENE_SMOKY_CORNELL_BOX 5
 
-#define SCENE_SELECT SCENE_SMOKY_CORNELL_BOX
+/* a random scene presenting everything in chapter 1-2 */
+
+#define SCENE_RAND_CHAP_2 6
+#define SCENE_SELECT SCENE_CORNELL_BOX
 
 #define MAX_OBJECTS 256
