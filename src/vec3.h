@@ -2,6 +2,7 @@
 #define VEC3_H
 #include <math.h>
 #include <stdbool.h>
+#include <stddef.h>
 #include "color.h"
 #include "config.h"
 #include "utils.h"

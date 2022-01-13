@@ -7,8 +7,6 @@
 #include "ray.h"
 #include "shape/shape.h"
 
-typedef struct hit_record HitRecord;
-
 struct hit_record
 {
     int depth;

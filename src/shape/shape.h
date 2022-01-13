@@ -3,6 +3,8 @@
 
 #include "../aabb.h"
 
+typedef struct hit_record HitRecord;
+
 typedef enum
 {
     SHAPE_NONE,
@@ -27,8 +29,6 @@ typedef struct
     void *data;
     ShapeTypes type;
 } Object;
-
-typedef struct hit_record HitRecord;
 
 bool object_collide(Ray r, rt_float t_min, rt_float t_max, HitRecord *record, Object *self);
 

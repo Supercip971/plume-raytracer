@@ -109,7 +109,7 @@ static Vec3 calculate_ray_color(Ray from, int depth, const Vec3 *background)
     forked_ray.origin = record.pos;
     forked_ray.direction = pdf_generate(&mixture_pdf);
     forked_ray.time = from.time;
-    pdf = pdf_value(forked_ray.direction, &mixture_pdf) + 0.0001;
+    pdf = pdf_value(forked_ray.direction, &mixture_pdf);
     /* quick and dirty code end */
     // emmited + (albedo * mat_pdf) * (raycol / pdf)
     (void)pdf;
@@ -136,7 +136,6 @@ FLATTEN static void render_update_part(struct render_part_args *arg)
     size_t x, y;
     rt_float u, v;
     rt_float offx, offy;
-
     offx = random_rt_float() / (rt_float)(arg->width - 1);
     offy = random_rt_float() / (rt_float)(arg->height - 1);
 

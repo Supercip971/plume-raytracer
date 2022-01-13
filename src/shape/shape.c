@@ -1,4 +1,5 @@
 #include "shape.h"
+#include <stdio.h>
 #include "../bvh.h"
 #include "../hitable.h"
 #include "Sphere.h"
@@ -112,7 +113,6 @@ rt_float object_pdf_value(Vec3 origin, Vec3 direction, const Object *self)
         return bvh_pdf_value(origin, direction, self->data);
     case SHAPE_HITABLE_LIST:
         return hitable_pdf_value(origin, direction, self->data);
-
     default:
         return 0;
     }

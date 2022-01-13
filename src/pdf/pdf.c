@@ -1,4 +1,5 @@
 #include "pdf.h"
+#include <stdio.h>
 #include "cosine.h"
 #include "hitable.h"
 #include "mixture.h"
