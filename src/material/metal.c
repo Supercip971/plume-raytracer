@@ -10,7 +10,7 @@ bool metal_callback(const Ray *r_in, const HitRecord *record, MaterialRecord *ma
     mat_record->scattered.direction = (vec3_add(target, vec3_mul_val(random_vec3_unit(), self->fuzzy)));
     mat_record->scattered.time = r_in->time;
     mat_record->attenuation = self->albedo;
-    mat_record->is_specular = false;
+    mat_record->is_specular = true;
     mat_record->pdf.type = PDF_NONE;
 
     return vec3_dot(mat_record->scattered.direction, record->normal) > 0;

@@ -2,11 +2,13 @@
 #include "engine.h"
 #include <limits.h>
 #include <math.h>
+#include <pthread.h>
 #include <stddef.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <unistd.h>
 #include "bvh.h"
 #include "camera.h"
 #include "config.h"
@@ -72,8 +74,8 @@ static Object root;
 static Object lights;
 
 static Vec3 background_color;
-
-static Vec3 calculate_ray_color(Ray from, int depth, const Vec3 *background)
+Vec3 calculate_ray_color(Ray from, int depth, const Vec3 *background);
+static Vec3 calculate_ray_color_impl(Ray from, int depth, const Vec3 *background)
 {
     HitRecord record = {0};
     Ray forked_ray = from;
@@ -104,12 +106,15 @@ static Vec3 calculate_ray_color(Ray from, int depth, const Vec3 *background)
     }
 
     Pdf hitable_pdf = make_pdf_hitable(&lights, record.pos);
-    Pdf mixture_pdf = make_mixture_pdf(&hitable_pdf, &mat_record.pdf);
-
+    Pdf mixture_pdf = make_mixture_pdf(&mat_record.pdf, &hitable_pdf);
+    (void)hitable_pdf;
     forked_ray.origin = record.pos;
     forked_ray.direction = pdf_generate(&mixture_pdf);
     forked_ray.time = from.time;
     pdf = pdf_value(forked_ray.direction, &mixture_pdf);
+    // printf("pdf: %f \n", pdf);
+    print_vec3(forked_ray.direction);
+
     /* quick and dirty code end */
     // emmited + (albedo * mat_pdf) * (raycol / pdf)
     (void)pdf;
@@ -122,8 +127,21 @@ static Vec3 calculate_ray_color(Ray from, int depth, const Vec3 *background)
                 material_get_pdf(&from, &record, &forked_ray, &record.material)),
 
             vec3_div_val(
-                calculate_ray_color(forked_ray, depth + 1, background),
+                calculate_ray_color_impl(forked_ray, depth + 1, background),
                 pdf)));
+}
+
+Vec3 calculate_ray_color(Ray from, int depth, const Vec3 *background)
+{
+    while (true)
+    {
+        volatile Vec3 v = calculate_ray_color_impl(from, depth, background);
+        if (v.x + 1 == v.x || v.y + 1 == v.y || v.z + 1 == v.z)
+        {
+            continue;
+        }
+        return v;
+    }
 }
 
 FLATTEN static void render_update_part(struct render_part_args *arg)
@@ -274,7 +292,7 @@ bool render_update(Color *framebuffer, size_t width, size_t height)
             args[fi].s_y = s_y;
             if (!get_no_active_thread(&ii))
             {
-                printf("no free thread founded \n");
+                // printf("no free thread founded \n");
                 lock_release(&args[fi].lock);
                 return false;
             }
@@ -287,7 +305,7 @@ bool render_update(Color *framebuffer, size_t width, size_t height)
         }
         else
         {
-            printf("no free sample founded \n");
+            // printf("no free sample founded \n");
             stop = true;
 
             return false;

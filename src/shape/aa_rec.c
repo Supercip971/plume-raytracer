@@ -12,6 +12,12 @@ rt_float aa_xyrect_pdf_value(Vec3 origin, Vec3 direction, XYrec *self)
     rt_float distance_squared;
     rt_float cosine;
 
+    AABB outaabb;
+    aaxyrect_get_aabb(0, 1, &outaabb, self);
+    if (!aabb_hit(&outaabb, &r, 0, 1000000))
+    {
+        return 0;
+    }
     if (!hit_aaxyrect_callback(r, 0.001, 10000000, &rec, self))
     {
         return 0;
@@ -34,6 +40,12 @@ rt_float aa_xzrect_pdf_value(Vec3 origin, Vec3 direction, XZrec *self)
     rt_float distance_squared;
     rt_float cosine;
 
+    AABB outaabb;
+    aaxzrect_get_aabb(0, 1, &outaabb, self);
+    if (!aabb_hit(&outaabb, &r, 0, 1000000))
+    {
+        return 0;
+    }
     if (!hit_aaxzrect_callback(r, 0.001, 1000000, &rec, self))
     {
         return 0;
@@ -55,6 +67,12 @@ rt_float aa_yzrect_pdf_value(Vec3 origin, Vec3 direction, YZrec *self)
     rt_float distance_squared;
     rt_float cosine;
 
+    AABB outaabb;
+    aayzrect_get_aabb(0, 1, &outaabb, self);
+    if (!aabb_hit(&outaabb, &r, 0, 1000000))
+    {
+        return 0;
+    }
     if (!hit_aayzrect_callback(r, 0.001, 100000, &rec, self))
     {
         return 0;
@@ -96,7 +114,7 @@ FLATTEN bool hit_aaxyrect_callback(Ray ray, rt_float t_min, rt_float t_max, HitR
     rt_float x, y;
     Vec3 outward;
 
-    t = (self->k - ray.origin.z) / (ray.direction.z + 0.0001);
+    t = (self->k - ray.origin.z) / (ray.direction.z);
 
     if (t < t_min || t > t_max)
     {
@@ -162,7 +180,7 @@ FLATTEN bool hit_aaxzrect_callback(Ray ray, rt_float t_min, rt_float t_max, HitR
     rt_float z, x;
     Vec3 outward;
 
-    t = (self->k - ray.origin.y) / (ray.direction.y + 0.0001);
+    t = (self->k - ray.origin.y) / (ray.direction.y);
 
     if (t < t_min || t > t_max)
     {
@@ -226,7 +244,7 @@ FLATTEN bool hit_aayzrect_callback(Ray ray, rt_float t_min, rt_float t_max, HitR
     rt_float z, y;
     Vec3 outward;
 
-    t = (self->k - ray.origin.x) / (ray.direction.x + 0.0001);
+    t = (self->k - ray.origin.x) / (ray.direction.x);
 
     if (t < t_min || t > t_max)
     {
@@ -250,7 +268,6 @@ FLATTEN bool hit_aayzrect_callback(Ray ray, rt_float t_min, rt_float t_max, HitR
 
     record->material = self->self_material;
     record->pos = ray_point_param(ray, t);
-
     return true;
 }
 

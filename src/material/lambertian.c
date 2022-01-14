@@ -7,12 +7,8 @@
 bool lambertian_callback(const Ray *r_in, const HitRecord *record, MaterialRecord *mat_record, const Lambertian *self)
 {
     Onb uvw = create_onb_from_vec(record->normal);
-    Vec3 direction = onb_local(&uvw, random_vec3_cosine_direction());
     (void)r_in;
 
-    mat_record->scattered.origin = record->pos;
-    mat_record->scattered.direction = vec3_unit(direction);
-    mat_record->scattered.time = r_in->time;
     mat_record->attenuation = texture_get(record->u, record->v, &record->pos, &self->albedo);
     mat_record->pdf = make_pdf_cosine(uvw);
     mat_record->is_specular = false;

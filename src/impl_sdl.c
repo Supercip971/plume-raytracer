@@ -179,7 +179,7 @@ void impl_render_loop(void)
         if (!render_update(pixels, SCRN_WIDTH, SCRN_HEIGHT))
         {
             swap_buffer();
-            printf(" ended [!] %li \n", impl_get_tick() - start_tick);
+            // printf(" ended [!] %li \n", impl_get_tick() - start_tick);
             return;
         }
         swap_buffer();
@@ -225,10 +225,10 @@ Image image_load(const char *path)
 
     if (error)
     {
-        printf("decoder error %u: %s\n", error, lodepng_error_text(error));
+        // printf("decoder error %u: %s\n", error, lodepng_error_text(error));
     }
 
-    printf("decoded: (%s) %x x %x \n", path, result.width, result.height);
+    // printf("decoded: (%s) %x x %x \n", path, result.width, result.height);
 
     result.converted_data = malloc(sizeof(Color) * result.width * (result.height + 3));
 

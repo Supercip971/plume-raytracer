@@ -17,5 +17,7 @@ rt_float pdf_hitable_value(Vec3 direction, const PdfData *self)
 
 Vec3 hitable_pdf_generate(const PdfData *self)
 {
-    return object_random(self->hitable.origin, self->hitable.obj);
+    Vec3 r = object_random(self->hitable.origin, self->hitable.obj);
+
+    return vec3_unit(r);
 }

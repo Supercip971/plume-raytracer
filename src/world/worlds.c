@@ -409,7 +409,7 @@ void scene_init(Object *root, Object *light, WorldConfig *config)
         break;
     }
     default:
-        printf("not recognised config: %d\n", SCENE_SELECT);
+        // printf("not recognised config: %d\n", SCENE_SELECT);
         exit(-1);
         break;
     }

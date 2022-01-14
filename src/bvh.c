@@ -1,9 +1,9 @@
 #include <stdio.h>
-#include <stdlib.h>
+#include<stdlib.h>
 #include <utils.h>
 #include "bvh.h"
 
-bool bvh_get_aabb(rt_float time_start, rt_float time_end, AABB *output, const bvhData *self)
+    bool bvh_get_aabb(rt_float time_start, rt_float time_end, AABB *output, const bvhData *self)
 {
     *output = self->box;
     (void)time_start;
@@ -12,20 +12,27 @@ bool bvh_get_aabb(rt_float time_start, rt_float time_end, AABB *output, const bv
 }
 bool bvh_hit(Ray r, rt_float t_min, rt_float t_max, HitRecord *record, const bvhData *self)
 {
-    bool hit_left, hit_right;
+    bool hit_left = false, hit_right = false;
+    AABB box_left, box_right;
 
     if (!aabb_hit(&self->box, &r, t_min, t_max))
     {
         return false;
     }
 
-    hit_left = object_collide(r, t_min, t_max, record, (Object *)&self->left);
-    hit_right = object_collide(r, t_min, hit_left ? record->t : t_max, record, (Object *)&self->right);
+    object_get_aabb(0, 1, &box_left, (Object *)&self->left);
+    object_get_aabb(0, 1, &box_right, (Object *)&self->right);
 
-    if (hit_left || hit_right)
+    if (aabb_hit(&box_left, &r, t_min, t_max))
     {
-        record->oc_depth += 1;
+        hit_left = object_collide(r, t_min, t_max, record, (Object *)&self->left);
     }
+    if (aabb_hit(&box_right, &r, t_min, t_max))
+    {
+
+        hit_right = object_collide(r, t_min, hit_left ? record->t : t_max, record, (Object *)&self->right);
+    }
+
     return hit_left || hit_right;
 }
 

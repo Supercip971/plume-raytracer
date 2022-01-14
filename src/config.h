@@ -16,7 +16,7 @@
 #define MAX_RENDER_THREAD 256
 #define MAX_RENDER_THREAD 256
 
-#define MAX_BOUNCE_DEPTH 128
+#define MAX_BOUNCE_DEPTH 64
 
 typedef float rt_float;
 

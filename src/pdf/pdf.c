@@ -30,6 +30,6 @@ Vec3 pdf_generate(const Pdf *self)
     case PDF_MIXTURE:
         return mixture_pdf_generate(&self->data);
     default:
-        return random_vec3_cosine_direction();
+        return vec3_create(1, 1, 1);
     }
 }

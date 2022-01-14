@@ -78,3 +78,25 @@ Object sphere_create(rt_float radius, Vec3 pos, Material sphere_material)
 
     return result;
 }
+rt_float sphere_pdf_value(Vec3 origin, Vec3 direction, const Sphere *self)
+{
+    HitRecord self_record = {};
+    Ray r = {
+        .direction = direction,
+        .origin = origin,
+    };
+    hit_sphere_object_callback(r, 0, 1, &self_record, self);
+
+    rt_float max_cos_theta = fast_sqrt(1 - (self->radius * self->radius / vec3_squared_length(vec3_sub(origin, self->pos))));
+    rt_float solid_angle = 2 * M_PI * (1 - max_cos_theta);
+
+    return 1 / solid_angle;
+}
+
+Vec3 sphere_random(Vec3 origin, const Sphere *self)
+{
+    Vec3 center = vec3_sub(self->pos, origin);
+    rt_float distance_squared = vec3_squared_length(center);
+    Onb uvw = create_onb_from_vec(center);
+    return onb_local(&uvw, random_vec3_direction_to_sphere(self->radius, distance_squared));
+}

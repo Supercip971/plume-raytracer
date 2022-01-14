@@ -132,7 +132,7 @@ void matrix_inverse(const Matrix4x4 *matrix, Matrix4x4 *result)
     if (det <= 0.0f)
     {
         create_matrix_identity(result);
-        printf("matrix_inverse: determinant is 0.0f\n");
+        // printf("matrix_inverse: determinant is 0.0f\n");
         return;
     }
 

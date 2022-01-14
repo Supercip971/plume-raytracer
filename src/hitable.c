@@ -32,17 +32,23 @@ bool hitable_list_call_all(Ray r, rt_float t_min, rt_float t_max, HitRecord *rec
     HitRecord temp;
     bool at_least_one_collided = false;
     size_t i;
+    AABB box;
 
     rt_float closest = t_max;
 
     for (i = 0; i < self->child_count; i++)
     {
-        if (object_collide(r, t_min, closest, &temp, (Object *)&self->childs[i]))
-        {
-            at_least_one_collided = true;
+        object_get_aabb(0, 1000, &box, &self->childs[i]);
 
-            closest = temp.t;
-            *record = temp;
+        if (aabb_hit(&box, &r, t_min, closest))
+        {
+            if (object_collide(r, t_min, closest, &temp, (Object *)&self->childs[i]))
+            {
+                at_least_one_collided = true;
+
+                closest = temp.t;
+                *record = temp;
+            }
         }
     }
 
@@ -155,7 +161,7 @@ Vec3 hitable_random(Vec3 origin, const HitableList *self)
         return vec3_create(0, 0, 1);
     }
 
-    return object_random(origin, &self->childs[(int)random_rt_range(0, self->child_count - 1)]);
+    return object_random(origin, &self->childs[(int)rand() % self->child_count]);
 }
 
 rt_float hitable_pdf_value(Vec3 origin, Vec3 direction, const HitableList *self)

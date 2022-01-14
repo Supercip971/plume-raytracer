@@ -3,6 +3,7 @@
 #include <math.h>
 #include <stdbool.h>
 #include <stddef.h>
+#include <stdio.h>
 #include "color.h"
 #include "config.h"
 #include "utils.h"
@@ -14,6 +15,12 @@ typedef struct vec3_t
     rt_float z;
     rt_float _n;
 } Vec3;
+
+static inline void print_vec3(Vec3 self)
+{
+    (void)self;
+    // printf("vec: {%f,%f,%f}\n", self.x, self.y, self.z);
+}
 
 static inline Vec3 vec3_create(rt_float x, rt_float y, rt_float z)
 {
@@ -195,9 +202,9 @@ static inline Vec3 vec_from_color(Color col)
 static inline Color vec_to_color(Vec3 from)
 {
     return color_create(
-        rt_min(from.x, 1),
-        rt_min(from.y, 1),
-        rt_min(from.z, 1));
+        rt_min(rt_abs(from.x), 1),
+        rt_min(rt_abs(from.y), 1),
+        rt_min(rt_abs(from.z), 1));
 }
 
 /* maybe the attribute hot is totally useless ? todo: check if it is really necessary */
@@ -245,6 +252,19 @@ static inline Vec3 random_vec3_cosine_direction(void)
     rt_float phi = r1 * M_PI * 2;
     rt_float x = fast_cos(phi) * fast_sqrt(r2);
     rt_float y = fast_sin(phi) * fast_sqrt(r2);
+    // printf("rvcd: %f %f %f\n", x, y, z);
+    return vec3_create(x, y, z);
+}
+
+static inline Vec3 random_vec3_direction_to_sphere(rt_float radius, rt_float dist_squared)
+{
+    rt_float r1 = random_rt_float();
+    rt_float r2 = random_rt_float();
+    rt_float z = 1 + r2 * (fast_sqrt(1 - radius * radius / dist_squared) - 1);
+
+    rt_float phi = r1 * M_PI * 2;
+    rt_float x = fast_cos(phi) * fast_sqrt(1 - z * z);
+    rt_float y = fast_sin(phi) * fast_sqrt(1 - z * z);
 
     return vec3_create(x, y, z);
 }
