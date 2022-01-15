@@ -117,6 +117,8 @@ rt_float object_pdf_value(Vec3 origin, Vec3 direction, const Object *self)
         return hitable_pdf_value(origin, direction, self->data);
     case SHAPE_SPHERE:
         return sphere_pdf_value(origin, direction, self->data);
+    case SHAPE_BOX:
+        return box_pdf_value(origin, direction, self->data);
     default:
         // printf("can't get value for: %i \n", self->type);
         assert(false);
@@ -142,6 +144,8 @@ Vec3 object_random(Vec3 origin, const Object *self)
         return bvh_random(origin, self->data);
     case SHAPE_SPHERE:
         return sphere_random(origin, self->data);
+    case SHAPE_BOX:
+        return box_random(origin, self->data);
     default:
         return vec3_create(1, 0, 0);
     }

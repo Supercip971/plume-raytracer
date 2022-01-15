@@ -14,7 +14,7 @@ rt_float aa_xyrect_pdf_value(Vec3 origin, Vec3 direction, XYrec *self)
 
     AABB outaabb;
     aaxyrect_get_aabb(0, 1, &outaabb, self);
-    if (!aabb_hit(&outaabb, &r, 0, 1000000))
+    if (!aabb_hit(&outaabb, &r, 0.01, 1000000))
     {
         return 0;
     }
@@ -42,7 +42,7 @@ rt_float aa_xzrect_pdf_value(Vec3 origin, Vec3 direction, XZrec *self)
 
     AABB outaabb;
     aaxzrect_get_aabb(0, 1, &outaabb, self);
-    if (!aabb_hit(&outaabb, &r, 0, 1000000))
+    if (!aabb_hit(&outaabb, &r, 0.01, 1000000))
     {
         return 0;
     }
@@ -69,7 +69,7 @@ rt_float aa_yzrect_pdf_value(Vec3 origin, Vec3 direction, YZrec *self)
 
     AABB outaabb;
     aayzrect_get_aabb(0, 1, &outaabb, self);
-    if (!aabb_hit(&outaabb, &r, 0, 1000000))
+    if (!aabb_hit(&outaabb, &r, 0.01, 1000000))
     {
         return 0;
     }

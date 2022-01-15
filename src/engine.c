@@ -77,15 +77,15 @@ static Vec3 background_color;
 Vec3 calculate_ray_color(Ray from, int depth, const Vec3 *background);
 static Vec3 calculate_ray_color_impl(Ray from, int depth, const Vec3 *background)
 {
-    HitRecord record = {0};
+    HitRecord record = {};
     Ray forked_ray = from;
-    Vec3 emitted = {0};
+    Vec3 emitted = {};
     rt_float pdf = 0;
-    MaterialRecord mat_record = {0};
+    MaterialRecord mat_record = {};
 
     if (stop)
     {
-        return emitted;
+        return vec3_create(0, 0, 0);
     }
 
     if (depth > MAX_BOUNCE_DEPTH)
@@ -107,13 +107,11 @@ static Vec3 calculate_ray_color_impl(Ray from, int depth, const Vec3 *background
 
     Pdf hitable_pdf = make_pdf_hitable(&lights, record.pos);
     Pdf mixture_pdf = make_mixture_pdf(&mat_record.pdf, &hitable_pdf);
-    (void)hitable_pdf;
     forked_ray.origin = record.pos;
-    forked_ray.direction = pdf_generate(&mixture_pdf);
+    forked_ray.direction = vec3_add(pdf_generate(&mixture_pdf), vec3_create(0.01, 0.01, 0.01));
     forked_ray.time = from.time;
     pdf = pdf_value(forked_ray.direction, &mixture_pdf);
     // printf("pdf: %f \n", pdf);
-    print_vec3(forked_ray.direction);
 
     /* quick and dirty code end */
     // emmited + (albedo * mat_pdf) * (raycol / pdf)
@@ -133,15 +131,19 @@ static Vec3 calculate_ray_color_impl(Ray from, int depth, const Vec3 *background
 
 Vec3 calculate_ray_color(Ray from, int depth, const Vec3 *background)
 {
-    while (true)
+
+    while (!stop)
     {
         volatile Vec3 v = calculate_ray_color_impl(from, depth, background);
         if (v.x + 1 == v.x || v.y + 1 == v.y || v.z + 1 == v.z)
         {
             continue;
         }
+
         return v;
     }
+
+    return vec3_create(0, 0, 0);
 }
 
 FLATTEN static void render_update_part(struct render_part_args *arg)

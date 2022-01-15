@@ -56,6 +56,15 @@ static inline Vec3 vec3_sub(Vec3 vec1, Vec3 vec2)
     return vec3_create(vec1.x - vec2.x, vec1.y - vec2.y, vec1.z - vec2.z);
 }
 
+static inline Vec3 vec3_min(Vec3 vec1, Vec3 vec2)
+{
+    return vec3_create(rt_min(vec1.x, vec2.x), rt_min(vec1.y, vec2.y), rt_min(vec1.z, vec2.z));
+}
+
+static inline Vec3 vec3_max(Vec3 vec1, Vec3 vec2)
+{
+    return vec3_create(rt_max(vec1.x, vec2.x), rt_max(vec1.y, vec2.y), rt_max(vec1.z, vec2.z));
+}
 #ifdef USE_INTRINSIC
 #    include <immintrin.h>
 #    include <x86intrin.h>
@@ -85,7 +94,29 @@ static inline Vec3 vec3_mul(Vec3 vec1, Vec3 vec2)
     return res;
     return vec3_create(vec1.x * vec2.x, vec1.y * vec2.y, vec1.z * vec2.z);
 }
+static inline Vec3 vec3_cross(Vec3 vec1, Vec3 vec2)
+{
+
+    __m128 a = _mm_load_ps((float *)&vec1);
+    __m128 b = _mm_load_ps((float *)&vec2);
+    __m128 tmp0 = _mm_shuffle_ps(a, a, _MM_SHUFFLE(3, 0, 2, 1));
+    __m128 tmp1 = _mm_shuffle_ps(b, b, _MM_SHUFFLE(3, 1, 0, 2));
+    __m128 tmp2 = _mm_mul_ps(tmp0, b);
+    __m128 tmp3 = _mm_mul_ps(tmp0, tmp1);
+    __m128 tmp4 = _mm_shuffle_ps(tmp2, tmp2, _MM_SHUFFLE(3, 0, 2, 1));
+    __m128 res_m = _mm_sub_ps(tmp3, tmp4);
+    Vec3 res = {};
+    _mm_store_ps((float *)&res, res_m);
+
+    return res;
+}
+
 #else
+
+static inline Vec3 vec3_cross(Vec3 vec1, Vec3 vec2)
+{
+    return vec3_create(vec1.y * vec2.z - vec1.z * vec2.y, vec1.z * vec2.x - vec1.x * vec2.z, vec1.x * vec2.y - vec1.y * vec2.x);
+}
 static inline Vec3 vec3_div(Vec3 vec1, Vec3 vec2)
 {
     return vec3_create(vec1.x / vec2.x, vec1.y / vec2.y, vec1.z / vec2.z);
@@ -111,24 +142,6 @@ static inline rt_float vec3_dot(Vec3 vec1, Vec3 vec2)
 
     return (vec1.x * vec2.x + vec1.y * vec2.y + vec1.z * vec2.z);
 }
-
-static inline Vec3 vec3_cross(Vec3 vec1, Vec3 vec2)
-{
-
-    __m128 a = _mm_load_ps((float *)&vec1);
-    __m128 b = _mm_load_ps((float *)&vec2);
-    __m128 tmp0 = _mm_shuffle_ps(a, a, _MM_SHUFFLE(3, 0, 2, 1));
-    __m128 tmp1 = _mm_shuffle_ps(b, b, _MM_SHUFFLE(3, 1, 0, 2));
-    __m128 tmp2 = _mm_mul_ps(tmp0, b);
-    __m128 tmp3 = _mm_mul_ps(tmp0, tmp1);
-    __m128 tmp4 = _mm_shuffle_ps(tmp2, tmp2, _MM_SHUFFLE(3, 0, 2, 1));
-    __m128 res_m = _mm_sub_ps(tmp3, tmp4);
-    Vec3 res = {};
-    _mm_store_ps((float *)&res, res_m);
-
-    return res;
-}
-
 static inline bool is_vec3_near_zero(Vec3 vec)
 {
     const rt_float precision = 1e-8;

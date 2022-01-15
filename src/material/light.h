@@ -7,6 +7,7 @@
 typedef struct
 {
     Texture emition;
+    bool flipped;
 } Light;
 
 Material light_create(Vec3 emition);

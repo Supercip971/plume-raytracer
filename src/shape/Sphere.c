@@ -84,10 +84,14 @@ rt_float sphere_pdf_value(Vec3 origin, Vec3 direction, const Sphere *self)
     Ray r = {
         .direction = direction,
         .origin = origin,
+        .time = 0,
     };
-    hit_sphere_object_callback(r, 0, 1, &self_record, self);
+    if (!hit_sphere_object_callback(r, 0.001, 1000000, &self_record, self))
+    {
+        return 0;
+    }
 
-    rt_float max_cos_theta = fast_sqrt(1 - (self->radius * self->radius / vec3_squared_length(vec3_sub(origin, self->pos))));
+    rt_float max_cos_theta = fast_sqrt(1 - (self->radius * self->radius / vec3_squared_length(vec3_sub(self->pos, origin))));
     rt_float solid_angle = 2 * M_PI * (1 - max_cos_theta);
 
     return 1 / solid_angle;

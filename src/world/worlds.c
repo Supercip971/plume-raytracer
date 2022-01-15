@@ -186,6 +186,7 @@ static void cornell_box(Object *root, Object *lights, WorldConfig *config)
     Matrix4x4 diff2_rot;
     Matrix4x4 diff_light;
     Matrix4x4 diff2_mov;
+    Object light_obj;
     Object translated_box2;
     Material red = lambertian_create(vec3_create(0.65, 0.05, 0.05));
     Material green = lambertian_create(vec3_create(0.12, 0.45, 0.15));
@@ -197,10 +198,12 @@ static void cornell_box(Object *root, Object *lights, WorldConfig *config)
     add_hitable_object(root, aayzrect_create(0, 555, 0, 555, 555, green));
     add_hitable_object(root, aayzrect_create(0, 555, 0, 555, 0, red));
 
-    create_matrix_scale(&diff_light, 1, 1, 1);
-    add_hitable_object(root, transform(aaxzrect_create(213, 343, 227, 332, 554, light), diff_light));
-    add_hitable_object(lights, transform(aaxzrect_create(213, 343, 227, 332, 554, light), diff_light));
-    add_hitable_object(lights, sphere_create(90, vec3_create(190, 90, 190), light));
+    create_matrix_scale(&diff_light, 1, -1, 1);
+    ((Light *)light.data)->flipped = true;
+    light_obj = aaxzrect_create(213, 343, 227, 332, 554.9, light);
+    add_hitable_object(root, light_obj);
+    add_hitable_object(lights, light_obj);
+    /*   add_hitable_object(lights, sphere_create(90, vec3_create(190, 90, 190), light)); */
     add_hitable_object(root, aaxzrect_create(0, 555, 0, 555, 0, white));
     add_hitable_object(root, aaxzrect_create(0, 555, 0, 555, 555, white));
     add_hitable_object(root, aaxyrect_create(0, 555, 0, 555, 555, white));

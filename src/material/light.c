@@ -5,11 +5,12 @@
 bool light_emit(const HitRecord *record, Vec3 *emit, const Light *self)
 {
 
-    if (!record->front_face)
+    if (record->front_face == self->flipped)
     {
         *emit = vec3_create(0, 0, 0);
-        return true;
+        return false;
     }
+    
     *emit = texture_get(record->u, record->v, &record->pos, &self->emition);
 
     return true;
