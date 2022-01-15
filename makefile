@@ -3,23 +3,22 @@ MKCWD=mkdir -p $(@D)
 
 PROJECT_NAME = craytracer
 
-CC = gcc
+CC = gcc 
 
 SANTIZERS = \
-	-fsanitize=address \
-	-fsanitize=leak \
-	-fsanitize=undefined \
-	-fsanitize=float-divide-by-zero \
-	-fsanitize=signed-integer-overflow \
+#	-fsanitize=address \
+#	-fsanitize=leak \
+#	-fsanitize=undefined \
+#	-fsanitize=float-divide-by-zero \
+#	-fsanitize=signed-integer-overflow \
 
 # for TCC
 # CFLAGS =  -DSDL_DISABLE_IMMINTRIN_H=0 -Isrc/ -pedantic  -O3  -std=gnu89
-CFLAGS = -DUSE_INTRINSIC -march=native -ansi -O0 -g -Isrc/  \
+CFLAGS = -DUSE_INTRINSIC -ansi -march=native  -Ofast -g -Isrc/  \
  	-std=gnu89 -Wall -Wextra -Wshadow -Werror  \
  	-Wmissing-prototypes -Wstrict-prototypes \
     -Wold-style-definition -flto=auto $(SANTIZERS)    \
  	-ffast-math -fno-semantic-interposition -ffunction-sections -fdata-sections 
-
 
 BUILD_DIR = build
 
