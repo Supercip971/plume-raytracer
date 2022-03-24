@@ -3,6 +3,35 @@
 #include <utils.h>
 #include "bvh.h"
 
+bvhData* bvh_blocks;
+int idx = 0;
+static bvhData* alloc_bvh_data(void)
+{
+    if(bvh_blocks == NULL)
+    {
+        bvh_blocks = malloc(sizeof(bvhData*) * 512);
+    }
+
+
+    idx++;
+    if(idx > 512)
+    {
+        exit(EXIT_FAILURE);
+        return NULL;
+    }
+    return &bvh_blocks[idx];
+}
+
+static void free_bvh_data(bvhData* v)
+{
+    idx--;
+    if(idx == 0)
+    {
+        free(bvh_blocks);
+    }
+    (void)v;
+}
+
     bool bvh_get_aabb(rt_float time_start, rt_float time_end, AABB *output, const bvhData *self)
 {
     *output = self->box;
@@ -33,7 +62,7 @@ bool bvh_hit(Ray r, rt_float t_min, rt_float t_max, HitRecord *record, const bvh
         hit_right = object_collide(r, t_min, hit_left ? record->t : t_max, record, (Object *)&self->right);
     }
 
-    return hit_left || hit_right;
+    return hit_left | hit_right;
 }
 
 bool bvh_destroy(bvhData *self)
@@ -58,13 +87,15 @@ bool bvh_destroy(bvhData *self)
     {
         object_destroy(&self->right);
     }
+
+    free_bvh_data(self);
     return true;
 }
 
 static Object bvh_init(bvhData **out_bvh)
 {
 
-    bvhData *data = malloc(sizeof(bvhData));
+    bvhData *data = alloc_bvh_data();
     Object result;
     result.data = data;
     result.type = SHAPE_BVH;
