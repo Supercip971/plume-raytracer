@@ -105,28 +105,48 @@ static Vec3 calculate_ray_color_impl(Ray from, int depth, const Vec3 *background
         return emitted;
     }
 
+    if (mat_record.is_specular)
+    {
+        return vec3_mul(
+            mat_record.attenuation,
+            calculate_ray_color_impl(mat_record.scattered, depth + 1, background));
+    }
+
     Pdf hitable_pdf = make_pdf_hitable(&lights, record.pos);
     Pdf mixture_pdf = make_mixture_pdf(&mat_record.pdf, &hitable_pdf);
     forked_ray.origin = record.pos;
-    forked_ray.direction = vec3_add(pdf_generate(&mixture_pdf), vec3_create(0.01, 0.01, 0.01));
+    forked_ray.direction = pdf_generate(&mixture_pdf);
+    if (is_vec3_near_zero(forked_ray.direction))
+    {
+        forked_ray.direction = record.normal;
+    }
     forked_ray.time = from.time;
     pdf = pdf_value(forked_ray.direction, &mixture_pdf);
-    // printf("pdf: %f \n", pdf);
 
+    if (pdf == 0)
+    {
+        return emitted;
+    }
+
+    rt_float scat_pdf = material_get_pdf(&from, &record, &forked_ray, &record.material);
+
+    /*    Vec3 col = vec3_div_val((vec3_mul_val( calculate_ray_color_impl(forked_ray,  depth+1, background), scat_pdf)), pdf); */
     /* quick and dirty code end */
     // emmited + (albedo * mat_pdf) * (raycol / pdf)
-    (void)pdf;
+    Vec3 l = vec3_mul_val(
+        mat_record.attenuation,
+        scat_pdf);
+
+    Vec3 r = vec3_div_val(
+        calculate_ray_color_impl(forked_ray, depth + 1, background),
+        pdf);
+
     return vec3_add(
         emitted,
 
         vec3_mul(
-            vec3_mul_val(
-                mat_record.attenuation,
-                material_get_pdf(&from, &record, &forked_ray, &record.material)),
-
-            vec3_div_val(
-                calculate_ray_color_impl(forked_ray, depth + 1, background),
-                pdf)));
+            l,
+            r));
 }
 
 Vec3 calculate_ray_color(Ray from, int depth, const Vec3 *background)
@@ -135,9 +155,9 @@ Vec3 calculate_ray_color(Ray from, int depth, const Vec3 *background)
     while (!stop)
     {
         volatile Vec3 v = calculate_ray_color_impl(from, depth, background);
-        if (v.x + 1 == v.x || v.y + 1 == v.y || v.z + 1 == v.z)
+        if (isnan(v.x) || isnan(v.y) || isnan(v.z))
         {
-            continue;
+            return (vec3_create(0, 0, 0));
         }
 
         return v;
