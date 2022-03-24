@@ -63,12 +63,13 @@ static void decrease_running_thread(void)
 static int sample_step_x = SCRN_WIDTH / (RENDER_THREAD);
 static int sample_step_y = SCRN_HEIGHT / (RENDER_THREAD);
 
-static bool stop;
+static volatile uint64_t thr[MAX_RENDER_THREAD] = {};
+
+
+static volatile bool stop;
 static Camera camera;
 
 struct render_thread_args *args;
-static uint64_t thr[MAX_RENDER_THREAD] = {0};
-
 /* handling this as a global variable is utterly retarded */
 static Object root;
 static Object lights;
@@ -173,44 +174,54 @@ FLATTEN static void render_update_part(struct render_part_args *arg)
 
     Color previous_color;
     Ray r;
-    size_t x, y;
+    size_t x, y, c;
     rt_float u, v;
-    rt_float offx, offy;
-    offx = random_rt_float() / (rt_float)(arg->width - 1);
-    offy = random_rt_float() / (rt_float)(arg->height - 1);
+    rt_float offx[SAMPLE_PER_THREAD], offy[SAMPLE_PER_THREAD];
+    rt_float inv_w = 1.0 / (arg->width - 1);
+    rt_float inv_h = 1.0 / (arg->height - 1);
 
-    for (x = arg->x_from; x < arg->x_max; x += 1)
+    for(c = 0; c < SAMPLE_PER_THREAD; c++)
     {
-        for (y = arg->y_from; y < arg->y_max; y += 1)
+        offx[c] = random_rt_float();
+        offy[c] = random_rt_float();
+    }
+
+    for (y = arg->y_from; y < arg->y_max; y += 1)
+    {
+        for (x = arg->x_from; x < arg->x_max; x += 1)
         {
-            if (stop)
+            for (c = 0; c < SAMPLE_PER_THREAD; c++)
             {
-                return;
+
+                if (stop)
+                {
+                    return;
+                }
+                u = ((rt_float)x + offx[c]) * inv_w;
+                v = ((rt_float)y + offy[c]) * inv_h;
+
+                r = get_camera_ray(&camera, u, v);
+
+                current_color = calculate_ray_color(r, 0, &arg->background);
+
+                /* add current sample to sum */
+                if (arg->sample_count  + c != 0)
+                {
+                    previous_color = (get_pixel(arg->framebuffer, x, y, arg->width));
+
+                    current_color = (vec3_div_val(
+                        vec3_add(
+                            vec3_mul_val(vec_from_color(previous_color), (rt_float)(arg->sample_count + c)), current_color),
+                        arg->sample_count + c + 1));
+                }
+
+                final_color = vec_to_color(current_color);
+
+                set_pixel(arg->framebuffer, x, y, arg->width, final_color);
             }
-            u = ((rt_float)x) / (rt_float)(arg->width - 1) + offx;
-            v = ((rt_float)y) / (rt_float)(arg->height - 1) + offy;
-
-            r = get_camera_ray(&camera, u, v);
-
-            current_color = (calculate_ray_color(r, 0, &arg->background));
-
-            /* add current sample to sum */
-            if (arg->sample_count != 0)
-            {
-                previous_color = get_pixel(arg->framebuffer, x, y, arg->width);
-
-                current_color = vec3_div_val(
-                    vec3_add(
-                        vec3_mul_val(vec_from_color(previous_color), (rt_float)arg->sample_count), current_color),
-                    arg->sample_count + 1);
-            }
-
-            final_color = vec_to_color(current_color);
-
-            set_pixel(arg->framebuffer, x, y, arg->width, final_color);
         }
     }
-    arg->sample_count += 1;
+    arg->sample_count += SAMPLE_PER_THREAD;
 }
 
 static void *render_update_part_thread(void *arg)
@@ -231,15 +242,9 @@ static void *render_update_part_thread(void *arg)
     render_argument.y_max = sample_step_y + v;
     render_argument.background = background_color;
 
-    while (v_count < SAMPLE_PER_THREAD)
-    {
+
         render_update_part(&render_argument);
-        v_count++;
-        if (stop)
-        {
-            break;
-        }
-    }
+        v_count+= SAMPLE_PER_THREAD;
 
     lock_acquire(&args[vargs.s_x + vargs.s_y * RENDER_THREAD].lock);
     args[vargs.s_x + vargs.s_y * RENDER_THREAD].ccount = vargs.ccount + v_count;
@@ -328,9 +333,14 @@ bool render_update(Color *framebuffer, size_t width, size_t height)
         else
         {
             // printf("no free sample founded \n");
-            stop = true;
-
-            return false;
+            if(running_thread_count != 0)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
         }
         s_x = 0;
         s_y = 0;
