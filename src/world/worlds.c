@@ -328,6 +328,8 @@ static void rand_chap2_scene(Object *root, Object *lights, WorldConfig *config)
 
     light_object = aaxzrect_create(123, 423, 147, 412, 554, light_mat);
     add_hitable_object(root, light_object);
+   add_hitable_object(lights, light_object);
+
 
     add_hitable_object(root, moving_sphere_create(50, 0, 1, mov_sphere_center, mov_sphere_center2, moving_sphere_mat));
 

@@ -20,7 +20,7 @@ rt_float lambertian_get_pdf(const Ray *r_in, const HitRecord *record, const Ray 
     (void)self;
     (void)r_in;
     rt_float cosine = vec3_dot(record->normal, vec3_unit(scattered->direction));
-    return cosine < 0 ? 0 : cosine / M_PI;
+    return (cosine < 0) ? 0 : cosine / M_PI;
 }
 Material lambertian_create(Vec3 albedo)
 {

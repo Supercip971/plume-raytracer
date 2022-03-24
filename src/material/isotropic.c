@@ -21,7 +21,7 @@ bool isotropic_callback(const Ray *r_in, const HitRecord *record, MaterialRecord
         .origin = record->pos,
         .time = r_in->time,
     };
-    mat_record->is_specular = false;
+    mat_record->is_specular = true;
     mat_record->pdf.type = PDF_NONE;
     mat_record->attenuation = texture_get(record->u, record->v, &record->pos, &self->albedo);
     return true;
