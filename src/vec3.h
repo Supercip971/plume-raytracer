@@ -8,18 +8,24 @@
 #include "config.h"
 #include "utils.h"
 
-typedef struct vec3_t
+
+typedef union vec3_t
 {
+    struct {
     rt_float x;
     rt_float y;
     rt_float z;
-    rt_float _n;
+    };
+
+
+#ifdef USE_INTRINSIC
+    rt_float v[4];
+#endif
 } Vec3;
 
 static inline void print_vec3(Vec3 self)
 {
-    (void)self;
-    // printf("vec: {%f,%f,%f}\n", self.x, self.y, self.z);
+     printf("vec: {%f,%f,%f}\n", self.x, self.y, self.z);
 }
 
 static inline Vec3 vec3_create(rt_float x, rt_float y, rt_float z)
