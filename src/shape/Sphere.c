@@ -43,9 +43,9 @@ FLATTEN bool hit_sphere_object_callback(Ray ray, rt_float t_min, rt_float t_max,
     rt_float b = vec3_dot(oc, ray.direction);
     rt_float c = vec3_squared_length(oc) - (self->radius_squared);
 
-    rt_float discriminant = b * b - a * c; /* ^ = b^2 - 4ac */
+    rt_float discriminant = b * b - a * c;
 
-    if (discriminant > 0.f && a != 0)
+    if (discriminant >= 0.f && a != 0)
     {
         if (hit_sphere_object_callback2(discriminant, a, b, t_min, t_max, record))
         {
@@ -53,8 +53,9 @@ FLATTEN bool hit_sphere_object_callback(Ray ray, rt_float t_min, rt_float t_max,
             outward = vec3_mul_val(vec3_sub(record->pos, self->pos), self->radius_inv);
 
             set_face_normal(&ray, outward, record);
-            record->material = self->self_material;
             get_sphere_uv(&outward, &record->u, &record->v);
+
+            record->material = self->self_material;
             return true;
         }
     }
@@ -70,7 +71,7 @@ Object sphere_create(rt_float radius, Vec3 pos, Material sphere_material)
     sphere->pos = pos;
     sphere->self_bounding_box = aabb_create(vec3_sub(pos, vec3_create(radius, radius, radius)), vec3_add(pos, vec3_create(radius, radius, radius)));
 
-    sphere->radius_inv = 1 / radius;
+    sphere->radius_inv = 1.f / radius;
     sphere->radius_squared = radius * radius;
     result.data = sphere;
     result.type = SHAPE_SPHERE;
@@ -78,6 +79,7 @@ Object sphere_create(rt_float radius, Vec3 pos, Material sphere_material)
 
     return result;
 }
+
 rt_float sphere_pdf_value(Vec3 origin, Vec3 direction, const Sphere *self)
 {
     HitRecord self_record = {};
@@ -94,7 +96,7 @@ rt_float sphere_pdf_value(Vec3 origin, Vec3 direction, const Sphere *self)
     rt_float max_cos_theta = fast_sqrt(1 - (self->radius * self->radius / vec3_squared_length(vec3_sub(self->pos, origin))));
     rt_float solid_angle = 2 * M_PI * (1 - max_cos_theta);
 
-    return 1 / solid_angle;
+    return 1.f / solid_angle;
 }
 
 Vec3 sphere_random(Vec3 origin, const Sphere *self)

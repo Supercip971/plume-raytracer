@@ -70,6 +70,23 @@ static inline float Q_rsqrt(float number)
     return a;
 }
 
+typedef union __attribute__((packed))
+{
+    unsigned int uix;
+    signed int six;
+    float fx;
+} FastLogIntFloat;
+
+static inline float fast_log(float x)
+{
+    FastLogIntFloat f;
+    f.fx = x;
+    unsigned int ex = f.uix >> 23;
+    signed int t = (signed int)ex - (signed int)127;
+    f.uix = 1065353216 | (f.uix & 8388607);
+    x = f.fx;
+    return -1.49278 + (2.11263 + (-0.729104 + 0.10969 * x) * x) * x + 0.6931471806 * t;
+}
 #else
 
 static inline float fast_sqrt(float number)
@@ -80,6 +97,11 @@ static inline float fast_sqrt(float number)
 static inline float Q_rsqrt(float number)
 {
     return 1 / sqrt(number);
+}
+
+static inline float fast_log(float n)
+{
+    return logf(n);
 }
 
 #endif

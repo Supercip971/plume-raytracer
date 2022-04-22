@@ -121,7 +121,6 @@ rt_float object_pdf_value(Vec3 origin, Vec3 direction, const Object *self)
         return box_pdf_value(origin, direction, self->data);
     default:
         // printf("can't get value for: %i \n", self->type);
-        assert(false);
         return 0;
     }
 }

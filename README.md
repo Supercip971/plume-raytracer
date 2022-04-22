@@ -2,6 +2,11 @@
 
 A portable simple C raytracer on CPU !
 
+### (22/04/2022) a 1920x1920 picture of some feature the raytracer have (+ sort of volumetric lighting with constant medium)
+
+![some-object](./pic/22-04-2022.png)
+
+
 ### (09/01/2022) cornell box with constant medium
 
 ![noisy cornell box](./pic/09-01-2022.png)

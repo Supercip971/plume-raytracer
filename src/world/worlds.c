@@ -68,7 +68,9 @@ static void earth_scene(Object *root, Object *lights, WorldConfig *config)
     *root = create_hitable_list();
     *lights = create_hitable_list();
 
-    add_hitable_object(root, sphere_create(2, vec3_create(0, 0, 0), lambertian_create_texture(image_create(image_load("assets/test_colors.png")))));
+    add_hitable_object(root, sphere_create(2, vec3_create(0, 0, 0), lambertian_create_texture(image_create(image_load("assets/earthmap.png")))));
+    add_hitable_object(root, sphere_create(2, vec3_create(20, 0, 0), light_create(vec3_create(15, 15, 15))));
+    add_hitable_object(lights, sphere_create(2, vec3_create(20, 0, 0), light_create(vec3_create(15, 15, 15))));
 
     lst = root->data;
     bvh_create_rec(lst, 1, 0);
@@ -240,21 +242,28 @@ static void smoky_cornell_box(Object *root, Object *lights, WorldConfig *config)
     Matrix4x4 diff_mov;
     Object translated_box;
     Object box2;
-    Matrix4x4 diff2;
-    Matrix4x4 diff2_rot;
-    Matrix4x4 diff2_mov;
-    Object translated_box2;
+    //  Matrix4x4 diff2;
+    // Matrix4x4 diff2_rot;
+    Matrix4x4 diff_light;
+    Object light_obj;
+
+    // Matrix4x4 diff2_mov;
+    // Object translated_box2;
     Material red = lambertian_create(vec3_create(0.65, 0.05, 0.05));
     Material green = lambertian_create(vec3_create(0.12, 0.45, 0.15));
     Material light = light_create(vec3_create(15, 15, 15));
+    Material diel_white = dieletric_create(1.5);
     Material white = lambertian_create(vec3_create(0.73, 0.73, 0.73));
     *lights = create_hitable_list();
-
     *root = create_hitable_list();
 
     add_hitable_object(root, aayzrect_create(0, 555, 0, 555, 555, green));
     add_hitable_object(root, aayzrect_create(0, 555, 0, 555, 0, red));
-    add_hitable_object(root, aaxzrect_create(113, 443, 127, 432, 554, light));
+    create_matrix_scale(&diff_light, 1, -1, 1);
+    ((Light *)light.data)->flipped = true;
+    light_obj = aaxzrect_create(213, 343, 227, 332, 554.9, light);
+    add_hitable_object(root, light_obj);
+    add_hitable_object(lights, light_obj);
     add_hitable_object(root, aaxzrect_create(0, 555, 0, 555, 0, white));
     add_hitable_object(root, aaxzrect_create(0, 555, 0, 555, 555, white));
     add_hitable_object(root, aaxyrect_create(0, 555, 0, 555, 555, white));
@@ -267,13 +276,16 @@ static void smoky_cornell_box(Object *root, Object *lights, WorldConfig *config)
 
     add_hitable_object(root, make_constant_medium(translated_box, 0.01, vec3_create(0.02, 0.02, 0.02)));
 
+    box2 = sphere_create(100, vec3_create(150, 65, 65), diel_white);
+    add_hitable_object(root, (box2));
+
+    /*
     box2 = box_create(vec3_create(0, 0, 0), vec3_create(165, 165, 165), white);
     create_matrix_translate(&diff2_mov, 130, 0, 65);
     create_matrix_rotate_y(&diff2_rot, DEG2RAD(-18));
     matrix_multiply(&diff2_mov, &diff2_rot, &diff2);
     translated_box2 = transform(box2, diff2);
-    add_hitable_object(root, make_constant_medium(translated_box2, 0.01, vec3_create(0.73, 0.73, 0.73)));
-
+   */
     lst = root->data;
     bvh_create_rec(lst, 1, 0);
 
@@ -295,7 +307,7 @@ static void rand_chap2_scene(Object *root, Object *lights, WorldConfig *config)
     Material ground_mat = lambertian_create(vec3_create(0.48, 0.83, 0.53));
     Material moving_sphere_mat = lambertian_create(vec3_create(0.7, 0.3, 0.1));
     Material tex_mat = lambertian_create_texture(image_create(image_load("assets/earthmap.png")));
-    Material noisy = lambertian_create_texture(perlin_create(0.1));
+    Material noisy = lambertian_create_texture(perlin_create(4));
     Material white = lambertian_create(vec3_create(0.73, 0.73, 0.73));
     const Vec3 mov_sphere_center = vec3_create(400, 400, 200);
     const Vec3 mov_sphere_center2 = vec3_add(mov_sphere_center, vec3_create(30, 0, 0));
@@ -328,8 +340,7 @@ static void rand_chap2_scene(Object *root, Object *lights, WorldConfig *config)
 
     light_object = aaxzrect_create(123, 423, 147, 412, 554, light_mat);
     add_hitable_object(root, light_object);
-   add_hitable_object(lights, light_object);
-
+    add_hitable_object(lights, light_object);
 
     add_hitable_object(root, moving_sphere_create(50, 0, 1, mov_sphere_center, mov_sphere_center2, moving_sphere_mat));
 
@@ -339,8 +350,10 @@ static void rand_chap2_scene(Object *root, Object *lights, WorldConfig *config)
 
     constant_sphere = sphere_create(70, vec3_create(360, 150, 45), dieletric_create(1.5));
     add_hitable_object(root, constant_sphere);
-    add_hitable_object(root, make_constant_medium(constant_sphere, 0.2, vec3_create(0.2, 0.4, 0.9)));
-    constant_sphere2 = sphere_create(5000, vec3_create(0, 0, 0), dieletric_create(1.5));
+    add_hitable_object(root, make_constant_medium(sphere_create(70, vec3_create(360, 150, 45), metal_create(vec3_create(0.8, 0.8, 0.9), 1.0)), 0.02, vec3_create(0.2, 0.4, 0.9)));
+
+    // add_hitable_object(root, make_constant_medium(constant_sphere, 0.02, vec3_create(0.2, 0.4, 0.9)));
+    constant_sphere2 = sphere_create(2000, vec3_create(0, 0, 0), dieletric_create(1.5));
     add_hitable_object(root, make_constant_medium(constant_sphere2, 0.0001, vec3_create(1, 1, 1)));
 
     //

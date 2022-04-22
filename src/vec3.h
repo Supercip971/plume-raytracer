@@ -71,6 +71,15 @@ static inline Vec3 vec3_max(Vec3 vec1, Vec3 vec2)
 {
     return vec3_create(rt_max(vec1.x, vec2.x), rt_max(vec1.y, vec2.y), rt_max(vec1.z, vec2.z));
 }
+static inline rt_float vec3_min_comp(Vec3 vec1)
+{
+    return rt_min(vec1.x, rt_min(vec1.y, vec1.z));
+}
+
+static inline rt_float vec3_max_comp(Vec3 vec1)
+{
+    return rt_max(vec1.x, rt_max(vec1.y, vec1.z));
+}
 #ifdef USE_INTRINSIC
 #    include <immintrin.h>
 #    include <x86intrin.h>
@@ -167,6 +176,7 @@ static inline Vec3 vec3_unit(Vec3 vec)
 
 static inline Vec3 random_vec3_unit(void)
 {
+
     while (true)
     {
         Vec3 p = vec3_create(random_rt_float() * 2 - 1, random_rt_float() * 2 - 1, random_rt_float() * 2 - 1);
@@ -178,13 +188,21 @@ static inline Vec3 random_vec3_unit(void)
 
 static inline Vec3 random_vec3_unit_in_disk(void)
 {
-    while (true)
+
+      while (true)
     {
         Vec3 p = vec3_create(random_rt_float() * 2 - 1, random_rt_float() * 2 - 1, 0);
         if (vec3_squared_length(p) >= 1)
             continue;
         return p;
     }
+
+    /*
+    rt_float s1 = random_rt_float();
+    rt_float s2 = random_rt_float();
+    rt_float r2 = s2 * M_PI*2;
+    rt_float sr = fast_sqrt(s1);
+    return vec3_create(sr * fast_cos(r2), sr * fast_sin(r2),0);*/
 }
 
 static inline Vec3 random_vec3_in_hemisphere(Vec3 normal)
@@ -256,9 +274,9 @@ __attribute__((hot)) static inline rt_float *vec_axis_ptr(Vec3 *vec, int axis)
 static inline void get_sphere_uv(const Vec3 *point, rt_float *__restrict u, rt_float *__restrict v)
 {
     rt_float theta = fast_acos(-(point->y));
-    rt_float phi = fast_atan2(-(point->z), point->x);
+    rt_float phi = fast_atan2(-(point->z), point->x) + M_PI;
 
-    *u = phi * (M_2_PI) + 0.5;
+    *u = phi * (1 / (2 * M_PI));
     *v = theta * M_1_PI;
 }
 

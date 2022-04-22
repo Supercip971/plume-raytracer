@@ -65,7 +65,7 @@ bool hit_constant_object_callback(Ray ray, rt_float t_min, rt_float t_max, HitRe
     rec_1.t = rt_max(rec_1.t, 0);
 
     distance_inside_box = (rec_1.t - rec_0.t) * ray_length;
-    hit_distance = self->d * log(flt);
+    hit_distance = self->d * fast_log(flt);
 
     if (hit_distance > distance_inside_box)
     {

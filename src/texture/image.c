@@ -16,7 +16,7 @@ Vec3 image_tex_get(rt_float u, rt_float v, const Vec3 *point, const ImageTexture
     }
 
     u = rt_clamp(u, 0, 1);
-    v = 1 - rt_clamp(v, 0, 1); /* use flip coord */
+    v = 1-rt_clamp(v, 0, 1); /* use flip coord */
 
     i = (int)(u * self->self_picture.width);
     j = (int)(v * self->self_picture.height);
@@ -26,6 +26,7 @@ Vec3 image_tex_get(rt_float u, rt_float v, const Vec3 *point, const ImageTexture
 
     pixel = self->self_picture.converted_data + (j * self->self_picture.width + i);
     (void)point;
+
 
     return vec_from_color(*pixel);
 }

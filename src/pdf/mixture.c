@@ -14,7 +14,7 @@ rt_float mixture_pdf_value(Vec3 direction, const PdfData *self)
 {
     return (pdf_value(direction, self->mixture.first) +
             pdf_value(direction, self->mixture.second)) /
-           2;
+           2.f;
 }
 
 Vec3 mixture_pdf_generate(const PdfData *self)
