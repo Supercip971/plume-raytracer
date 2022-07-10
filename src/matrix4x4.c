@@ -191,6 +191,7 @@ void matrix_apply_ray(const Matrix4x4 *matrix, Ray *ray)
 {
     matrix_apply_point(matrix, &ray->origin);
     matrix_apply_vector(matrix, &ray->direction);
+    ray_dir_init(ray);
 }
 void matrix_apply_vector(const Matrix4x4 *matrix, Vec3 *vector)
 {

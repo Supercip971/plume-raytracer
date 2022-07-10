@@ -28,7 +28,7 @@ Ray get_camera_ray(const Camera *camera, rt_float u, rt_float v)
         result.time = 0;
     }
 
-    return result;
+    return ray_dir_init(&result);
 }
 
 Camera create_camera(CameraConfig config)

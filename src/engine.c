@@ -65,7 +65,6 @@ static int sample_step_y = SCRN_HEIGHT / (RENDER_THREAD);
 
 static volatile uint64_t thr[MAX_RENDER_THREAD] = {};
 
-
 static volatile bool stop;
 static Camera camera;
 
@@ -80,7 +79,7 @@ static Vec3 calculate_ray_color_impl(Ray from, int depth, const Vec3 *background
 {
     HitRecord record = {};
     Ray forked_ray = from;
-    Vec3 emitted = {};
+    Vec3 emitted = vec3_create(0, 0, 0);
     rt_float pdf = 0;
     MaterialRecord mat_record = {};
 
@@ -89,11 +88,7 @@ static Vec3 calculate_ray_color_impl(Ray from, int depth, const Vec3 *background
         return vec3_create(0, 0, 0);
     }
 
-    if (depth > MAX_BOUNCE_DEPTH)
-    {
-        return vec3_create(0, 0, 0);
-    }
-    rt_float t_max = 10000000;
+    const rt_float t_max = 10000000;
     if (!object_collide(from, 0.001, t_max, &record, &root))
     {
         return *background;
@@ -101,13 +96,14 @@ static Vec3 calculate_ray_color_impl(Ray from, int depth, const Vec3 *background
 
     material_color_emit(&record, &emitted, &record.material);
 
-    if (!material_get(&from, &record, &mat_record, &record.material))
+    if (!material_get(&from, &record, &mat_record, &record.material) || depth > MAX_BOUNCE_DEPTH)
     {
         return emitted;
     }
 
     if (mat_record.is_specular)
     {
+        ray_dir_init(&mat_record.scattered);
         return vec3_mul(
             mat_record.attenuation,
             calculate_ray_color_impl(mat_record.scattered, depth + 1, background));
@@ -122,15 +118,17 @@ static Vec3 calculate_ray_color_impl(Ray from, int depth, const Vec3 *background
         forked_ray.direction = record.normal;
     }
     forked_ray.time = from.time;
+    ray_dir_init(&forked_ray);
     pdf = pdf_value(forked_ray.direction, &mixture_pdf);
 
-    if (pdf == 0)
+    if (pdf <= 0.001)
     {
         return emitted;
     }
 
     rt_float scat_pdf = material_get_pdf(&from, &record, &forked_ray, &record.material);
 
+    // printf("scat: %f pdf: %f\n", scat_pdf, pdf);
     /*    Vec3 col = vec3_div_val((vec3_mul_val( calculate_ray_color_impl(forked_ray,  depth+1, background), scat_pdf)), pdf); */
     /* quick and dirty code end */
     // emmited + (albedo * mat_pdf) * (raycol / pdf)
@@ -155,10 +153,11 @@ Vec3 calculate_ray_color(Ray from, int depth, const Vec3 *background)
 
     while (!stop)
     {
-        volatile Vec3 v = calculate_ray_color_impl(from, depth, background);
+        Vec3 v = calculate_ray_color_impl(from, depth, background);
         if (isnan(v.x) || isnan(v.y) || isnan(v.z))
         {
-            return (vec3_create(0, 0, 0));
+            printf("NAN!\n");
+            return (vec3_create(10000, 0, 0));
         }
 
         return v;
@@ -286,7 +285,7 @@ static bool get_no_active_thread(size_t *thread_id)
     bool founded = false;
     for (i = 0; i < MULTIPLE_THREAD; i++)
     {
-        if (thr[i] == 0 || impl_is_thread_ended(thr[i]))
+        if (thr[i] == 0 || impl_is_thread_ended((uint64_t)thr[i]))
         {
 
             founded = true;

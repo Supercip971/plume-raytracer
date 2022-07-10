@@ -7,7 +7,10 @@
 rt_float aa_xyrect_pdf_value(Vec3 origin, Vec3 direction, XYrec *self)
 {
     HitRecord rec = {};
+
     Ray r = {.origin = origin, .direction = direction, .time = 0};
+
+    ray_dir_init(&r);
     rt_float area;
     rt_float distance_squared;
     rt_float cosine;
@@ -41,6 +44,8 @@ rt_float aa_xzrect_pdf_value(Vec3 origin, Vec3 direction, XZrec *self)
     rt_float cosine;
 
     AABB outaabb;
+
+    ray_dir_init(&r);
     aaxzrect_get_aabb(0, 1, &outaabb, self);
     if (!aabb_hit(&outaabb, &r, 0.01, 1000000))
     {
@@ -68,6 +73,8 @@ rt_float aa_yzrect_pdf_value(Vec3 origin, Vec3 direction, YZrec *self)
     rt_float cosine;
 
     AABB outaabb;
+
+    ray_dir_init(&r);
     aayzrect_get_aabb(0, 1, &outaabb, self);
     if (!aabb_hit(&outaabb, &r, 0.01, 1000000))
     {
@@ -114,7 +121,7 @@ FLATTEN bool hit_aaxyrect_callback(Ray ray, rt_float t_min, rt_float t_max, HitR
     rt_float x, y;
     Vec3 outward;
 
-    t = (self->k - ray.origin.z) / (ray.direction.z);
+    t = (self->k - ray.origin.z) * (ray.inv_dir.z);
 
     if (t < t_min || t > t_max)
     {
@@ -180,7 +187,7 @@ FLATTEN bool hit_aaxzrect_callback(Ray ray, rt_float t_min, rt_float t_max, HitR
     rt_float z, x;
     Vec3 outward;
 
-    t = (self->k - ray.origin.y) / (ray.direction.y);
+    t = (self->k - ray.origin.y) * (ray.inv_dir.y);
 
     if (t < t_min || t > t_max)
     {
@@ -244,7 +251,7 @@ FLATTEN bool hit_aayzrect_callback(Ray ray, rt_float t_min, rt_float t_max, HitR
     rt_float z, y;
     Vec3 outward;
 
-    t = (self->k - ray.origin.x) / (ray.direction.x);
+    t = (self->k - ray.origin.x) * (ray.inv_dir.x);
 
     if (t < t_min || t > t_max)
     {

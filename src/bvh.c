@@ -1,38 +1,36 @@
 #include <stdio.h>
-#include<stdlib.h>
+#include <stdlib.h>
 #include <utils.h>
 #include "bvh.h"
 
-bvhData* bvh_blocks;
+bvhData *bvh_blocks = NULL;
 int idx = 0;
-static bvhData* alloc_bvh_data(void)
+static bvhData *alloc_bvh_data(void)
 {
-    if(bvh_blocks == NULL)
+    if (bvh_blocks == NULL)
     {
-        bvh_blocks = malloc(sizeof(bvhData*) * 512);
+        bvh_blocks = malloc(sizeof(bvhData) * 512);
     }
 
-
     idx++;
-    if(idx > 512)
+    if (idx > 511)
     {
-        exit(EXIT_FAILURE);
-        return NULL;
+        return malloc(sizeof(bvhData));
     }
     return &bvh_blocks[idx];
 }
 
-static void free_bvh_data(bvhData* v)
+static void free_bvh_data(bvhData *v)
 {
     idx--;
-    if(idx == 0)
+    if (idx == 0)
     {
         free(bvh_blocks);
     }
     (void)v;
 }
 
-    bool bvh_get_aabb(rt_float time_start, rt_float time_end, AABB *output, const bvhData *self)
+bool bvh_get_aabb(rt_float time_start, rt_float time_end, AABB *output, const bvhData *self)
 {
     *output = self->box;
     (void)time_start;
@@ -41,8 +39,9 @@ static void free_bvh_data(bvhData* v)
 }
 bool bvh_hit(Ray r, rt_float t_min, rt_float t_max, HitRecord *record, const bvhData *self)
 {
-    bool hit_left = false, hit_right = false;
+
     AABB box_left, box_right;
+    bool hit_left = false, hit_right = false;
 
     if (!aabb_hit(&self->box, &r, t_min, t_max))
     {
@@ -56,7 +55,7 @@ bool bvh_hit(Ray r, rt_float t_min, rt_float t_max, HitRecord *record, const bvh
     {
         hit_left = object_collide(r, t_min, t_max, record, (Object *)&self->left);
     }
-    if (aabb_hit(&box_right, &r, t_min, t_max))
+    if (aabb_hit(&box_right, &r, t_min, hit_left ? record->t : t_max))
     {
 
         hit_right = object_collide(r, t_min, hit_left ? record->t : t_max, record, (Object *)&self->right);
@@ -104,12 +103,14 @@ static Object bvh_init(bvhData **out_bvh)
     return result;
 }
 
-static rt_float bvh_distance(Object *left, Object *right, rt_float tstart, rt_float tend)
+static rt_float bvh_distance(Object *left, Object *right, rt_float tstart, rt_float tend, bool *intersect)
 {
     AABB a, b;
     Vec3 a_center, b_center;
     object_get_aabb(tstart, tend, &a, left);
     object_get_aabb(tstart, tend, &b, right);
+
+    *intersect = aabb_intersect(&a, &b);
     a_center = vec3_add(a.min, vec3_mul_val(vec3_sub(a.max, a.min), 0.5));
     b_center = vec3_add(b.min, vec3_mul_val(vec3_sub(b.max, b.min), 0.5));
 
@@ -139,7 +140,8 @@ void bvh_create_rec(HitableList *list, rt_float tstart, rt_float tend)
                 {
                     continue;
                 }
-                dist = bvh_distance(&list->childs[i], &list->childs[j], tstart, tend);
+                bool intersect = false;
+                dist = bvh_distance(&list->childs[i], &list->childs[j], tstart, tend, &intersect);
                 if (dist < best_dist)
                 {
                     best_dist = dist;
@@ -158,6 +160,8 @@ void bvh_create_rec(HitableList *list, rt_float tstart, rt_float tend)
         result_bvh->left = *left;
         object_get_aabb(tstart, tend, &l_aa, left);
         object_get_aabb(tstart, tend, &r_aa, right);
+        result_bvh->has_conflict = aabb_intersect(&l_aa, &r_aa);
+
         result_bvh->box = aabb_surrounding(&l_aa, &r_aa);
 
         hit_remove_object(list, *right);

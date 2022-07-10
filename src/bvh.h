@@ -8,7 +8,9 @@ typedef struct bvh_data
     Object left;
     Object right;
     AABB box;
+    bool has_conflict;
 } bvhData;
+
 bool bvh_get_aabb(rt_float time_start, rt_float time_end, AABB *output, const bvhData *self);
 bool bvh_destroy(bvhData *self);
 bool bvh_hit(Ray r, rt_float t_min, rt_float t_max, HitRecord *record, const bvhData *self);
