@@ -8,15 +8,14 @@
 #include "config.h"
 #include "utils.h"
 
-
 typedef union vec3_t
 {
-    struct {
-    rt_float x;
-    rt_float y;
-    rt_float z;
+    struct
+    {
+        rt_float x;
+        rt_float y;
+        rt_float z;
     };
-
 
 #ifdef USE_INTRINSIC
     rt_float v[4];
@@ -25,7 +24,7 @@ typedef union vec3_t
 
 static inline void print_vec3(Vec3 self)
 {
-     printf("vec: {%f,%f,%f}\n", self.x, self.y, self.z);
+    printf("vec: {%f,%f,%f}\n", self.x, self.y, self.z);
 }
 
 static inline Vec3 vec3_create(rt_float x, rt_float y, rt_float z)
@@ -62,15 +61,6 @@ static inline Vec3 vec3_sub(Vec3 vec1, Vec3 vec2)
     return vec3_create(vec1.x - vec2.x, vec1.y - vec2.y, vec1.z - vec2.z);
 }
 
-static inline Vec3 vec3_min(Vec3 vec1, Vec3 vec2)
-{
-    return vec3_create(rt_min(vec1.x, vec2.x), rt_min(vec1.y, vec2.y), rt_min(vec1.z, vec2.z));
-}
-
-static inline Vec3 vec3_max(Vec3 vec1, Vec3 vec2)
-{
-    return vec3_create(rt_max(vec1.x, vec2.x), rt_max(vec1.y, vec2.y), rt_max(vec1.z, vec2.z));
-}
 static inline rt_float vec3_min_comp(Vec3 vec1)
 {
     return rt_min(vec1.x, rt_min(vec1.y, vec1.z));
@@ -126,6 +116,28 @@ static inline Vec3 vec3_cross(Vec3 vec1, Vec3 vec2)
     return res;
 }
 
+static inline Vec3 vec3_min(Vec3 vec1, Vec3 vec2)
+{
+    __m128 a = _mm_load_ps((float *)&vec1);
+    __m128 b = _mm_load_ps((float *)&vec2);
+    __m128 res_m = _mm_min_ps(a, b);
+    Vec3 res = {};
+    _mm_store_ps((float *)&res, res_m);
+
+    return res;
+}
+
+static inline Vec3 vec3_max(Vec3 vec1, Vec3 vec2)
+{
+    __m128 a = _mm_load_ps((float *)&vec1);
+    __m128 b = _mm_load_ps((float *)&vec2);
+    __m128 res_m = _mm_max_ps(a, b);
+    Vec3 res = {};
+    _mm_store_ps((float *)&res, res_m);
+
+    return res;
+}
+
 #else
 
 static inline Vec3 vec3_cross(Vec3 vec1, Vec3 vec2)
@@ -141,7 +153,17 @@ static inline Vec3 vec3_mul(Vec3 vec1, Vec3 vec2)
 {
     return vec3_create(vec1.x * vec2.x, vec1.y * vec2.y, vec1.z * vec2.z);
 }
+static inline Vec3 vec3_min(Vec3 vec1, Vec3 vec2)
+{
+    return vec3_create(rt_min(vec1.x, vec2.x), rt_min(vec1.y, vec2.y), rt_min(vec1.z, vec2.z));
+}
+
+static inline Vec3 vec3_max(Vec3 vec1, Vec3 vec2)
+{
+    return vec3_create(rt_max(vec1.x, vec2.x), rt_max(vec1.y, vec2.y), rt_max(vec1.z, vec2.z));
+}
 #endif
+
 static inline Vec3 vec3_mul_val(Vec3 vec1, rt_float x)
 {
     return vec3_create(vec1.x * x, vec1.y * x, vec1.z * x);
@@ -159,7 +181,7 @@ static inline rt_float vec3_dot(Vec3 vec1, Vec3 vec2)
 }
 static inline bool is_vec3_near_zero(Vec3 vec)
 {
-    const rt_float precision = 1e-8;
+    const rt_float precision = 1e-4;
 
     return (fabs((double)vec.x) < precision) && (fabs((double)vec.y) < precision) && (fabs((double)vec.z) < precision);
 }
@@ -189,13 +211,10 @@ static inline Vec3 random_vec3_unit(void)
 static inline Vec3 random_vec3_unit_in_disk(void)
 {
 
-      while (true)
-    {
-        Vec3 p = vec3_create(random_rt_float() * 2 - 1, random_rt_float() * 2 - 1, 0);
-        if (vec3_squared_length(p) >= 1)
-            continue;
-        return p;
-    }
+    Vec3 p = vec3_create(random_rt_float() * 2 - 1, random_rt_float() * 2 - 1, 0);
+    if (vec3_squared_length(p) >= 1)
+        return vec3_unit(p);
+    return p;
 
     /*
     rt_float s1 = random_rt_float();

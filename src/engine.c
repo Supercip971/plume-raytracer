@@ -180,15 +180,15 @@ FLATTEN static void render_update_part(struct render_part_args *arg)
     rt_float inv_w = 1.0 / (arg->width - 1);
     rt_float inv_h = 1.0 / (arg->height - 1);
 
-    for(c = 0; c < SAMPLE_PER_THREAD; c++)
+    for (c = 0; c < SAMPLE_PER_THREAD; c++)
     {
         offx[c] = random_rt_float();
         offy[c] = random_rt_float();
     }
 
-    for (y = arg->y_from; y < arg->y_max; y += 1)
+    for (y = arg->y_from; y < arg->y_max; y++)
     {
-        for (x = arg->x_from; x < arg->x_max; x += 1)
+        for (x = arg->x_from; x < arg->x_max; x++)
         {
             for (c = 0; c < SAMPLE_PER_THREAD; c++)
             {
@@ -205,7 +205,7 @@ FLATTEN static void render_update_part(struct render_part_args *arg)
                 current_color = calculate_ray_color(r, 0, &arg->background);
 
                 /* add current sample to sum */
-                if (arg->sample_count  + c != 0)
+                if (arg->sample_count + c != 0)
                 {
                     previous_color = (get_pixel(arg->framebuffer, x, y, arg->width));
 
@@ -242,9 +242,8 @@ static void *render_update_part_thread(void *arg)
     render_argument.y_max = sample_step_y + v;
     render_argument.background = background_color;
 
-
-        render_update_part(&render_argument);
-        v_count+= SAMPLE_PER_THREAD;
+    render_update_part(&render_argument);
+    v_count += SAMPLE_PER_THREAD;
 
     lock_acquire(&args[vargs.s_x + vargs.s_y * RENDER_THREAD].lock);
     args[vargs.s_x + vargs.s_y * RENDER_THREAD].ccount = vargs.ccount + v_count;
@@ -325,7 +324,7 @@ bool render_update(Color *framebuffer, size_t width, size_t height)
             }
             args[fi].active = 1;
 
-            impl_start_thread(&thr[ii], render_update_part_thread, (void *)(args + (fi)));
+            impl_start_thread((uint64_t *)&thr[ii], render_update_part_thread, (void *)(args + (fi)));
 
             increase_running_thread();
             lock_release(&args[fi].lock);
@@ -333,7 +332,7 @@ bool render_update(Color *framebuffer, size_t width, size_t height)
         else
         {
             // printf("no free sample founded \n");
-            if(running_thread_count != 0)
+            if (running_thread_count != 0)
             {
                 return true;
             }

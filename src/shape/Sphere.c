@@ -3,16 +3,16 @@
 #include "Sphere.h"
 
 /* this is so bad there is too much arg >:()*/
-static bool hit_sphere_object_callback2(rt_float discriminant, rt_float a, rt_float b, rt_float t_min, rt_float t_max, HitRecord *record)
+static bool hit_sphere_object_callback2(rt_float discriminant, rt_float a, rt_float nb, rt_float t_min, rt_float t_max, HitRecord *record)
 {
     rt_float t;
     rt_float discriminent_root = fast_sqrt(discriminant);
 
-    t = (-b - discriminent_root) / a;
+    t = (nb - discriminent_root) / a;
 
     if (!(t < t_max && t > t_min))
     {
-        t = (-b + discriminent_root) / a;
+        t = (nb + discriminent_root) / a;
 
         if (!(t < t_max && t > t_min)) /* if it is still not in range just return false */
         {
@@ -47,7 +47,7 @@ FLATTEN bool hit_sphere_object_callback(Ray ray, rt_float t_min, rt_float t_max,
 
     if (discriminant >= 0.f && a != 0)
     {
-        if (hit_sphere_object_callback2(discriminant, a, b, t_min, t_max, record))
+        if (hit_sphere_object_callback2(discriminant, a, -b, t_min, t_max, record))
         {
             record->pos = ray_point_param(ray, record->t);
             outward = vec3_mul_val(vec3_sub(record->pos, self->pos), self->radius_inv);

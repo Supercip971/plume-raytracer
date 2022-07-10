@@ -16,7 +16,6 @@ bool dieletric_callback(const Ray *r_in, const HitRecord *record, MaterialRecord
 {
 
     Vec3 direction;
-    mat_record->pdf.type = PDF_NONE;
 
     rt_float refraction_ratio = record->front_face ? (1.0f / self->ref_index) : self->ref_index;
     Vec3 unit_direction = vec3_unit(r_in->direction);
@@ -35,6 +34,7 @@ bool dieletric_callback(const Ray *r_in, const HitRecord *record, MaterialRecord
         direction = refract(unit_direction, record->normal, refraction_ratio);
     }
 
+    mat_record->pdf.type = PDF_NONE;
     mat_record->scattered.direction = direction;
     mat_record->scattered.origin = record->pos;
     mat_record->scattered.time = r_in->time;

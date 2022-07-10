@@ -147,11 +147,13 @@ void add_hitable_list(HitableList *hitable_list, Object object)
     object.uid = uobj++;
     hitable_list->childs[hitable_list->child_count] = object;
     hitable_list->child_count++;
+
     if (hitable_list->child_count == hitable_list->allocated_childs)
     {
         hitable_list->allocated_childs *= 2;
         hitable_list->childs = realloc(hitable_list->childs, hitable_list->allocated_childs * sizeof(Object));
     }
+
     hitable_get_all_aabb(0, 100000, &hitable_list->bounding_box, hitable_list);
 }
 Vec3 hitable_random(Vec3 origin, const HitableList *self)
@@ -177,7 +179,8 @@ rt_float hitable_pdf_value(Vec3 origin, Vec3 direction, const HitableList *self)
 
     for (i = 0; i < self->child_count; i++)
     {
-        res += object_pdf_value(origin, direction, (Object *)&self->childs[i]) * weight;
+        res += object_pdf_value(origin, direction, &self->childs[i]) * weight;
     }
+
     return res;
 }

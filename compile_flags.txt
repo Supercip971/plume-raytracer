@@ -1,0 +1,5 @@
+-DUSE_INTRINSIC
+-Wall
+-Werror
+-Wextra
+-Isrc/

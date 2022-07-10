@@ -25,14 +25,17 @@ static inline uint32_t fast_rand(void)
         2419050644,
         343247216,
     };
+    static int t = 0;
     uint32_t s1 = shuffle_table[0];
     uint32_t s0 = shuffle_table[1];
-    uint32_t result = s0 + s1;
-    shuffle_table[0] = s0;
+    uint32_t result = (s0 + s1) * (t++ * 8);
+    shuffle_table[0] = s0 ^ (t << 8);
     s1 ^= s1 << 11;
     shuffle_table[1] = s1 ^ s0 ^ (s1 >> 9) ^ (s0 >> 5);
     return (uint32_t)result;
 }
+
+
 
 #define rt_copysign(x, y) (__builtin_copysign(x, y))
 
@@ -51,7 +54,7 @@ static inline float fast_sqrt(float number);
 
 #    include <immintrin.h>
 #    include <x86intrin.h>
-
+#include <stdio.h>
 static inline float fast_sqrt(float number)
 {
     float a;

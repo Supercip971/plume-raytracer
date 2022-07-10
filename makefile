@@ -14,7 +14,7 @@ SANTIZERS = \
 
 # for TCC
 # CFLAGS =  -DSDL_DISABLE_IMMINTRIN_H=0 -Isrc/ -pedantic  -O3  -std=gnu89
-CFLAGS = -DUSE_INTRINSIC -ansi  -Ofast -march=native -Isrc/  \
+CFLAGS = -DUSE_INTRINSIC -ansi -Ofast -march=native -mtune=native -Isrc/  \
  	-std=gnu89 -Wall -Wextra -Wshadow -Werror  \
  	-Wmissing-prototypes -Wstrict-prototypes \
     -Wold-style-definition -flto=auto $(SANTIZERS)    \

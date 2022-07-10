@@ -103,7 +103,14 @@ static void random_scene(Object *root, Object *lights, WorldConfig *config)
 
             if (vec3_length(vec3_sub(center, vec3_create(4, 0.2, 0))) > 0.9)
             {
-                if (material < 0.1)
+                if (material < 0.05)
+                {
+                    Vec3 random_albedo = vec3_create(random_rt_float(), random_rt_float(), random_rt_float());
+                    result_material = light_create(vec3_mul_val(random_albedo, 8));
+                    add_hitable_object(lights, sphere_create(0.2, center, result_material));
+                    add_hitable_object(root, sphere_create(0.2, center, result_material));
+                }
+                else if (material < 0.1)
                 {
                     Vec3 random_albedo = vec3_create(random_rt_float(), random_rt_float(), random_rt_float());
                     result_material = lambertian_create(vec3_mul(random_albedo, random_albedo));
@@ -192,8 +199,11 @@ static void cornell_box(Object *root, Object *lights, WorldConfig *config)
     Object translated_box2;
     Material red = lambertian_create(vec3_create(0.65, 0.05, 0.05));
     Material green = lambertian_create(vec3_create(0.12, 0.45, 0.15));
-    Material light = light_create(vec3_create(15, 15, 15));
+    Material light = light_create(vec3_create(5, 5, 5));
+
     Material white = lambertian_create(vec3_create(0.73, 0.73, 0.73));
+    Material white2 = dieletric_create(1.5);
+
     *lights = create_hitable_list();
     *root = create_hitable_list();
 
@@ -202,7 +212,7 @@ static void cornell_box(Object *root, Object *lights, WorldConfig *config)
 
     create_matrix_scale(&diff_light, 1, -1, 1);
     ((Light *)light.data)->flipped = true;
-    light_obj = aaxzrect_create(213, 343, 227, 332, 554.9, light);
+    light_obj = aaxzrect_create(213 - 64, 343 + 64, 227 - 64, 332 + 64, 554.9, light);
     add_hitable_object(root, light_obj);
     add_hitable_object(lights, light_obj);
     /*   add_hitable_object(lights, sphere_create(90, vec3_create(190, 90, 190), light)); */
@@ -210,7 +220,7 @@ static void cornell_box(Object *root, Object *lights, WorldConfig *config)
     add_hitable_object(root, aaxzrect_create(0, 555, 0, 555, 555, white));
     add_hitable_object(root, aaxyrect_create(0, 555, 0, 555, 555, white));
 
-    box = box_create(vec3_create(0, 0, 0), vec3_create(165, 330, 165), white);
+    box = box_create(vec3_create(0, 0, 0), vec3_create(165, 330, 165), white2);
     create_matrix_translate(&diff_mov, 265, 0, 295);
     create_matrix_rotate_y(&diff_rot, DEG2RAD(15));
     matrix_multiply(&diff_mov, &diff_rot, &diff);
@@ -218,7 +228,7 @@ static void cornell_box(Object *root, Object *lights, WorldConfig *config)
 
     add_hitable_object(root, translated_box);
 
-    box2 = box_create(vec3_create(0, 0, 0), vec3_create(165, 165, 165), white);
+    box2 = box_create(vec3_create(0, 0, 0), vec3_create(165, 165, 165), white2);
     create_matrix_translate(&diff2_mov, 130, 0, 65);
     create_matrix_rotate_y(&diff2_rot, DEG2RAD(-18));
     matrix_multiply(&diff2_mov, &diff2_rot, &diff2);

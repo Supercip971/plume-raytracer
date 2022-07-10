@@ -24,7 +24,9 @@ Ray get_camera_ray(const Camera *camera, rt_float u, rt_float v)
         result.time = random_rt_float() * (camera->time_end - camera->time_start) + camera->time_start;
     }
     else
+    {
         result.time = 0;
+    }
 
     return result;
 }
