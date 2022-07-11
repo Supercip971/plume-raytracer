@@ -11,12 +11,12 @@
 #define RENDER_THREAD (4)
 #define MULTIPLE_THREAD (11)
 
-#define MAX_SAMPLE 8000
-#define SAMPLE_PER_THREAD 1
+#define MAX_SAMPLE 10
+#define SAMPLE_PER_THREAD 3
 #define MAX_RENDER_THREAD 256
 #define MAX_RENDER_THREAD 256
 
-#define MAX_BOUNCE_DEPTH 4
+#define MAX_BOUNCE_DEPTH 8
 
 typedef float rt_float;
 

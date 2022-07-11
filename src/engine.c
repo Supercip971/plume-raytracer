@@ -41,25 +41,25 @@ struct render_part_args
     Vec3 background;
     size_t width;
     size_t height;
-    rt_float x_from;
-    rt_float y_from;
-    rt_float x_max;
-    rt_float y_max;
+    rt_float x_begin;
+    rt_float y_begin;
+    rt_float x_end;
+    rt_float y_end;
     size_t sample_count;
 };
 
-static size_t running_thread_count = 0;
+static volatile size_t running_thread_count = 0;
 
 static void increase_running_thread(void)
 {
-
     __atomic_fetch_add(&running_thread_count, 1, __ATOMIC_SEQ_CST);
 }
+
 static void decrease_running_thread(void)
 {
-
     __atomic_fetch_sub(&running_thread_count, 1, __ATOMIC_SEQ_CST);
 }
+
 static int sample_step_x = SCRN_WIDTH / (RENDER_THREAD);
 static int sample_step_y = SCRN_HEIGHT / (RENDER_THREAD);
 
@@ -82,11 +82,6 @@ static Vec3 calculate_ray_color_impl(Ray from, int depth, const Vec3 *background
     Vec3 emitted = vec3_create(0, 0, 0);
     rt_float pdf = 0;
     MaterialRecord mat_record = {};
-
-    if (stop)
-    {
-        return vec3_create(0, 0, 0);
-    }
 
     const rt_float t_max = 10000000;
     if (!object_collide(from, 0.001, t_max, &record, &root))
@@ -113,10 +108,12 @@ static Vec3 calculate_ray_color_impl(Ray from, int depth, const Vec3 *background
     Pdf mixture_pdf = make_mixture_pdf(&mat_record.pdf, &hitable_pdf);
     forked_ray.origin = record.pos;
     forked_ray.direction = pdf_generate(&mixture_pdf);
+
     if (is_vec3_near_zero(forked_ray.direction))
     {
         forked_ray.direction = record.normal;
     }
+
     forked_ray.time = from.time;
     ray_dir_init(&forked_ray);
     pdf = pdf_value(forked_ray.direction, &mixture_pdf);
@@ -128,9 +125,6 @@ static Vec3 calculate_ray_color_impl(Ray from, int depth, const Vec3 *background
 
     rt_float scat_pdf = material_get_pdf(&from, &record, &forked_ray, &record.material);
 
-    // printf("scat: %f pdf: %f\n", scat_pdf, pdf);
-    /*    Vec3 col = vec3_div_val((vec3_mul_val( calculate_ray_color_impl(forked_ray,  depth+1, background), scat_pdf)), pdf); */
-    /* quick and dirty code end */
     // emmited + (albedo * mat_pdf) * (raycol / pdf)
     Vec3 l = vec3_mul_val(
         mat_record.attenuation,
@@ -166,16 +160,36 @@ Vec3 calculate_ray_color(Ray from, int depth, const Vec3 *background)
     return vec3_create(0, 0, 0);
 }
 
-FLATTEN static void render_update_part(struct render_part_args *arg)
+static Color push_color(int sample_count, Color current, Color pushed)
+{
+    if (sample_count != 0)
+    {
+        // current = (previous * (arg->sample_count + c) + current) / (arg->sample_count + c + 1);
+        current = vec_to_color(vec3_div_val(
+            vec3_add(
+                vec3_mul_val(
+                    vec_from_color(current), (rt_float)(sample_count)),
+                vec_from_color(pushed)),
+            sample_count + 1));
+    }
+    else
+    {
+        current = pushed;
+    }
+    return current;
+}
+
+FLATTEN static void render_update_part(struct render_part_args const *arg)
 {
     Vec3 current_color;
     Color final_color;
 
+    rt_float offx[SAMPLE_PER_THREAD], offy[SAMPLE_PER_THREAD];
     Color previous_color;
     Ray r;
     size_t x, y, c;
     rt_float u, v;
-    rt_float offx[SAMPLE_PER_THREAD], offy[SAMPLE_PER_THREAD];
+
     rt_float inv_w = 1.0 / (arg->width - 1);
     rt_float inv_h = 1.0 / (arg->height - 1);
 
@@ -185,9 +199,9 @@ FLATTEN static void render_update_part(struct render_part_args *arg)
         offy[c] = random_rt_float();
     }
 
-    for (y = arg->y_from; y < arg->y_max; y++)
+    for (y = arg->y_begin; y < arg->y_end; y++)
     {
-        for (x = arg->x_from; x < arg->x_max; x++)
+        for (x = arg->x_begin; x < arg->x_end; x++)
         {
             for (c = 0; c < SAMPLE_PER_THREAD; c++)
             {
@@ -196,6 +210,7 @@ FLATTEN static void render_update_part(struct render_part_args *arg)
                 {
                     return;
                 }
+
                 u = ((rt_float)x + offx[c]) * inv_w;
                 v = ((rt_float)y + offy[c]) * inv_h;
 
@@ -204,48 +219,49 @@ FLATTEN static void render_update_part(struct render_part_args *arg)
                 current_color = calculate_ray_color(r, 0, &arg->background);
 
                 /* add current sample to sum */
-                if (arg->sample_count + c != 0)
-                {
-                    previous_color = (get_pixel(arg->framebuffer, x, y, arg->width));
 
-                    current_color = (vec3_div_val(
-                        vec3_add(
-                            vec3_mul_val(vec_from_color(previous_color), (rt_float)(arg->sample_count + c)), current_color),
-                        arg->sample_count + c + 1));
-                }
+                previous_color = get_pixel(arg->framebuffer, x, y, arg->width);
 
-                final_color = vec_to_color(current_color);
+                final_color = push_color(arg->sample_count + c, previous_color, vec_to_color(current_color));
 
                 set_pixel(arg->framebuffer, x, y, arg->width, final_color);
             }
         }
     }
-    arg->sample_count += SAMPLE_PER_THREAD;
 }
 
-static void *render_update_part_thread(void *arg)
+static void render_init_args(struct render_part_args *arg, struct render_thread_args vargs)
 {
-    struct render_thread_args vargs = *(struct render_thread_args *)arg;
-    struct render_part_args render_argument = {0};
     rt_float u = (rt_float)vargs.s_x * sample_step_x;
     rt_float v = (rt_float)vargs.s_y * sample_step_y;
-    int v_count = 0;
 
-    render_argument.width = vargs.width;
-    render_argument.height = vargs.height;
-    render_argument.framebuffer = vargs.framebuffer;
-    render_argument.sample_count = vargs.ccount;
-    render_argument.x_from = u;
-    render_argument.y_from = v;
-    render_argument.x_max = sample_step_x + u;
-    render_argument.y_max = sample_step_y + v;
-    render_argument.background = background_color;
+    *arg = (struct render_part_args){
+        .width = vargs.width,
+        .height = vargs.height,
+        .framebuffer = vargs.framebuffer,
+        .sample_count = vargs.ccount,
+        .x_begin = u,
+        .x_end = u + sample_step_x,
+        .y_begin = v,
+        .y_end = v + sample_step_y,
+        .background = background_color,
+    };
+}
+
+static void *render_update_part_thread(void *thread_arg)
+{
+    struct render_thread_args vargs = *(struct render_thread_args *)thread_arg;
+
+    struct render_part_args render_argument;
+
+    render_init_args(&render_argument, vargs);
 
     render_update_part(&render_argument);
-    v_count += SAMPLE_PER_THREAD;
+
+    render_argument.sample_count += SAMPLE_PER_THREAD;
 
     lock_acquire(&args[vargs.s_x + vargs.s_y * RENDER_THREAD].lock);
-    args[vargs.s_x + vargs.s_y * RENDER_THREAD].ccount = vargs.ccount + v_count;
+    args[vargs.s_x + vargs.s_y * RENDER_THREAD].ccount = vargs.ccount + SAMPLE_PER_THREAD;
     args[vargs.s_x + vargs.s_y * RENDER_THREAD].active = 0;
     lock_release(&args[vargs.s_x + vargs.s_y * RENDER_THREAD].lock);
 
@@ -263,6 +279,7 @@ static bool get_least_sample(size_t *sx, size_t *sy)
     for (ss = 0; ss < RENDER_THREAD * RENDER_THREAD; ss++)
     {
         lock_acquire(&args[ss].lock);
+
         if (args[ss].active == 0 && (args[ss].ccount <= current_min))
         {
             current_min = args[ss].ccount;
@@ -270,6 +287,7 @@ static bool get_least_sample(size_t *sx, size_t *sy)
             mx = ss % RENDER_THREAD;
             founded = true;
         }
+
         lock_release(&args[ss].lock);
     }
 
@@ -278,6 +296,7 @@ static bool get_least_sample(size_t *sx, size_t *sy)
 
     return founded;
 }
+
 static bool get_no_active_thread(size_t *thread_id)
 {
     size_t i;
@@ -296,6 +315,7 @@ static bool get_no_active_thread(size_t *thread_id)
     *thread_id = saved_i;
     return founded;
 }
+
 bool render_update(Color *framebuffer, size_t width, size_t height)
 {
     size_t s_x = 0;
@@ -305,7 +325,6 @@ bool render_update(Color *framebuffer, size_t width, size_t height)
 
     while (running_thread_count < MULTIPLE_THREAD)
     {
-
         if (get_least_sample(&s_x, &s_y))
         {
             fi = s_x + s_y * RENDER_THREAD;
@@ -350,16 +369,12 @@ bool render_update(Color *framebuffer, size_t width, size_t height)
 
 void render_wait_all_thread(void)
 {
-    while (true)
+    while (running_thread_count != 0)
     {
-        if (running_thread_count == 0)
-        {
-            break;
-        }
-        increase_running_thread();
-        decrease_running_thread();
+        asm volatile("pause");
     }
 }
+
 void render_init(void)
 {
     size_t i = 0;
@@ -370,9 +385,9 @@ void render_init(void)
     background_color = conf.sky_color;
 
     args = malloc(sizeof(struct render_thread_args) * RENDER_THREAD * RENDER_THREAD);
+
     for (i = 0; i < RENDER_THREAD * RENDER_THREAD; i++)
     {
-
         memset(&(args[i]), 0, sizeof(struct render_thread_args));
     }
 
