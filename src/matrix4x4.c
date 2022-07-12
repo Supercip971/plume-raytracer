@@ -175,14 +175,17 @@ void matrix_transpose(const Matrix4x4 *matrix, Matrix4x4 *result)
 void matrix_multiply(const Matrix4x4 *a, const Matrix4x4 *b, Matrix4x4 *result)
 {
     int x, y;
+
+    Matrix4x4 acopy = *a;
+    Matrix4x4 bcopy = *b;
     for (x = 0; x < 4; x++)
     {
         for (y = 0; y < 4; y++)
         {
-            result->value[y][x] = a->value[x][0] * b->value[0][y] +
-                                  a->value[x][1] * b->value[1][y] +
-                                  a->value[x][2] * b->value[2][y] +
-                                  a->value[x][3] * b->value[3][y];
+            result->value[y][x] = acopy.value[y][0] * bcopy.value[0][x] +
+                                  acopy.value[y][1] * bcopy.value[1][x] +
+                                  acopy.value[y][2] * bcopy.value[2][x] +
+                                  acopy.value[y][3] * bcopy.value[3][x];
         }
     }
 }
@@ -195,10 +198,10 @@ void matrix_apply_ray(const Matrix4x4 *matrix, Ray *ray)
 }
 void matrix_apply_vector(const Matrix4x4 *matrix, Vec3 *vector)
 {
-    Vec3 temp = {};
-    temp.x = vector->x * matrix->value[0][0] + vector->y * matrix->value[1][0] + vector->z * matrix->value[2][0];
-    temp.y = vector->x * matrix->value[0][1] + vector->y * matrix->value[1][1] + vector->z * matrix->value[2][1];
-    temp.z = vector->x * matrix->value[0][2] + vector->y * matrix->value[1][2] + vector->z * matrix->value[2][2];
+   Vec3 temp = {};
+    temp.x = vector->x * matrix->value[0][0] + vector->y * matrix->value[0][1] + vector->z * matrix->value[0][2];
+    temp.y = vector->x * matrix->value[1][0] + vector->y * matrix->value[1][1] + vector->z * matrix->value[1][2];
+    temp.z = vector->x * matrix->value[2][0] + vector->y * matrix->value[2][1] + vector->z * matrix->value[2][2];
 
     *vector = temp;
 }
@@ -207,8 +210,8 @@ void matrix_apply_vector(const Matrix4x4 *matrix, Vec3 *vector)
 void matrix_apply_point(const Matrix4x4 *matrix, Vec3 *point)
 {
     Vec3 temp = {};
-    temp.x = point->x * matrix->value[0][0] + point->y * matrix->value[1][0] + point->z * matrix->value[2][0] + matrix->value[3][0];
-    temp.y = point->x * matrix->value[0][1] + point->y * matrix->value[1][1] + point->z * matrix->value[2][1] + matrix->value[3][1];
-    temp.z = point->x * matrix->value[0][2] + point->y * matrix->value[1][2] + point->z * matrix->value[2][2] + matrix->value[3][2];
+    temp.x = point->x * matrix->value[0][0] + point->y * matrix->value[0][1] + point->z * matrix->value[0][2] + matrix->value[0][3];
+    temp.y = point->x * matrix->value[1][0] + point->y * matrix->value[1][1] + point->z * matrix->value[1][2] + matrix->value[1][3];
+    temp.z = point->x * matrix->value[2][0] + point->y * matrix->value[2][1] + point->z * matrix->value[2][2] + matrix->value[2][3];
     *point = temp;
 }
