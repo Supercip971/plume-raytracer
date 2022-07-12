@@ -26,7 +26,7 @@ rt_float aa_xyrect_pdf_value(Vec3 origin, Vec3 direction, XYrec *self)
         return 0;
     }
 
-    area = (self->x_1 - self->x_0) * (self->y_1 - self->y_0);
+    area = rt_abs(self->x_1 - self->x_0) * rt_abs(self->y_1 - self->y_0);
 
     distance_squared = rec.t * rec.t * vec3_squared_length(direction);
 
@@ -56,7 +56,7 @@ rt_float aa_xzrect_pdf_value(Vec3 origin, Vec3 direction, XZrec *self)
         return 0;
     }
 
-    area = (self->x_1 - self->x_0) * (self->z_1 - self->z_0);
+    area = rt_abs(self->x_1 - self->x_0) * rt_abs(self->z_1 - self->z_0);
 
     distance_squared = rec.t * rec.t * vec3_squared_length(direction);
 
@@ -85,7 +85,7 @@ rt_float aa_yzrect_pdf_value(Vec3 origin, Vec3 direction, YZrec *self)
         return 0;
     }
 
-    area = (self->y_1 - self->y_0) * (self->z_1 - self->z_0);
+    area = rt_abs(self->y_1 - self->y_0) * rt_abs(self->z_1 - self->z_0);
 
     distance_squared = rec.t * rec.t * vec3_squared_length(direction);
 

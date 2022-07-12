@@ -140,6 +140,7 @@ static Vec3 calculate_ray_color_impl(Ray from, int depth, const Vec3 *background
         vec3_mul(
             l,
             r));
+
 }
 
 Vec3 calculate_ray_color(Ray from, int depth, const Vec3 *background)

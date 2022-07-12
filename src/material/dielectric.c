@@ -8,7 +8,7 @@ static rt_float schlick(rt_float cosine, rt_float ref_index)
     rt_float r0 = (1.0 - ref_index) / (1.0 + ref_index);
     r0 = r0 * r0;
     rt_float v = 1 - cosine;
-    return r0 + (1.0 - r0) * powf(v, 5);
+    return r0 + (1.0 - r0) * powf( v, 5);
 }
 
 bool dieletric_callback(const Ray *r_in, const HitRecord *record, MaterialRecord *mat_record,
@@ -38,6 +38,7 @@ bool dieletric_callback(const Ray *r_in, const HitRecord *record, MaterialRecord
     mat_record->scattered.direction = direction;
     mat_record->scattered.origin = record->pos;
     mat_record->scattered.time = r_in->time;
+
     mat_record->is_specular = true;
     mat_record->attenuation = vec3_create(1, 1, 1);
     return 1;

@@ -19,6 +19,6 @@ Onb create_onb_from_vec(Vec3 vec)
     a = (rt_abs(self.w.x) > 0.9) ? vec3_create(0, 1, 0) : vec3_create(1, 0, 0);
 
     self.v = vec3_unit(vec3_cross(self.w, a));
-    self.u = vec3_cross(self.v, self.w);
+    self.u = vec3_cross(self.w, self.v);
     return self;
 }

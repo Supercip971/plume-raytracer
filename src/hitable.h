@@ -14,6 +14,7 @@ struct hit_record
     rt_float t;
     Vec3 pos;
     Vec3 normal;
+    Vec3 outward;
     rt_float u, v;
     Material material;
     bool front_face;
