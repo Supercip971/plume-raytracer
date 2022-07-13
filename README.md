@@ -1,6 +1,22 @@
-# C raytracer
 
-A portable simple C raytracer on CPU !
+<p align="center">
+  <img height="256" src="./assets/logo-black.svg#gh-light-mode-only">
+  <img height="256" src="./assets/logo-white.svg#gh-dark-mode-only">
+</p>
+<br/>
+
+<h1 align="center"><b>PLUME</b></h1>
+<p align="center">
+  My try at making a *simple* and *fast* raytracer written in C.
+</p>
+
+<br/>
+<br>
+<br>
+
+
+
+
 
 ### (22/04/2022) a 1920x1920 picture of some feature the raytracer have (+ sort of volumetric lighting with constant medium)
 

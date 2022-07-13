@@ -3,7 +3,7 @@ MKCWD=mkdir -p $(@D)
 
 PROJECT_NAME = craytracer
 
-CC = gcc 
+CC = gcc
 
 SANTIZERS = \
 #	-fsanitize=address \
@@ -12,10 +12,8 @@ SANTIZERS = \
 #	-fsanitize=float-divide-by-zero \
 #	-fsanitize=signed-integer-overflow \
 
-# for TCC
-# CFLAGS =  -DSDL_DISABLE_IMMINTRIN_H=0 -Isrc/ -pedantic  -O3  -std=gnu89
-CFLAGS = -DUSE_INTRINSIC -ansi -Ofast -march=native -mtune=native -Isrc/  \
- 	-std=gnu89 -Wall -Wextra -Wshadow -Werror  \
+CFLAGS = -DUSE_INTRINSIC -Ofast -march=native -mtune=native -Isrc/  \
+ 	-std=gnu17 -Wall -Wextra -Wshadow -Werror  \
  	-Wmissing-prototypes -Wstrict-prototypes \
     -Wold-style-definition -flto=auto $(SANTIZERS)    \
  	-ffast-math -fno-semantic-interposition -ffunction-sections -fdata-sections 
