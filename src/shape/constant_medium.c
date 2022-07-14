@@ -3,6 +3,7 @@
 #include <material/isotropic.h>
 #include <texture/solid_color.h>
 #include <utils/utils.h>
+#include <shape/hittable.h>
 
 Object make_constant_medium(Object obj, rt_float d, Vec3 albedo)
 {

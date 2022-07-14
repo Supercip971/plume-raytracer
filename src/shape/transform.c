@@ -1,4 +1,6 @@
 #include "transform.h"
+
+#include <shape/hittable.h>
 #include <stdlib.h>
 #include <math/matrix4x4.h>
 #include <shape/shape.h>

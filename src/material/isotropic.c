@@ -1,4 +1,6 @@
 #include "isotropic.h"
+#include <shape/hittable.h>
+
 
 Material isotropic_create(Texture albedo)
 {

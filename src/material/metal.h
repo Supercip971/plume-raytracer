@@ -1,6 +1,5 @@
 #pragma once
-
-#include <hitable.h>
+#include <material/material.h>
 
 typedef struct
 {

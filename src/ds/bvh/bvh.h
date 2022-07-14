@@ -2,7 +2,9 @@
 #define BVH_H
 /* todo: implement a better data structure */
 
-#include <hitable.h>
+#include <shape/hittable.h>
+#include <ds/list/hitable_list.h>
+
 typedef struct bvh_data
 {
     Object left;

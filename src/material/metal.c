@@ -1,6 +1,8 @@
 #include "metal.h"
 #include <stdlib.h>
 #include <material/material.h>
+#include <shape/hittable.h>
+
 
 bool metal_callback(const Ray *r_in, const HitRecord *record, MaterialRecord *mat_record, const Metal *self)
 {

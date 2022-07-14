@@ -1,5 +1,6 @@
 #pragma once
-#include <hitable.h>
+#include <material/material.h>
+
 #include <texture/texture.h>
 #include <utils/utils.h>
 #include <math/vec3.h>

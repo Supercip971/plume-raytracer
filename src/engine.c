@@ -9,6 +9,7 @@
 #include <string.h>
 #include <unistd.h>
 #include <ds/bvh/bvh.h>
+#include <shape/hittable.h>
 #include <gfx/camera.h>
 #include <utils/config.h>
 #include <impl.h>

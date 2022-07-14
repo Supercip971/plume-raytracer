@@ -1,8 +1,9 @@
 #ifndef AA_REC_H
 #define AA_REC_H
 #include <math/aabb.h>
-#include <hitable.h>
 #include <math/ray.h>
+#include <shape/shape.h>
+#include <material/material.h>
 #include <math/vec3.h>
 
 typedef struct xy_rec

@@ -3,6 +3,8 @@
 #include <stdlib.h>
 #include <utils/utils.h>
 #include "dielectric.h"
+#include <shape/hittable.h>
+
 
 static rt_float schlick(rt_float cosine, rt_float ref_index)
 {

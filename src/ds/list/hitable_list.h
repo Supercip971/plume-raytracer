@@ -7,18 +7,6 @@
 #include <math/ray.h>
 #include <shape/shape.h>
 
-struct hit_record
-{
-    int depth;
-    int oc_depth;
-    rt_float t;
-    Vec3 pos;
-    Vec3 normal;
-    Vec3 outward;
-    rt_float u, v;
-    Material material;
-    bool front_face;
-};
 
 typedef struct hitable_list
 {
@@ -33,8 +21,6 @@ void add_hitable_object(Object *hitable_list, Object object);
 void hit_destroy_all_objects(Object *hitable_list);
 
 bool hit_call_all_object(Object *hitable_list, Ray r, rt_float t_min, rt_float t_max, HitRecord *record);
-
-void set_face_normal(const Ray *r, const Vec3 outward, HitRecord *self);
 
 Object create_hitable_list(void);
 

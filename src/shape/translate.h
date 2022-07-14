@@ -1,7 +1,8 @@
 #ifndef TRANSLATE_H
 #define TRANSLATE_H
 #include <math/aabb.h>
-#include <hitable.h>
+#include <shape/shape.h>
+#include <material/material.h>
 #include <math/ray.h>
 #include <math/vec3.h>
 

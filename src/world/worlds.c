@@ -1,7 +1,7 @@
 #include "worlds.h"
 #include <stdio.h>
 #include <ds/bvh/bvh.h>
-#include <hitable.h>
+#include <ds/list/hitable_list.h>
 #include <gfx/image.h>
 #include <impl.h>
 #include <material/dielectric.h>

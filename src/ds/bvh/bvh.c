@@ -3,6 +3,7 @@
 #include <utils.h>
 #include "bvh.h"
 #include <shape/shape.h>
+#include <shape/hittable.h>
 
 bvhData *bvh_blocks = NULL;
 int idx = 0;

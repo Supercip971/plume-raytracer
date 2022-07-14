@@ -1,10 +1,13 @@
 #include "lambertian.h"
 #include <math/onb.h>
 #include <pdf/cosine.h>
+#include <shape/hittable.h>
 #include <pdf/pdf.h>
 #include <texture/solid_color.h>
 #include <utils/utils.h>
 #include <material/material.h>
+#include <shape/hittable.h>
+
 
 bool lambertian_callback(const Ray *r_in, const HitRecord *record, MaterialRecord *mat_record, const Lambertian *self)
 {

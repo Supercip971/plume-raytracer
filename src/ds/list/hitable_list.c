@@ -1,8 +1,9 @@
-#include "hitable.h"
+#include "hitable_list.h"
 #include <stddef.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <shape/shape.h>
+#include <shape/hittable.h>
 
 size_t uobj = 0;
 
@@ -90,14 +91,6 @@ bool hitable_get_aabb(rt_float time_start, rt_float time_end, AABB *output, cons
 void hit_destroy_all_objects(Object *hitable_list)
 {
     object_destroy(hitable_list);
-}
-
-void set_face_normal(const Ray *r, const Vec3 outward, HitRecord *self)
-{
-
-    self->outward = outward;
-    self->front_face = vec3_dot(r->direction, outward) < 0;
-    self->normal = self->front_face ? outward : vec3_neg(outward);
 }
 
 Object create_hitable_list(void)

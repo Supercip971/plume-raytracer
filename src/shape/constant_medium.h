@@ -1,6 +1,7 @@
 #ifndef CONSTANT_MEDIUM_H
 #define CONSTANT_MEDIUM_H
-#include <hitable.h>
+#include <shape/shape.h>
+#include <material/material.h>
 #include <math/ray.h>
 #include <math/vec3.h>
 

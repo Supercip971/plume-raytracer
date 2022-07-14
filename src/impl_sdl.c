@@ -8,7 +8,7 @@
 #include <utils/config.h>
 #include <engine.h>
 #include <extern/lodepng.h>
-#include <hitable.h>
+#include <ds/list/hitable_list.h>
 #include <gfx/image.h>
 #include <impl.h>
 

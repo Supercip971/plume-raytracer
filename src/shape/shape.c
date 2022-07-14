@@ -3,7 +3,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <ds/bvh/bvh.h>
-#include <hitable.h>
 #include <shape/Sphere.h>
 #include <shape/aa_rec.h>
 #include <shape/box.h>

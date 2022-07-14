@@ -2,7 +2,6 @@
 #include <ds/bvh/bvh.h>
 #include <shape/aa_rec.h>
 #include <math/aabb.h>
-#include <hitable.h>
 #include <shape/shape.h>
 
 bool box_get_aabb(rt_float time_start, rt_float time_end, AABB *output, const Box *self)
