@@ -10,6 +10,6 @@ typedef struct
     CameraConfig cam_config;
 } WorldConfig;
 
-void scene_init(Object *root, Object *light, WorldConfig *config);
+void static_scene_init(Object *root, Object *light, WorldConfig *config);
 
 #endif // WORLDS_H

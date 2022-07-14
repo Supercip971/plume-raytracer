@@ -21,7 +21,7 @@
 #include <math/ray.h>
 #include <utils/utils.h>
 #include <math/vec3.h>
-#include <world/worlds.h>
+#include <loaders/static.h>
 
 struct render_thread_args
 {
@@ -373,7 +373,7 @@ void render_wait_all_thread(void)
 void render_init(void)
 {
     WorldConfig conf = {};
-    scene_init(&root, &lights, &conf);
+    static_scene_init(&root, &lights, &conf);
     camera = create_camera(conf.cam_config);
     background_color = conf.sky_color;
 

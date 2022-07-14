@@ -1,4 +1,4 @@
-#include "worlds.h"
+#include "static.h"
 #include <stdio.h>
 #include <ds/bvh/bvh.h>
 #include <ds/list/hitable_list.h>
@@ -389,7 +389,7 @@ static void rand_chap2_scene(Object *root, Object *lights, WorldConfig *config)
 
     config->sky_color = vec3_create(0, 0, 0);
 }
-void scene_init(Object *root, Object *light, WorldConfig *config)
+void static_scene_init(Object *root, Object *light, WorldConfig *config)
 {
     switch (SCENE_SELECT)
     {
