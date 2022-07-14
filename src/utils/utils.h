@@ -7,11 +7,13 @@
 
 #define rt_float_max (rt_float)((uint64_t)-1)
 
-#define FLATTEN
+#define FLATTEN __attribute__((flatten))
 
 #define rt_min(a, b) (((a) < (b)) ? (a) : (b))
 #define rt_max(a, b) (((a) > (b)) ? (a) : (b))
+
 #define rt_abs(a) (((a) < 0) ? -(a) : (a))
+
 #define rt_floor(a) ((a == (long)a || a >= 0) ? (rt_float)((long)a) : (rt_float)((long)a - 1))
 
 #define rt_clamp(a, from, to) rt_max(rt_min(a, to), from)
