@@ -9,6 +9,7 @@
 #include <shape/constant_medium.h>
 #include <shape/moving_sphere.h>
 #include <shape/transform.h>
+#include <shape/material_wrap.h>
 #include <shape/translate.h>
 
 bool object_collide(Ray r, rt_float t_min, rt_float t_max, HitRecord *record, Object *self)
@@ -37,6 +38,9 @@ bool object_collide(Ray r, rt_float t_min, rt_float t_max, HitRecord *record, Ob
         return hit_aayzrect_callback(r, t_min, t_max, record, self->data);
     case SHAPE_CONSTANT_MEDIUM:
         return hit_constant_object_callback(r, t_min, t_max, record, self->data);
+    case SHAPE_MATERIAL_WRAP:
+        return hit_mwrap_object_callback(r, t_min, t_max, record, self->data);
+    
     default:
         return false;
     }
@@ -68,6 +72,8 @@ bool object_get_aabb(rt_float time_start, rt_float time_end, AABB *output, Objec
         return aayzrect_get_aabb(time_start, time_end, output, self->data);
     case SHAPE_CONSTANT_MEDIUM:
         return constant_get_aabb(time_start, time_end, output, self->data);
+     case SHAPE_MATERIAL_WRAP:
+        return mwrap_get_aabb(time_start, time_end, output, self->data);
     default:
         return false;
     }
@@ -92,6 +98,9 @@ bool object_destroy(Object *self)
         return transform_destroy(self->data);
     case SHAPE_CONSTANT_MEDIUM:
         return constant_destroy(self->data);
+    case SHAPE_MATERIAL_WRAP:
+        return mwrap_destroy(self->data);
+ 
     default:
         return false;
     }
@@ -117,6 +126,8 @@ rt_float object_pdf_value(Vec3 origin, Vec3 direction, const Object *self)
         return sphere_pdf_value(origin, direction, self->data);
     case SHAPE_BOX:
         return box_pdf_value(origin, direction, self->data);
+    case SHAPE_MATERIAL_WRAP:
+        return mwrap_pdf_value(origin,  direction, self->data);
     default:
         // printf("can't get value for: %i \n", self->type);
         return 0;
@@ -142,6 +153,8 @@ Vec3 object_random(Vec3 origin, const Object *self)
         return sphere_random(origin, self->data);
     case SHAPE_BOX:
         return box_random(origin, self->data);
+    case SHAPE_MATERIAL_WRAP:
+        return mwrap_pdf_random(origin, self->data);
     default:
         return vec3_create(1, 0, 0);
     }

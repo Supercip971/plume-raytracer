@@ -17,6 +17,7 @@ typedef enum
     SHAPE_HITABLE_LIST,
     SHAPE_TRANSFORM,
     SHAPE_CONSTANT_MEDIUM,
+    SHAPE_MATERIAL_WRAP,
 
 } ShapeTypes;
 
