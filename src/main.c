@@ -3,10 +3,10 @@
 #include <stdio.h>
 #include <sys/time.h>
 #include <time.h>
-#include "config.h"
-#include "engine.h"
-#include "impl.h"
-#include "utils.h"
+#include <utils/config.h>
+#include <engine.h>
+#include <impl.h>
+#include <utils/utils.h>
 
 FLATTEN int main(void)
 {

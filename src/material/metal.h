@@ -1,5 +1,6 @@
 #pragma once
-#include "../hitable.h"
+
+#include <hitable.h>
 
 typedef struct
 {

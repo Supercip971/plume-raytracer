@@ -1,7 +1,7 @@
 #ifndef TRANSFORM_H
 #define TRANSFORM_H
-#include "../hitable.h"
-#include "../matrix4x4.h"
+#include <hitable.h>
+#include <math/matrix4x4.h>
 
 typedef struct
 {

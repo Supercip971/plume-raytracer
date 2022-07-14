@@ -5,13 +5,12 @@
 #define __USE_GNU
 #include <pthread.h>
 #include <unistd.h>
-#include "config.h"
-#include "engine.h"
-#include "extern/lodepng.h"
-#include "hitable.h"
-#include "image.h"
-#include "impl.h"
-#include "pthread.h"
+#include <utils/config.h>
+#include <engine.h>
+#include <extern/lodepng.h>
+#include <hitable.h>
+#include <gfx/image.h>
+#include <impl.h>
 
 struct color *pixels;
 
@@ -279,6 +278,5 @@ int impl_join_thread(uint64_t id)
 
 int impl_is_thread_ended(uint64_t id)
 {
-
     return pthread_tryjoin_np(id, NULL) != 0;
 }

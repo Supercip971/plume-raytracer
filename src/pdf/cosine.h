@@ -1,7 +1,7 @@
 #ifndef COSINE_H
 #define COSINE_H
-#include "../onb.h"
-#include "pdf.h"
+#include <math/onb.h>
+#include <pdf/pdf.h>
 
 Pdf make_pdf_cosine(Onb onb);
 

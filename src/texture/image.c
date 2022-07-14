@@ -1,7 +1,7 @@
 #include "image.h"
 #include <stdio.h>
 #include <stdlib.h>
-#include "../utils.h"
+#include <utils/utils.h>
 
 Vec3 image_tex_get(rt_float u, rt_float v, const Vec3 *point, const ImageTexture *self)
 {

@@ -1,8 +1,8 @@
 #include "pdf.h"
 #include <stdio.h>
-#include "cosine.h"
-#include "hitable.h"
-#include "mixture.h"
+#include <pdf/cosine.h>
+#include <pdf/hitable.h>
+#include <pdf/mixture.h>
 
 rt_float pdf_value(Vec3 direction, const Pdf *self)
 {

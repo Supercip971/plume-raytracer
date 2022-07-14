@@ -1,8 +1,9 @@
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include "../utils.h"
+#include <utils/utils.h>
 #include "dielectric.h"
+
 static rt_float schlick(rt_float cosine, rt_float ref_index)
 {
     rt_float r0 = (1.0 - ref_index) / (1.0 + ref_index);

@@ -1,7 +1,7 @@
 #ifndef _HITABLE_H_
 #define _HITABLE_H_
-#include "../vec3.h"
-#include "pdf.h"
+#include <math/vec3.h>
+#include <pdf/pdf.h>
 
 Pdf make_pdf_hitable(Object *obj, Vec3 origin);
 

@@ -1,8 +1,10 @@
 #ifndef MATRIX_H
 #define MATRIX_H
-#include "ray.h"
-#include "utils.h"
-#include "vec3.h"
+
+#include <math/ray.h>
+#include <utils/utils.h>
+#include <math/vec3.h>
+
 typedef struct
 {
     rt_float value[4][4];

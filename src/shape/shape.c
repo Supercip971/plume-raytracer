@@ -2,15 +2,15 @@
 #include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include "../bvh.h"
-#include "../hitable.h"
-#include "Sphere.h"
-#include "aa_rec.h"
-#include "box.h"
-#include "constant_medium.h"
-#include "moving_sphere.h"
-#include "transform.h"
-#include "translate.h"
+#include <ds/bvh/bvh.h>
+#include <hitable.h>
+#include <shape/Sphere.h>
+#include <shape/aa_rec.h>
+#include <shape/box.h>
+#include <shape/constant_medium.h>
+#include <shape/moving_sphere.h>
+#include <shape/transform.h>
+#include <shape/translate.h>
 
 bool object_collide(Ray r, rt_float t_min, rt_float t_max, HitRecord *record, Object *self)
 {
@@ -106,7 +106,6 @@ rt_float object_pdf_value(Vec3 origin, Vec3 direction, const Object *self)
         return aa_xyrect_pdf_value(origin, direction, self->data);
     case SHAPE_AAREC_XZ:
         return aa_xzrect_pdf_value(origin, direction, self->data);
-
     case SHAPE_AAREC_YZ:
         return aa_yzrect_pdf_value(origin, direction, self->data);
     case SHAPE_TRANSFORM:
@@ -132,7 +131,6 @@ Vec3 object_random(Vec3 origin, const Object *self)
         return aa_xyrect_pdf_random(origin, self->data);
     case SHAPE_AAREC_XZ:
         return aa_xzrect_pdf_random(origin, self->data);
-
     case SHAPE_AAREC_YZ:
         return aa_yzrect_pdf_random(origin, self->data);
     case SHAPE_TRANSFORM:

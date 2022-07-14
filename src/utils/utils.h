@@ -3,7 +3,7 @@
 #include <math.h>
 #include <stdint.h>
 #include <stdlib.h>
-#include "config.h"
+#include <utils/config.h>
 
 #define rt_float_max (rt_float)((uint64_t)-1)
 
@@ -21,10 +21,11 @@
 
 static inline uint32_t fast_rand(void)
 {
-    static uint32_t shuffle_table[4] = {
-        2419050644,
-        343247216,
+    static uint64_t shuffle_table[4] = {
+        2419050644 * 3,
+        343247216 * 3,
     };
+    /*
     static int t = 0;
     uint32_t s1 = shuffle_table[0];
     uint32_t s0 = shuffle_table[1];
@@ -32,7 +33,16 @@ static inline uint32_t fast_rand(void)
     shuffle_table[0] = s0 ^ (t << 8);
     s1 ^= s1 << 11;
     shuffle_table[1] = s1 ^ s0 ^ (s1 >> 9) ^ (s0 >> 5);
-    return (uint32_t)result;
+    */
+
+    uint64_t x = shuffle_table[0];
+
+    x ^= x << 13;
+    x ^= x >> 7;
+    x ^= x << 17;
+
+    shuffle_table[0] = x;
+    return (uint32_t)x;
 }
 
 

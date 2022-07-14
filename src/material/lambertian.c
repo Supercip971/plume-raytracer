@@ -1,10 +1,11 @@
 #include "lambertian.h"
-#include "../onb.h"
-#include "../pdf/cosine.h"
-#include "../pdf/pdf.h"
-#include "../texture/solid_color.h"
-#include "../utils.h"
-#include "material/material.h"
+#include <math/onb.h>
+#include <pdf/cosine.h>
+#include <pdf/pdf.h>
+#include <texture/solid_color.h>
+#include <utils/utils.h>
+#include <material/material.h>
+
 bool lambertian_callback(const Ray *r_in, const HitRecord *record, MaterialRecord *mat_record, const Lambertian *self)
 {
     Onb uvw = create_onb_from_vec(record->normal);

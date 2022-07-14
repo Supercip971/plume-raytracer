@@ -1,7 +1,7 @@
 #pragma once
-#include "../hitable.h"
-#include "../texture/texture.h"
-#include "./material.h"
+#include <hitable.h>
+#include <texture/texture.h>
+#include <material/material.h>
 
 typedef struct
 {

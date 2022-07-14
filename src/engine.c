@@ -2,26 +2,25 @@
 #include "engine.h"
 #include <limits.h>
 #include <math.h>
-#include <pthread.h>
 #include <stddef.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
-#include "bvh.h"
-#include "camera.h"
-#include "config.h"
-#include "impl.h"
-#include "lock.h"
-#include "matrix4x4.h"
-#include "pdf/cosine.h"
-#include "pdf/hitable.h"
-#include "pdf/mixture.h"
-#include "ray.h"
-#include "utils.h"
-#include "vec3.h"
-#include "world/worlds.h"
+#include <ds/bvh/bvh.h>
+#include <gfx/camera.h>
+#include <utils/config.h>
+#include <impl.h>
+#include <utils/lock.h>
+#include <math/matrix4x4.h>
+#include <pdf/cosine.h>
+#include <pdf/hitable.h>
+#include <pdf/mixture.h>
+#include <math/ray.h>
+#include <utils/utils.h>
+#include <math/vec3.h>
+#include <world/worlds.h>
 
 struct render_thread_args
 {
@@ -63,9 +62,9 @@ static void decrease_running_thread(void)
 static int sample_step_x = SCRN_WIDTH / (RENDER_THREAD);
 static int sample_step_y = SCRN_HEIGHT / (RENDER_THREAD);
 
-static volatile uint64_t thr[MAX_RENDER_THREAD] = {};
+static volatile uint64_t thr[MAX_RENDER_THREAD] = {0};
 
-static volatile bool stop;
+static volatile bool stop = false;
 static Camera camera;
 
 static struct render_thread_args *args;
@@ -266,8 +265,8 @@ static bool get_least_sample(size_t *sx, size_t *sy)
 {
     size_t current_min = MAX_SAMPLE;
 
-    size_t mx;
-    size_t my;
+    size_t mx = 0;
+    size_t my = 0;
 
     bool founded = false;
     for (size_t ss = 0; ss < RENDER_THREAD * RENDER_THREAD; ss++)
@@ -302,6 +301,7 @@ static bool get_inactive_thread(size_t *thread_id)
 
             founded = true;
             inactive_thread = i;
+            break;
         }
     }
 

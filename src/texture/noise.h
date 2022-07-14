@@ -1,12 +1,12 @@
 #pragma once
-#include "../perlin.h"
-#include "texture.h"
+
+#include <gfx/perlin.h>
+#include <texture/texture.h>
 
 typedef struct perlin
 {
     PerlinNoise self_noise;
     rt_float scale;
-
 } Perlin;
 
 Texture perlin_create(rt_float scale);

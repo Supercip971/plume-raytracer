@@ -1,6 +1,7 @@
 
 #include "translate.h"
-#include "shape.h"
+#include <shape/shape.h>
+
 FLATTEN bool translate_get_aabb(rt_float time_start, rt_float time_end, AABB *output, const Translate *self)
 {
     if (object_get_aabb(time_start, time_end, output, (Object *)&self->target))

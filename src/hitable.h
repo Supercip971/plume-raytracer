@@ -2,10 +2,10 @@
 #define HITABLE_H
 #include <stdbool.h>
 #include <stddef.h>
-#include "aabb.h"
-#include "material/material.h"
-#include "ray.h"
-#include "shape/shape.h"
+#include <math/aabb.h>
+#include <material/material.h>
+#include <math/ray.h>
+#include <shape/shape.h>
 
 struct hit_record
 {

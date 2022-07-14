@@ -1,6 +1,6 @@
 #ifndef ONB_H
 #define ONB_H
-#include "vec3.h"
+#include <math/vec3.h>
 /* we may use a 4x4 matrix instead of an ONB, but this is faster and simpler */
 
 typedef struct onb

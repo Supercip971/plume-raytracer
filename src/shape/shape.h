@@ -1,7 +1,7 @@
 #ifndef __SHAPE_H__
 #define __SHAPE_H__
 
-#include "../aabb.h"
+#include <math/aabb.h>
 
 typedef struct hit_record HitRecord;
 

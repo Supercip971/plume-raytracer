@@ -1,8 +1,8 @@
 #include "constant_medium.h"
 #include <stdlib.h>
-#include "../material/isotropic.h"
-#include "../texture/solid_color.h"
-#include "utils.h"
+#include <material/isotropic.h>
+#include <texture/solid_color.h>
+#include <utils/utils.h>
 
 Object make_constant_medium(Object obj, rt_float d, Vec3 albedo)
 {

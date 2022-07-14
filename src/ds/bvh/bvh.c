@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <utils.h>
 #include "bvh.h"
-#include "shape/shape.h"
+#include <shape/shape.h>
 
 bvhData *bvh_blocks = NULL;
 int idx = 0;

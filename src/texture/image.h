@@ -1,6 +1,6 @@
 #pragma once
-#include "../image.h"
-#include "texture.h"
+#include <gfx/image.h>
+#include <texture/texture.h>
 
 typedef struct image_texture
 {

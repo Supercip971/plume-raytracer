@@ -1,8 +1,9 @@
 #ifndef CONSTANT_MEDIUM_H
 #define CONSTANT_MEDIUM_H
-#include "../hitable.h"
-#include "../ray.h"
-#include "../vec3.h"
+#include <hitable.h>
+#include <math/ray.h>
+#include <math/vec3.h>
+
 typedef struct
 {
     rt_float d;
@@ -11,6 +12,7 @@ typedef struct
 } ConstantMedium;
 
 Object make_constant_medium(Object obj, rt_float d, Vec3 albedo);
+
 Object make_constant_medium_mat(Object obj, rt_float d, Material mat);
 
 bool constant_get_aabb(rt_float time_start, rt_float time_end, AABB *output, const ConstantMedium *self);

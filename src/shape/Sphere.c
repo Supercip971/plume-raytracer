@@ -1,7 +1,6 @@
 #include <stdlib.h>
-#include "../utils.h"
+#include <utils/utils.h>
 #include "Sphere.h"
-#include "ray.h"
 
 /* this is so bad there is too much arg >:()*/
 static bool hit_sphere_object_callback2(rt_float discriminant, rt_float a, rt_float nb, rt_float t_min, rt_float t_max, HitRecord *record)

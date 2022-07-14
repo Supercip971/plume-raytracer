@@ -1,5 +1,5 @@
 #pragma once
-#include "texture.h"
+#include <texture/texture.h>
 
 typedef struct checker_texture
 {

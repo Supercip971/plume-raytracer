@@ -1,8 +1,8 @@
 #ifndef __MATERIAL_H__
 #define __MATERIAL_H__
-#include "../aabb.h"
-#include "../pdf/pdf.h"
-#include "../ray.h"
+#include <math/aabb.h>
+#include <pdf/pdf.h>
+#include <math/ray.h>
 
 typedef enum
 {

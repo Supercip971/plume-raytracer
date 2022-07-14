@@ -1,6 +1,6 @@
 #include <stdlib.h>
-#include "../utils.h"
-#include "moving_sphere.h"
+#include <utils/utils.h>
+#include <shape/moving_sphere.h>
 
 /*
  == this is so dumb, I mean, this is just a transform of an object, but affected by time.

@@ -1,6 +1,6 @@
 #ifndef MIXTURE_H
 #define MIXTURE_H
-#include "pdf.h"
+#include <pdf/pdf.h>
 
 rt_float mixture_pdf_value(Vec3 direction, const PdfData *self);
 

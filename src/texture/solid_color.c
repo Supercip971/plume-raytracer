@@ -1,7 +1,7 @@
 
 #include "solid_color.h"
 #include <stdlib.h>
-#include "texture/texture.h"
+#include <texture/texture.h>
 
 Vec3 solid_color_get(rt_float u, rt_float v, const Vec3 *point, const SolidColor *self)
 {

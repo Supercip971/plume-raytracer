@@ -1,7 +1,9 @@
 #pragma once
-#include "../hitable.h"
-#include "../ray.h"
-#include "../vec3.h"
+
+#include <hitable.h>
+#include <math/ray.h>
+#include <math/vec3.h>
+
 typedef struct moving_sphere
 {
     rt_float radius;

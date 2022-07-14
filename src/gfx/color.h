@@ -1,6 +1,6 @@
 #ifndef COLOR_H
 #define COLOR_H
-#include "config.h"
+#include <utils/config.h>
 
 typedef struct color
 {

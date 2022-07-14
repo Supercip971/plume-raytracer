@@ -4,9 +4,9 @@
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdio.h>
-#include "color.h"
-#include "config.h"
-#include "utils.h"
+#include <gfx/color.h>
+#include <utils/config.h>
+#include <utils/utils.h>
 
 typedef union vec3_t
 {

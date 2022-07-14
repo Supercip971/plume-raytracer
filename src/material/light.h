@@ -1,8 +1,8 @@
 #pragma once
-#include "../hitable.h"
-#include "../texture/texture.h"
-#include "../utils.h"
-#include "../vec3.h"
+#include <hitable.h>
+#include <texture/texture.h>
+#include <utils/utils.h>
+#include <math/vec3.h>
 
 typedef struct
 {

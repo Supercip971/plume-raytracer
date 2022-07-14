@@ -2,7 +2,7 @@
 #include <stddef.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include "shape/shape.h"
+#include <shape/shape.h>
 
 size_t uobj = 0;
 

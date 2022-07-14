@@ -1,9 +1,9 @@
 #include "material.h"
-#include "dielectric.h"
-#include "isotropic.h"
-#include "lambertian.h"
-#include "light.h"
-#include "metal.h"
+#include <material/dielectric.h>
+#include <material/isotropic.h>
+#include <material/lambertian.h>
+#include <material/light.h>
+#include <material/metal.h>
 
 FLATTEN bool material_get(const Ray *r_in, const HitRecord *record, MaterialRecord *mat_record, const Material *self)
 {

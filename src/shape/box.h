@@ -1,8 +1,9 @@
 #ifndef BOX_H
 #define BOX_H
-#include "../hitable.h"
-#include "../ray.h"
-#include "../vec3.h"
+
+#include <hitable.h>
+#include <math/ray.h>
+#include <math/vec3.h>
 
 typedef struct box
 {
@@ -10,6 +11,7 @@ typedef struct box
 
     Object list;
 } Box;
+
 bool box_get_aabb(rt_float time_start, rt_float time_end, AABB *output, const Box *self);
 
 bool box_destroy(Box *self);

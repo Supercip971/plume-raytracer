@@ -1,8 +1,8 @@
 #ifndef ISOTROPIC_H
 #define ISOTROPIC_H
-#include "../color.h"
-#include "../hitable.h"
-#include "../texture/texture.h"
+#include <gfx/color.h>
+#include <hitable.h>
+#include <texture/texture.h>
 
 typedef struct
 {

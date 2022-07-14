@@ -1,6 +1,6 @@
 #include "aabb.h"
 #include <stdio.h>
-#include "utils.h"
+#include <utils/utils.h>
 
 AABB aabb_create(Vec3 min, Vec3 max)
 {

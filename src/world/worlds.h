@@ -1,8 +1,8 @@
 #ifndef WORLDS_H
 #define WORLDS_H
-#include "../bvh.h"
-#include "../camera.h"
-#include "../vec3.h"
+#include <ds/bvh/bvh.h>
+#include <gfx/camera.h>
+#include <math/vec3.h>
 
 typedef struct
 {
@@ -11,4 +11,5 @@ typedef struct
 } WorldConfig;
 
 void scene_init(Object *root, Object *light, WorldConfig *config);
+
 #endif // WORLDS_H

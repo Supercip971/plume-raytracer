@@ -1,26 +1,26 @@
 #include "worlds.h"
 #include <stdio.h>
-#include "../bvh.h"
-#include "../hitable.h"
-#include "../image.h"
-#include "../impl.h"
-#include "../material/dielectric.h"
-#include "../material/isotropic.h"
-#include "../material/lambertian.h"
-#include "../material/light.h"
-#include "../material/material.h"
-#include "../material/metal.h"
-#include "../shape/Sphere.h"
-#include "../shape/aa_rec.h"
-#include "../shape/box.h"
-#include "../shape/constant_medium.h"
-#include "../shape/moving_sphere.h"
-#include "../shape/transform.h"
-#include "../texture/checker.h"
-#include "../texture/image.h"
-#include "../texture/noise.h"
-#include "../texture/solid_color.h"
-#include "../texture/texture.h"
+#include <ds/bvh/bvh.h>
+#include <hitable.h>
+#include <gfx/image.h>
+#include <impl.h>
+#include <material/dielectric.h>
+#include <material/isotropic.h>
+#include <material/lambertian.h>
+#include <material/light.h>
+#include <material/material.h>
+#include <material/metal.h>
+#include <shape/Sphere.h>
+#include <shape/aa_rec.h>
+#include <shape/box.h>
+#include <shape/constant_medium.h>
+#include <shape/moving_sphere.h>
+#include <shape/transform.h>
+#include <texture/checker.h>
+#include <texture/image.h>
+#include <texture/noise.h>
+#include <texture/solid_color.h>
+#include <texture/texture.h>
 
 /*
     this cursed file will be replaced one day by json loading. For the moment this code is quick and dirty.

@@ -1,7 +1,7 @@
 
 #include "mixture.h"
-#include "../utils.h"
-#include "pdf/pdf.h"
+#include <utils/utils.h>
+#include <pdf/pdf.h>
 
 Pdf make_mixture_pdf(Pdf *first, Pdf *second)
 {

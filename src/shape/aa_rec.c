@@ -1,6 +1,6 @@
 #include "aa_rec.h"
 #include <stdlib.h>
-#include "../utils.h"
+#include <utils/utils.h>
 
 /* TODO: make this code better because it's shit for now */
 

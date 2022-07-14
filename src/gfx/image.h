@@ -2,7 +2,7 @@
 #define IMAGE_H
 #include <stddef.h>
 #include <stdint.h>
-#include "color.h"
+#include <gfx/color.h>
 
 typedef struct image
 {

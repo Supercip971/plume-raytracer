@@ -1,8 +1,8 @@
-#include "texture.h"
-#include "checker.h"
-#include "image.h"
-#include "noise.h"
-#include "solid_color.h"
+#include <texture/checker.h>
+#include <texture/image.h>
+#include <texture/noise.h>
+#include <texture/solid_color.h>
+
 Vec3 texture_get(rt_float u, rt_float v, const Vec3 *point, const Texture *texture)
 {
     switch (texture->type)

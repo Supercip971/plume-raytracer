@@ -2,7 +2,7 @@
 
 #include <stdbool.h>
 #include <stddef.h>
-#include "color.h"
+#include <gfx/color.h>
 
 bool render_update(Color *framebuffer, size_t width, size_t height);
 

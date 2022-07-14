@@ -1,7 +1,8 @@
 #ifndef RAY_H
 #define RAY_H
-#include "config.h"
-#include "vec3.h"
+
+#include <utils/config.h>
+#include <math/vec3.h>
 
 typedef struct ray
 {

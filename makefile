@@ -6,11 +6,11 @@ PROJECT_NAME = craytracer
 CC = gcc
 
 SANTIZERS = \
-#	-fsanitize=address \
-#	-fsanitize=leak \
-#	-fsanitize=undefined \
-#	-fsanitize=float-divide-by-zero \
-#	-fsanitize=signed-integer-overflow \
+	# -fsanitize=address \
+	# -fsanitize=leak \
+	# -fsanitize=undefined \
+	# -fsanitize=float-divide-by-zero \
+	# -fsanitize=signed-integer-overflow -g \
 
 CFLAGS = -DUSE_INTRINSIC -Ofast -march=native -mtune=native -Isrc/  \
  	-std=gnu17 -Wall -Wextra -Wshadow -Werror  \
@@ -22,8 +22,8 @@ BUILD_DIR = build
 
 # source files
 
-CFILES = $(wildcard src/*.c)  $(wildcard src/*/*.c)
-HFILES = $(wildcard src/*.h)  $(wildcard src/*/*.h)
+CFILES = $(wildcard src/*.c)  $(wildcard src/*/*.c)  $(wildcard src/*/*/*.c)
+HFILES = $(wildcard src/*.h)  $(wildcard src/*/*.h)  $(wildcard src/*/*/*.h)
 OFILES = $(patsubst src/%.c, $(BUILD_DIR)/%.o, $(CFILES))
 
 OUTPUT = build/$(PROJECT_NAME).elf

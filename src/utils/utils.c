@@ -4,7 +4,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "config.h"
-#include "vec3.h"
+#include <math/vec3.h>
 
 /* note: quake inv squareroot is slower than sse square root (+ only for floats)*/
 
