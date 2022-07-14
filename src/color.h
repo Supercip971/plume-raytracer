@@ -1,6 +1,7 @@
 #ifndef COLOR_H
 #define COLOR_H
 #include "config.h"
+
 typedef struct color
 {
     rt_float r;

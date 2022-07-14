@@ -21,6 +21,7 @@ FLATTEN bool material_get(const Ray *r_in, const HitRecord *record, MaterialReco
         return false;
     }
 }
+
 bool material_color_emit(const HitRecord *record, Vec3 *emit, const Material *self)
 {
     switch (self->type)
@@ -31,6 +32,7 @@ bool material_color_emit(const HitRecord *record, Vec3 *emit, const Material *se
         return false;
     }
 }
+
 rt_float material_get_pdf(const Ray *r_in, const HitRecord *record, const Ray *scattered, const Material *self)
 {
     switch (self->type)

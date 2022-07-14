@@ -19,3 +19,5 @@ PerlinNoise noise_create(void);
 rt_float noise(const Vec3 *point, const PerlinNoise *self);
 
 rt_float turb(const Vec3 *point, int depth, const PerlinNoise *self);
+
+rt_float trilinear_interp(rt_float c[2][2][2], rt_float u, rt_float v, rt_float w);

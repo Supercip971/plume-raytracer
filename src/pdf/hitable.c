@@ -1,13 +1,15 @@
 #include "hitable.h"
+#include "pdf/pdf.h"
 
 Pdf make_pdf_hitable(Object *obj, Vec3 origin)
 {
-    Pdf self = {};
-    self.data.hitable.origin = origin;
-    self.data.hitable.obj = obj;
-    self.type = PDF_HITABLE;
-
-    return self;
+    return (Pdf){
+        .type = PDF_HITABLE,
+        .data.hitable = {
+            .origin = origin,
+            .obj = obj,
+        },
+    };
 }
 
 rt_float pdf_hitable_value(Vec3 direction, const PdfData *self)

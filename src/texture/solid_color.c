@@ -1,6 +1,7 @@
 
 #include "solid_color.h"
 #include <stdlib.h>
+#include "texture/texture.h"
 
 Vec3 solid_color_get(rt_float u, rt_float v, const Vec3 *point, const SolidColor *self)
 {
@@ -12,13 +13,11 @@ Vec3 solid_color_get(rt_float u, rt_float v, const Vec3 *point, const SolidColor
 
 Texture solid_color_create(Vec3 color)
 {
-    Texture result;
     SolidColor *col = malloc(sizeof(SolidColor));
 
     col->color = color;
 
-    result.data = col;
-    result.type = TEXTURE_SOLID_COLOR;
-
-    return result;
+    return (Texture){
+        .data = col,
+        .type = TEXTURE_SOLID_COLOR};
 }

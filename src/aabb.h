@@ -170,7 +170,6 @@ static inline rt_float aabb_distance_squarred(const AABB *box, Vec3 point)
 
 static inline rt_float aabb_distance(const AABB *box, Vec3 point)
 {
-
     return fast_sqrt(aabb_distance_squarred(box, point));
 }
 

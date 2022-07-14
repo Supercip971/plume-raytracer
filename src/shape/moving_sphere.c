@@ -2,6 +2,11 @@
 #include "../utils.h"
 #include "moving_sphere.h"
 
+/*
+ == this is so dumb, I mean, this is just a transform of an object, but affected by time.
+ It will be removed later.
+*/
+
 static Vec3 get_sphere_pos(const MovingSphere *self, rt_float time)
 {
     rt_float val = (time - self->time_start) / (self->time_end - self->time_start);

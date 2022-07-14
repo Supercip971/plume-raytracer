@@ -36,7 +36,7 @@ static inline Vec3 vec3_create(rt_float x, rt_float y, rt_float z)
     return res;
 }
 
-static inline Vec3 vec3_inv(Vec3 vec)
+static inline Vec3 vec3_neg(Vec3 vec)
 {
     return vec3_create(-vec.x, -vec.y, -vec.z);
 }
@@ -99,6 +99,7 @@ static inline Vec3 vec3_mul(Vec3 vec1, Vec3 vec2)
     return res;
     return vec3_create(vec1.x * vec2.x, vec1.y * vec2.y, vec1.z * vec2.z);
 }
+
 static inline Vec3 vec3_cross(Vec3 vec1, Vec3 vec2)
 {
 
@@ -183,7 +184,7 @@ static inline bool is_vec3_near_zero(Vec3 vec)
 {
     const rt_float precision = 1e-4;
 
-    return (fabs((double)vec.x) < precision) && (fabs((double)vec.y) < precision) && (fabs((double)vec.z) < precision);
+    return (fabs(vec.x) < precision) && (fabs(vec.y) < precision) && (fabs(vec.z) < precision);
 }
 
 /* vec / sqrt(vecx * vecx + vecy * vecy + vecz * vecz)
@@ -233,7 +234,7 @@ static inline Vec3 random_vec3_in_hemisphere(Vec3 normal)
         return in_unit;
     }
 
-    return vec3_inv(in_unit);
+    return vec3_neg(in_unit);
 }
 
 static inline Vec3 reflect(Vec3 vec1, Vec3 vec2)
@@ -243,7 +244,7 @@ static inline Vec3 reflect(Vec3 vec1, Vec3 vec2)
 
 static inline Vec3 refract(Vec3 vec1, Vec3 vec2, rt_float ni_over_nt)
 {
-    rt_float cos_theta = rt_min(vec3_dot(vec3_inv(vec1), vec2), 1.0);
+    rt_float cos_theta = rt_min(vec3_dot(vec3_neg(vec1), vec2), 1.0);
     Vec3 r_out_perp = vec3_mul_val(vec3_add(vec1, vec3_mul_val(vec2, cos_theta)), ni_over_nt);
     Vec3 r_out_parl = vec3_mul_val(vec2, -fast_sqrt(rt_abs((1.0 - vec3_squared_length(r_out_perp)))));
 
@@ -290,6 +291,7 @@ __attribute__((hot)) static inline rt_float *vec_axis_ptr(Vec3 *vec, int axis)
     }
     return &vec->z;
 }
+
 static inline void get_sphere_uv(const Vec3 *point, rt_float *__restrict u, rt_float *__restrict v)
 {
     rt_float theta = fast_acos(-(point->y));

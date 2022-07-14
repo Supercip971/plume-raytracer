@@ -1,4 +1,5 @@
 #include "isotropic.h"
+
 Material isotropic_create(Texture albedo)
 {
     Isotropic *iso = malloc(sizeof(Isotropic));

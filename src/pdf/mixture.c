@@ -1,13 +1,17 @@
 
 #include "mixture.h"
 #include "../utils.h"
+#include "pdf/pdf.h"
+
 Pdf make_mixture_pdf(Pdf *first, Pdf *second)
 {
-    Pdf self = {};
-    self.type = PDF_MIXTURE;
-    self.data.mixture.first = first;
-    self.data.mixture.second = second;
-    return self;
+    return (Pdf){
+        .type = PDF_MIXTURE,
+        .data.mixture = {
+            .first = first,
+            .second = second,
+        },
+    };
 }
 
 rt_float mixture_pdf_value(Vec3 direction, const PdfData *self)

@@ -1,11 +1,10 @@
 
 #include <stdlib.h>
 #include "noise.h"
+#include "texture/texture.h"
 
 Vec3 perlin_get(rt_float u, rt_float v, const Vec3 *point, const Perlin *self)
 {
-
-    /* Vec3 scaled_point = vec3_mul_val(*point, self->scale);*/
     Vec3 final = vec3_mul_val(vec3_create(1, 1, 1), 0.5 * (1 + fast_sin(self->scale * point->z + 10 * turb(point, 7, &self->self_noise))));
 
     (void)u;
@@ -16,14 +15,15 @@ Vec3 perlin_get(rt_float u, rt_float v, const Vec3 *point, const Perlin *self)
 
 Texture perlin_create(rt_float scale)
 {
-    Texture result;
     Perlin *perl = malloc(sizeof(Perlin));
 
-    perl->self_noise = noise_create();
+    *perl = (Perlin){
+        .scale = scale,
+        .self_noise = noise_create(),
+    };
 
-    perl->scale = scale;
-    result.data = perl;
-    result.type = TEXTURE_NOISE;
-
-    return result;
+    return (Texture){
+        .type = TEXTURE_NOISE,
+        .data = perl,
+    };
 }

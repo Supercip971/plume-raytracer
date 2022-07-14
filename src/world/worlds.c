@@ -28,25 +28,22 @@
 
 static struct camera_config camera_config_init(Vec3 position, Vec3 lookat, rt_float vfov, bool moving_obj)
 {
-    struct camera_config camera_config;
-
-    camera_config.position = position;
-    camera_config.lookat = lookat;
-    camera_config.up = vec3_create(0, 1, 0);
-    camera_config.aspect = ((rt_float)SCRN_WIDTH / (rt_float)SCRN_HEIGHT);
-    camera_config.vfov = vfov;
-    camera_config.aperture = 0.0001;
-    camera_config.focus_distance = 10;
-    camera_config.time_end = 1;
-    camera_config.time_start = 0.0;
-    camera_config.moving_obj = moving_obj;
-
-    return camera_config;
+    return (struct camera_config){
+        .position = position,
+        .lookat = lookat,
+        .up = vec3_create(0, 1, 0),
+        .aspect = ((rt_float)SCRN_WIDTH / (rt_float)SCRN_HEIGHT),
+        .vfov = vfov,
+        .aperture = 0.0001,
+        .focus_distance = 10,
+        .time_end = 1,
+        .time_start = 0.0,
+        .moving_obj = moving_obj,
+    };
 }
 
 static void noise_scene(Object *root, Object *lights, WorldConfig *config)
 {
-    HitableList *lst;
     Texture per_texture = perlin_create(4);
     *root = create_hitable_list();
     *lights = create_hitable_list();
@@ -54,7 +51,8 @@ static void noise_scene(Object *root, Object *lights, WorldConfig *config)
     add_hitable_object(root, sphere_create(1000, vec3_create(0, -1000, 0), lambertian_create_texture(per_texture)));
     add_hitable_object(root, sphere_create(2, vec3_create(0, 2, 0), lambertian_create_texture(per_texture)));
 
-    lst = root->data;
+    HitableList *lst = root->data;
+
     bvh_create_rec(lst, 1, 0);
 
     config->cam_config = camera_config_init(vec3_create(13, 2, 3), vec3_create(0, 0, 0), 20, false);
@@ -64,7 +62,6 @@ static void noise_scene(Object *root, Object *lights, WorldConfig *config)
 
 static void earth_scene(Object *root, Object *lights, WorldConfig *config)
 {
-    HitableList *lst;
     *root = create_hitable_list();
     *lights = create_hitable_list();
 
@@ -72,7 +69,7 @@ static void earth_scene(Object *root, Object *lights, WorldConfig *config)
     add_hitable_object(root, sphere_create(2, vec3_create(20, 0, 0), light_create(vec3_create(15, 15, 15))));
     add_hitable_object(lights, sphere_create(2, vec3_create(20, 0, 0), light_create(vec3_create(15, 15, 15))));
 
-    lst = root->data;
+    HitableList *lst = root->data;
     bvh_create_rec(lst, 1, 0);
 
     config->cam_config = camera_config_init(vec3_create(13, 2, 3), vec3_create(0, 0, 0), 20, false);
@@ -81,20 +78,18 @@ static void earth_scene(Object *root, Object *lights, WorldConfig *config)
 
 static void random_scene(Object *root, Object *lights, WorldConfig *config)
 {
-    int a, b;
     HitableList *lst;
-    Texture checker;
 
     *root = create_hitable_list();
     *lights = create_hitable_list();
 
-    checker = checker_create_col(vec3_create(0.2, 0.3, 0.1), vec3_create(0.9, 0.9, 0.9), 10.f);
+    Texture checker = checker_create_col(vec3_create(0.2, 0.3, 0.1), vec3_create(0.9, 0.9, 0.9), 10.f);
     add_hitable_object(root, sphere_create(1000, vec3_create(0, -1000, -1),
                                            lambertian_create_texture(checker)));
 
-    for (a = -11; a < 11; a++)
+    for (int a = -11; a < 11; a++)
     {
-        for (b = -11; b < 11; b++)
+        for (int b = -11; b < 11; b++)
         {
             Material result_material;
 

@@ -2,9 +2,12 @@
 #include <stdlib.h>
 #include <utils.h>
 #include "bvh.h"
+#include "shape/shape.h"
 
 bvhData *bvh_blocks = NULL;
 int idx = 0;
+
+// this will be rewritten for a cache-friendly implementation
 static bvhData *alloc_bvh_data(void)
 {
     if (bvh_blocks == NULL)
@@ -37,19 +40,20 @@ bool bvh_get_aabb(rt_float time_start, rt_float time_end, AABB *output, const bv
     (void)time_end;
     return true;
 }
+
 bool bvh_hit(Ray r, rt_float t_min, rt_float t_max, HitRecord *record, const bvhData *self)
 {
-
-    AABB box_left, box_right;
-    bool hit_left = false, hit_right = false;
-
     if (!aabb_hit(&self->box, &r, t_min, t_max))
     {
         return false;
     }
 
+    AABB box_left, box_right;
+
     object_get_aabb(0, 1, &box_left, (Object *)&self->left);
     object_get_aabb(0, 1, &box_right, (Object *)&self->right);
+
+    bool hit_left = false, hit_right = false;
 
     if (aabb_hit(&box_left, &r, t_min, t_max))
     {
@@ -57,7 +61,6 @@ bool bvh_hit(Ray r, rt_float t_min, rt_float t_max, HitRecord *record, const bvh
     }
     if (aabb_hit(&box_right, &r, t_min, hit_left ? record->t : t_max))
     {
-
         hit_right = object_collide(r, t_min, hit_left ? record->t : t_max, record, (Object *)&self->right);
     }
 
@@ -93,12 +96,14 @@ bool bvh_destroy(bvhData *self)
 
 static Object bvh_init(bvhData **out_bvh)
 {
-
     bvhData *data = alloc_bvh_data();
-    Object result;
-    result.data = data;
-    result.type = SHAPE_BVH;
-    result.is_leaf = false;
+
+    Object result = {
+        .data = data,
+        .type = SHAPE_BVH,
+        .is_leaf = false,
+    };
+
     *out_bvh = data;
     return result;
 }
@@ -106,13 +111,13 @@ static Object bvh_init(bvhData **out_bvh)
 static rt_float bvh_distance(Object *left, Object *right, rt_float tstart, rt_float tend, bool *intersect)
 {
     AABB a, b;
-    Vec3 a_center, b_center;
     object_get_aabb(tstart, tend, &a, left);
     object_get_aabb(tstart, tend, &b, right);
 
     *intersect = aabb_intersect(&a, &b);
-    a_center = vec3_add(a.min, vec3_mul_val(vec3_sub(a.max, a.min), 0.5));
-    b_center = vec3_add(b.min, vec3_mul_val(vec3_sub(b.max, b.min), 0.5));
+
+    Vec3 a_center = vec3_add(a.min, vec3_mul_val(vec3_sub(a.max, a.min), 0.5));
+    Vec3 b_center = vec3_add(b.min, vec3_mul_val(vec3_sub(b.max, b.min), 0.5));
 
     return vec3_squared_length(vec3_sub(b_center, a_center));
 }
@@ -120,7 +125,6 @@ static rt_float bvh_distance(Object *left, Object *right, rt_float tstart, rt_fl
 void bvh_create_rec(HitableList *list, rt_float tstart, rt_float tend)
 {
 
-    size_t i, j;
     while (list->child_count > 1)
     {
         Object *left = NULL;
@@ -132,9 +136,9 @@ void bvh_create_rec(HitableList *list, rt_float tstart, rt_float tend)
         AABB l_aa;
         AABB r_aa;
 
-        for (i = 0; i < list->child_count; i++)
+        for (size_t i = 0; i < list->child_count; i++)
         {
-            for (j = 0; j < list->child_count; j++)
+            for (size_t j = 0; j < list->child_count; j++)
             {
                 if (i == j)
                 {
@@ -173,14 +177,14 @@ void bvh_create_rec(HitableList *list, rt_float tstart, rt_float tend)
 
 rt_float bvh_pdf_value(Vec3 origin, Vec3 direction, const bvhData *self)
 {
-    rt_float val_left, val_right;
-    val_left = object_pdf_value(origin, direction, (Object *)&self->left);
-    val_right = object_pdf_value(origin, direction, (Object *)&self->right);
+    rt_float val_left = object_pdf_value(origin, direction, (Object *)&self->left);
+    rt_float val_right = object_pdf_value(origin, direction, (Object *)&self->right);
+
     return (val_left + val_right) / 2;
 }
+
 Vec3 bvh_random(Vec3 origin, const bvhData *self)
 {
-
     if (random_rt_float() > 0.5)
     {
         return object_random(origin, &self->left);

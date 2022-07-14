@@ -3,6 +3,7 @@
 
 #include <stdbool.h>
 #include <stdint.h>
+
 typedef struct lock
 {
     uint8_t data;

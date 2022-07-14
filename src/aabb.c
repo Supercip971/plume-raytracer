@@ -4,9 +4,11 @@
 
 AABB aabb_create(Vec3 min, Vec3 max)
 {
-    AABB result;
-    result.min = min;
-    result.max = max;
+    AABB result = {
+        .min = min,
+        .max = max,
+    };
+
     return result;
 }
 

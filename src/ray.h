@@ -7,7 +7,7 @@ typedef struct ray
 {
     Vec3 origin;
     Vec3 direction;
-    rt_float time; /* using double for more precision (todo: check if we can use float) */
+    rt_float time;
     Vec3 inv_dir;
 } Ray;
 

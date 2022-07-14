@@ -28,12 +28,12 @@ struct raw_color
     uint8_t g;
     uint8_t r;
 } __attribute__((packed));
+
 struct raw_le_color
 {
     uint8_t r;
     uint8_t g;
     uint8_t b;
-
 } __attribute__((packed));
 
 static rt_float color_clamp(rt_float value)
@@ -83,9 +83,9 @@ __attribute__((unused)) static void convert_raw_to_float(const struct raw_color 
         }
     }
 }
+
 static Color color_be_int_to_f(struct raw_le_color color)
 {
-
     Color res;
     res.a = 1.f;
     res.g = (rt_float)color.g / 255.f;
@@ -96,25 +96,20 @@ static Color color_be_int_to_f(struct raw_le_color color)
 
 static void convert_be_raw_to_float(const struct raw_le_color *color, Color *target, size_t width, size_t height)
 {
-    size_t x;
-    size_t y;
-
-    for (y = 0; y < height; y++)
+    for (size_t y = 0; y < height; y++)
     {
-        for (x = 0; x < width; x++)
+        for (size_t x = 0; x < width; x++)
         {
             target[x + (y * width)] = color_be_int_to_f(color[x + (y * width)]);
         }
     }
 }
+
 static void swap_buffer(void)
 {
-    size_t x;
-    size_t y;
-
-    for (y = 0; y < SCRN_HEIGHT; y++)
+    for (size_t y = 0; y < SCRN_HEIGHT; y++)
     {
-        for (x = 0; x < SCRN_WIDTH; x++)
+        for (size_t x = 0; x < SCRN_WIDTH; x++)
         {
             raw_pixels[x + ((SCRN_HEIGHT - y - 1) * SCRN_WIDTH)] = color_f_to_int(pixels[x + (y * SCRN_WIDTH)]);
         }
@@ -166,32 +161,32 @@ size_t impl_get_tick(void)
 void impl_render_loop(void)
 {
     int frames = 0;
-    rt_float fps;
-    uint32_t prev_ticks = 0;
     uint32_t start_tick = impl_get_tick();
     int32_t wait_tick;
-    SDL_Rect target;
 
     while (event_update())
     {
-        prev_ticks = impl_get_tick();
+        uint32_t prev_ticks = impl_get_tick();
 
         if (!render_update(pixels, SCRN_WIDTH, SCRN_HEIGHT))
         {
             swap_buffer();
-            // printf(" ended [!] %li \n", impl_get_tick() - start_tick);
             return;
         }
+
         swap_buffer();
 
         SDL_UpdateTexture(framebuffer, NULL, raw_pixels,
                           SCRN_WIDTH * sizeof(struct raw_color));
 
-        target.x = 0;
-        target.y = 0;
-        target.w = ASCRN_WIDTH;
-        target.h = ASCRN_HEIGHT;
-        SDL_RenderCopy(renderer, framebuffer, NULL, &target);
+        SDL_Rect update_target = {
+            .x = 0,
+            .y = 0,
+            .w = ASCRN_WIDTH,
+            .h = ASCRN_HEIGHT,
+        };
+
+        SDL_RenderCopy(renderer, framebuffer, NULL, &update_target);
         SDL_RenderPresent(renderer);
         SDL_RenderClear(renderer);
 
@@ -205,7 +200,7 @@ void impl_render_loop(void)
         if (frames > 20)
         {
             frames = 0;
-            fps = 1000 / (impl_get_tick() - prev_ticks);
+            rt_float fps = 1000.f / (impl_get_tick() - prev_ticks);
             printf("fps: %f \n", (double)fps);
         }
 
@@ -217,15 +212,18 @@ void impl_render_loop(void)
 
 Image image_load(const char *path)
 {
-    Image result;
+    Image result = {
+        .width = 1,
+        .height = 1,
+    };
     unsigned error;
-    result.width = 1;
-    result.height = 1;
+
     error = lodepng_decode24_file((uint8_t **)&result.source_data, (uint32_t *)&result.width, (uint32_t *)&result.height, path);
 
     if (error)
     {
-        // printf("decoder error %u: %s\n", error, lodepng_error_text(error));
+        printf("decoder error %u: %s\n", error, lodepng_error_text(error));
+        return result;
     }
 
     // printf("decoded: (%s) %x x %x \n", path, result.width, result.height);

@@ -68,7 +68,7 @@ static volatile uint64_t thr[MAX_RENDER_THREAD] = {};
 static volatile bool stop;
 static Camera camera;
 
-struct render_thread_args *args;
+static struct render_thread_args *args;
 /* handling this as a global variable is utterly retarded */
 static Object root;
 static Object lights;
@@ -140,7 +140,6 @@ static Vec3 calculate_ray_color_impl(Ray from, int depth, const Vec3 *background
         vec3_mul(
             l,
             r));
-
 }
 
 Vec3 calculate_ray_color(Ray from, int depth, const Vec3 *background)
@@ -182,29 +181,22 @@ static Color push_color(int sample_count, Color current, Color pushed)
 
 FLATTEN static void render_update_part(struct render_part_args const *arg)
 {
-    Vec3 current_color;
-    Color final_color;
-
     rt_float offx[SAMPLE_PER_THREAD], offy[SAMPLE_PER_THREAD];
-    Color previous_color;
-    Ray r;
-    size_t x, y, c;
-    rt_float u, v;
 
-    rt_float inv_w = 1.0 / (arg->width - 1);
-    rt_float inv_h = 1.0 / (arg->height - 1);
+    const rt_float inv_w = 1.0 / (arg->width - 1);
+    const rt_float inv_h = 1.0 / (arg->height - 1);
 
-    for (c = 0; c < SAMPLE_PER_THREAD; c++)
+    for (size_t c = 0; c < SAMPLE_PER_THREAD; c++)
     {
         offx[c] = random_rt_float();
         offy[c] = random_rt_float();
     }
 
-    for (y = arg->y_begin; y < arg->y_end; y++)
+    for (size_t y = arg->y_begin; y < arg->y_end; y++)
     {
-        for (x = arg->x_begin; x < arg->x_end; x++)
+        for (size_t x = arg->x_begin; x < arg->x_end; x++)
         {
-            for (c = 0; c < SAMPLE_PER_THREAD; c++)
+            for (size_t c = 0; c < SAMPLE_PER_THREAD; c++)
             {
 
                 if (stop)
@@ -212,18 +204,18 @@ FLATTEN static void render_update_part(struct render_part_args const *arg)
                     return;
                 }
 
-                u = ((rt_float)x + offx[c]) * inv_w;
-                v = ((rt_float)y + offy[c]) * inv_h;
+                rt_float u = ((rt_float)x + offx[c]) * inv_w;
+                rt_float v = ((rt_float)y + offy[c]) * inv_h;
 
-                r = get_camera_ray(&camera, u, v);
+                Ray r = get_camera_ray(&camera, u, v);
 
-                current_color = calculate_ray_color(r, 0, &arg->background);
+                Vec3 current_color = calculate_ray_color(r, 0, &arg->background);
 
                 /* add current sample to sum */
 
-                previous_color = get_pixel(arg->framebuffer, x, y, arg->width);
+                Color previous_color = get_pixel(arg->framebuffer, x, y, arg->width);
 
-                final_color = push_color(arg->sample_count + c, previous_color, vec_to_color(current_color));
+                Color final_color = push_color(arg->sample_count + c, previous_color, vec_to_color(current_color));
 
                 set_pixel(arg->framebuffer, x, y, arg->width, final_color);
             }
@@ -273,11 +265,12 @@ static void *render_update_part_thread(void *thread_arg)
 static bool get_least_sample(size_t *sx, size_t *sy)
 {
     size_t current_min = MAX_SAMPLE;
-    size_t ss;
-    size_t mx = 0;
-    size_t my = 0;
+
+    size_t mx;
+    size_t my;
+
     bool founded = false;
-    for (ss = 0; ss < RENDER_THREAD * RENDER_THREAD; ss++)
+    for (size_t ss = 0; ss < RENDER_THREAD * RENDER_THREAD; ss++)
     {
         lock_acquire(&args[ss].lock);
 
@@ -298,22 +291,21 @@ static bool get_least_sample(size_t *sx, size_t *sy)
     return founded;
 }
 
-static bool get_no_active_thread(size_t *thread_id)
+static bool get_inactive_thread(size_t *thread_id)
 {
-    size_t i;
-    size_t saved_i = 1000000000;
+    size_t inactive_thread = 1000000000;
     bool founded = false;
-    for (i = 0; i < MULTIPLE_THREAD; i++)
+    for (size_t i = 0; i < MULTIPLE_THREAD; i++)
     {
         if (thr[i] == 0 || impl_is_thread_ended((uint64_t)thr[i]))
         {
 
             founded = true;
-            saved_i = i;
+            inactive_thread = i;
         }
     }
 
-    *thread_id = saved_i;
+    *thread_id = inactive_thread;
     return founded;
 }
 
@@ -321,21 +313,24 @@ bool render_update(Color *framebuffer, size_t width, size_t height)
 {
     size_t s_x = 0;
     size_t s_y = 0;
-    size_t ii = 0;
-    size_t fi = 0;
 
     while (running_thread_count < MULTIPLE_THREAD)
     {
         if (get_least_sample(&s_x, &s_y))
         {
-            fi = s_x + s_y * RENDER_THREAD;
+            size_t fi = s_x + s_y * RENDER_THREAD;
+
             lock_acquire(&args[fi].lock);
+
+            args[fi].active = 1;
             args[fi].framebuffer = framebuffer;
             args[fi].width = width;
             args[fi].height = height;
             args[fi].s_x = s_x;
             args[fi].s_y = s_y;
-            if (!get_no_active_thread(&ii))
+
+            size_t ii;
+            if (!get_inactive_thread(&ii))
             {
                 // printf("no free thread founded \n");
                 lock_release(&args[fi].lock);
@@ -362,8 +357,6 @@ bool render_update(Color *framebuffer, size_t width, size_t height)
         }
         s_x = 0;
         s_y = 0;
-        ii = 0;
-        fi = 0;
     }
     return true;
 }
@@ -378,21 +371,21 @@ void render_wait_all_thread(void)
 
 void render_init(void)
 {
-    size_t i = 0;
     WorldConfig conf = {};
-    stop = false;
     scene_init(&root, &lights, &conf);
     camera = create_camera(conf.cam_config);
     background_color = conf.sky_color;
 
+    stop = false;
+
     args = malloc(sizeof(struct render_thread_args) * RENDER_THREAD * RENDER_THREAD);
 
-    for (i = 0; i < RENDER_THREAD * RENDER_THREAD; i++)
+    for (size_t i = 0; i < RENDER_THREAD * RENDER_THREAD; i++)
     {
         memset(&(args[i]), 0, sizeof(struct render_thread_args));
     }
 
-    for (i = 0; i < MAX_RENDER_THREAD; i++)
+    for (size_t i = 0; i < MAX_RENDER_THREAD; i++)
     {
         thr[i] = 0;
     }
@@ -400,15 +393,12 @@ void render_init(void)
 
 void render_deinit(void)
 {
-    size_t i = 0;
-
     stop = true;
 
-    for (i = 0; i < MAX_RENDER_THREAD; i++)
+    for (size_t i = 0; i < MAX_RENDER_THREAD; i++)
     {
         if (thr[i] != 0)
         {
-
             impl_join_thread(thr[i]);
         }
     }

@@ -6,8 +6,6 @@
 Vec3 image_tex_get(rt_float u, rt_float v, const Vec3 *point, const ImageTexture *self)
 {
 
-    int i;
-    int j;
     Color *pixel;
 
     if (self->self_picture.converted_data == NULL)
@@ -16,17 +14,16 @@ Vec3 image_tex_get(rt_float u, rt_float v, const Vec3 *point, const ImageTexture
     }
 
     u = rt_clamp(u, 0, 1);
-    v = 1-rt_clamp(v, 0, 1); /* use flip coord */
+    v = 1 - rt_clamp(v, 0, 1); /* use flip coord */
 
-    i = (int)(u * self->self_picture.width);
-    j = (int)(v * self->self_picture.height);
+    int i = (int)(u * self->self_picture.width);
+    int j = (int)(v * self->self_picture.height);
 
     i = rt_min(i, self->self_picture.width - 1);
     j = rt_min(j, self->self_picture.height - 1);
 
     pixel = self->self_picture.converted_data + (j * self->self_picture.width + i);
     (void)point;
-
 
     return vec_from_color(*pixel);
 }

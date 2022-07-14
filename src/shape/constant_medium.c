@@ -2,17 +2,15 @@
 #include <stdlib.h>
 #include "../material/isotropic.h"
 #include "../texture/solid_color.h"
+#include "utils.h"
 
 Object make_constant_medium(Object obj, rt_float d, Vec3 albedo)
 {
     return make_constant_medium_mat(obj, d, isotropic_create(solid_color_create(albedo)));
 }
+
 Object make_constant_medium_mat(Object obj, rt_float d, Material mat)
 {
-    Object res = {};
-    res.type = SHAPE_CONSTANT_MEDIUM;
-    res.is_leaf = true;
-
     ConstantMedium *data = malloc(sizeof(ConstantMedium));
     *data = (ConstantMedium){
         .d = -1 / d,
@@ -20,9 +18,11 @@ Object make_constant_medium_mat(Object obj, rt_float d, Material mat)
         .target = obj,
     };
 
-    res.data = data;
-
-    return res;
+    return (Object){
+        .type = SHAPE_CONSTANT_MEDIUM,
+        .is_leaf = true,
+        .data = data,
+    };
 }
 
 bool constant_get_aabb(rt_float time_start, rt_float time_end, AABB *output, const ConstantMedium *self)
@@ -37,12 +37,9 @@ bool constant_destroy(ConstantMedium *self)
 
 bool hit_constant_object_callback(Ray ray, rt_float t_min, rt_float t_max, HitRecord *record, const ConstantMedium *self)
 {
-    rt_float flt = random_rt_float();
     HitRecord rec_0 = {};
     HitRecord rec_1 = {};
     const rt_float ray_length = vec3_length(ray.direction);
-    rt_float hit_distance;
-    rt_float distance_inside_box;
 
     if (!object_collide(ray, -INFINITY, +INFINITY, &rec_0, (Object *)&self->target))
     {
@@ -64,8 +61,8 @@ bool hit_constant_object_callback(Ray ray, rt_float t_min, rt_float t_max, HitRe
 
     rec_1.t = rt_max(rec_1.t, 0);
 
-    distance_inside_box = (rec_1.t - rec_0.t) * ray_length;
-    hit_distance = self->d * fast_log(flt);
+    rt_float distance_inside_box = (rec_1.t - rec_0.t) * ray_length;
+    rt_float hit_distance = self->d * fast_log(random_rt_float());
 
     if (hit_distance > distance_inside_box)
     {
@@ -74,7 +71,6 @@ bool hit_constant_object_callback(Ray ray, rt_float t_min, rt_float t_max, HitRe
 
     record->t = rec_0.t + hit_distance / ray_length;
     record->pos = ray_point_param(ray, record->t);
-
     record->normal = vec3_create(1, 0, 0);
     record->material = self->phase_material;
     record->front_face = true;

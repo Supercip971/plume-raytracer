@@ -1,6 +1,7 @@
 #include "matrix4x4.h"
 #include <stdio.h>
 #include <string.h>
+
 void create_matrix_identity(Matrix4x4 *matrix)
 {
     Matrix4x4 val = {{{1, 0, 0, 0},
@@ -30,6 +31,7 @@ void create_matrix_translate(Matrix4x4 *matrix, rt_float x, rt_float y, rt_float
 
     *matrix = val;
 }
+
 void create_matrix_rotate_x(Matrix4x4 *matrix, rt_float angle)
 {
     Matrix4x4 val = {{{1, 0, 0, 0},
@@ -39,6 +41,7 @@ void create_matrix_rotate_x(Matrix4x4 *matrix, rt_float angle)
 
     *matrix = val;
 }
+
 void create_matrix_rotate_y(Matrix4x4 *matrix, rt_float angle)
 {
     Matrix4x4 val = {{{cos(angle), 0, sin(angle), 0},
@@ -64,10 +67,10 @@ static void matrix_getcofactor(const Matrix4x4 *matrix, Matrix4x4 *result, int r
 {
     int rx = 0;
     int ry = 0;
-    int x, y = 0;
-    for (x = 0; x < size; x++)
+
+    for (int x = 0; x < size; x++)
     {
-        for (y = 0; y < size; y++)
+        for (int y = 0; y < size; y++)
         {
             if (x != r && y != c)
             {
@@ -85,8 +88,7 @@ static void matrix_getcofactor(const Matrix4x4 *matrix, Matrix4x4 *result, int r
 static rt_float matrix_get_determinant(const Matrix4x4 *matrix, int size)
 {
     rt_float det = 0;
-    Matrix4x4 cofactor;
-    int i;
+    Matrix4x4 cofactor = {};
 
     rt_float sign = 1;
 
@@ -95,38 +97,38 @@ static rt_float matrix_get_determinant(const Matrix4x4 *matrix, int size)
         return matrix->value[0][0];
     }
 
-    for (i = 0; i < size; i++)
+    for (int i = 0; i < size; i++)
     {
         matrix_getcofactor(matrix, &cofactor, 0, i, size);
         det += sign * matrix->value[i][0] * matrix_get_determinant(&cofactor, size - 1);
 
         sign = -sign;
     }
+
     return det;
 }
+
 static void matrix_get_adjoint(const Matrix4x4 *matrix, Matrix4x4 *result)
 {
-    rt_float sign;
-
     Matrix4x4 temp_matrix = {};
-    int x, y;
-    for (x = 0; x < 4; x++)
+
+    for (int x = 0; x < 4; x++)
     {
-        for (y = 0; y < 4; y++)
+        for (int y = 0; y < 4; y++)
         {
             matrix_getcofactor(matrix, &temp_matrix, x, y, 4);
-            sign = ((x + y) % 2 == 0) ? 1.0 : -1.0;
+
+            rt_float sign = ((x + y) % 2 == 0) ? 1.0 : -1.0;
+
             result->value[y][x] = sign * matrix_get_determinant(&temp_matrix, 4 - 1);
         }
     }
 }
+
 void matrix_inverse(const Matrix4x4 *matrix, Matrix4x4 *result)
 {
     // calculate the inverse of the 4x4 matrix
     // using Cramer's Rule
-    int x, y;
-    Matrix4x4 save;
-    Matrix4x4 adjoint;
     rt_float det = matrix_get_determinant(matrix, 4);
 
     if (det <= 0.0f)
@@ -136,20 +138,20 @@ void matrix_inverse(const Matrix4x4 *matrix, Matrix4x4 *result)
         return;
     }
 
+    Matrix4x4 adjoint;
     matrix_get_adjoint(matrix, &adjoint);
 
-    for (x = 0; x < 4; x++)
+    for (int x = 0; x < 4; x++)
     {
-        for (y = 0; y < 4; y++)
+        for (int y = 0; y < 4; y++)
         {
             result->value[y][x] = adjoint.value[y][x] / det;
         }
     }
 
-    save = *result;
+    Matrix4x4 save = *result;
 
     matrix_transpose(&save, result);
-    // TODO: check if this is correct we may need to do a transpose !
 }
 
 void matrix_transpose(const Matrix4x4 *matrix, Matrix4x4 *result)
@@ -172,15 +174,15 @@ void matrix_transpose(const Matrix4x4 *matrix, Matrix4x4 *result)
     result->value[3][2] = matrix->value[2][3];
     result->value[3][3] = matrix->value[3][3];
 }
+
 void matrix_multiply(const Matrix4x4 *a, const Matrix4x4 *b, Matrix4x4 *result)
 {
-    int x, y;
-
     Matrix4x4 acopy = *a;
     Matrix4x4 bcopy = *b;
-    for (x = 0; x < 4; x++)
+
+    for (int x = 0; x < 4; x++)
     {
-        for (y = 0; y < 4; y++)
+        for (int y = 0; y < 4; y++)
         {
             result->value[y][x] = acopy.value[y][0] * bcopy.value[0][x] +
                                   acopy.value[y][1] * bcopy.value[1][x] +
@@ -190,28 +192,31 @@ void matrix_multiply(const Matrix4x4 *a, const Matrix4x4 *b, Matrix4x4 *result)
     }
 }
 
-void matrix_apply_ray(const Matrix4x4 *matrix, Ray *ray)
-{
-    matrix_apply_point(matrix, &ray->origin);
-    matrix_apply_vector(matrix, &ray->direction);
-    ray_dir_init(ray);
-}
 void matrix_apply_vector(const Matrix4x4 *matrix, Vec3 *vector)
 {
-   Vec3 temp = {};
-    temp.x = vector->x * matrix->value[0][0] + vector->y * matrix->value[0][1] + vector->z * matrix->value[0][2];
-    temp.y = vector->x * matrix->value[1][0] + vector->y * matrix->value[1][1] + vector->z * matrix->value[1][2];
-    temp.z = vector->x * matrix->value[2][0] + vector->y * matrix->value[2][1] + vector->z * matrix->value[2][2];
-
+    Vec3 temp = {
+        .x = vector->x * matrix->value[0][0] + vector->y * matrix->value[0][1] + vector->z * matrix->value[0][2],
+        .y = vector->x * matrix->value[1][0] + vector->y * matrix->value[1][1] + vector->z * matrix->value[1][2],
+        .z = vector->x * matrix->value[2][0] + vector->y * matrix->value[2][1] + vector->z * matrix->value[2][2],
+    };
     *vector = temp;
 }
 
 // point is just apply vector with the matrix offset applied
 void matrix_apply_point(const Matrix4x4 *matrix, Vec3 *point)
 {
-    Vec3 temp = {};
-    temp.x = point->x * matrix->value[0][0] + point->y * matrix->value[0][1] + point->z * matrix->value[0][2] + matrix->value[0][3];
-    temp.y = point->x * matrix->value[1][0] + point->y * matrix->value[1][1] + point->z * matrix->value[1][2] + matrix->value[1][3];
-    temp.z = point->x * matrix->value[2][0] + point->y * matrix->value[2][1] + point->z * matrix->value[2][2] + matrix->value[2][3];
+    Vec3 temp = {
+        .x = point->x * matrix->value[0][0] + point->y * matrix->value[0][1] + point->z * matrix->value[0][2] + matrix->value[0][3],
+        .y = point->x * matrix->value[1][0] + point->y * matrix->value[1][1] + point->z * matrix->value[1][2] + matrix->value[1][3],
+        .z = point->x * matrix->value[2][0] + point->y * matrix->value[2][1] + point->z * matrix->value[2][2] + matrix->value[2][3],
+    };
+
     *point = temp;
+}
+
+void matrix_apply_ray(const Matrix4x4 *matrix, Ray *ray)
+{
+    matrix_apply_point(matrix, &ray->origin);
+    matrix_apply_vector(matrix, &ray->direction);
+    ray_dir_init(ray);
 }

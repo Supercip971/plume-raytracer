@@ -1,5 +1,6 @@
 #include "metal.h"
 #include <stdlib.h>
+#include "material/material.h"
 
 bool metal_callback(const Ray *r_in, const HitRecord *record, MaterialRecord *mat_record, const Metal *self)
 {
@@ -18,13 +19,15 @@ bool metal_callback(const Ray *r_in, const HitRecord *record, MaterialRecord *ma
 
 Material metal_create(Vec3 albedo, rt_float fuzzy)
 {
-    Material mat;
     Metal *self = malloc(sizeof(Metal));
 
-    self->albedo = albedo;
-    self->fuzzy = fuzzy;
+    *self = (Metal){
+        .albedo = albedo,
+        .fuzzy = fuzzy,
+    };
 
-    mat.data = self;
-    mat.type = MATERIAL_METAL;
-    return mat;
+    return (Material){
+        .data = self,
+        .type = MATERIAL_METAL,
+    };
 }

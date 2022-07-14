@@ -1,29 +1,29 @@
 #include "transform.h"
 #include <stdlib.h>
 #include "matrix4x4.h"
+#include "shape/shape.h"
 
 static AABB get_transformed_aabb(AABB from, Matrix4x4 matrix)
 {
-    Vec3 points[8];
-    Vec3 min, max;
-    int i;
+    Vec3 points[8] = {
+        [0] = from.min,
+        [1] = vec3_add(from.min, vec3_create(from.max.x, 0, 0)),
+        [2] = vec3_add(from.min, vec3_create(0, from.max.y, 0)),
+        [3] = vec3_add(from.min, vec3_create(from.max.x, from.max.y, 0)),
+        [4] = vec3_add(from.min, vec3_create(0, 0, from.max.z)),
+        [5] = vec3_add(from.min, vec3_create(from.max.x, 0, from.max.z)),
+        [6] = vec3_add(from.min, vec3_create(0, from.max.y, from.max.z)),
+        [7] = from.max,
+    };
 
-    points[0] = from.min;
-    points[1] = vec3_add(from.min, vec3_create(from.max.x, 0, 0));
-    points[2] = vec3_add(from.min, vec3_create(0, from.max.y, 0));
-    points[3] = vec3_add(from.min, vec3_create(from.max.x, from.max.y, 0));
-    points[4] = vec3_add(from.min, vec3_create(0, 0, from.max.z));
-    points[5] = vec3_add(from.min, vec3_create(from.max.x, 0, from.max.z));
-    points[6] = vec3_add(from.min, vec3_create(0, from.max.y, from.max.z));
-    points[7] = from.max;
-
-    for (i = 0; i < 8; i++)
+    for (int i = 0; i < 8; i++)
     {
         matrix_apply_point(&matrix, &points[i]);
     }
-    min = points[0];
-    max = points[7];
-    for (i = 0; i < 8; i++)
+
+    Vec3 min = points[0];
+    Vec3 max = points[7];
+    for (int i = 0; i < 8; i++)
     {
         min = vec3_min(min, points[i]);
         max = vec3_max(max, points[i]);
@@ -34,20 +34,21 @@ static AABB get_transformed_aabb(AABB from, Matrix4x4 matrix)
 
 Object transform(Object translated, Matrix4x4 matrix)
 {
-    Object res;
     Transform *b = malloc(sizeof(Transform));
 
     b->target = translated;
     b->matrix = matrix;
     matrix_inverse(&matrix, &b->inv_matrix);
-
-    res.data = b;
-    res.type = SHAPE_TRANSFORM;
-    res.is_leaf = true;
-
     object_get_aabb(-1000, 1000, &b->transformed_aabb, &translated);
 
     b->transformed_aabb = get_transformed_aabb(b->transformed_aabb, matrix);
+
+    Object res = {
+        .data = b,
+        .type = SHAPE_TRANSFORM,
+        .is_leaf = true,
+    };
+
     return res;
 }
 
@@ -61,11 +62,11 @@ bool hit_transform_object_callback(Ray ray, rt_float t_min, rt_float t_max, HitR
     {
         return false;
     }
+
     matrix_apply_point(&self->matrix, &record->pos);
 
     matrix_apply_vector(&self->matrix, &record->outward);
     set_face_normal(&ray, record->outward, record);
-
 
     return true;
 }
@@ -78,6 +79,7 @@ bool transform_get_aabb(rt_float time_start, rt_float time_end, AABB *output, co
 
     return true;
 }
+
 bool transform_destroy(Transform *self)
 {
     return object_destroy(&self->target);
@@ -95,10 +97,10 @@ rt_float transform_pdf_value(Vec3 origin, Vec3 direction, const Transform *self)
 
 Vec3 transform_pdf_random(Vec3 origin, const Transform *self)
 {
-    Vec3 res;
     matrix_apply_point(&self->inv_matrix, &origin);
-    res = object_random(origin, &self->target);
-//    matrix_apply_vector(&self->matrix, &res);
+
+    Vec3 res = object_random(origin, &self->target);
+    //    matrix_apply_vector(&self->matrix, &res);
 
     return res;
 }

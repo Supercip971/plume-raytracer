@@ -1,5 +1,5 @@
-#pragma once
-
+#ifndef BVH_H
+#define BVH_H
 /* todo: implement a better data structure */
 
 #include "hitable.h"
@@ -19,3 +19,5 @@ void bvh_create_rec(HitableList *list, rt_float tstart, rt_float tend);
 
 rt_float bvh_pdf_value(Vec3 origin, Vec3 direction, const bvhData *self);
 Vec3 bvh_random(Vec3 origin, const bvhData *self);
+
+#endif

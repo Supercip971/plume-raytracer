@@ -1,14 +1,14 @@
 #include <stdlib.h>
 #include "../utils.h"
 #include "Sphere.h"
+#include "ray.h"
 
 /* this is so bad there is too much arg >:()*/
 static bool hit_sphere_object_callback2(rt_float discriminant, rt_float a, rt_float nb, rt_float t_min, rt_float t_max, HitRecord *record)
 {
-    rt_float t;
     rt_float discriminent_root = fast_sqrt(discriminant);
 
-    t = (nb - discriminent_root) / a;
+    rt_float t = (nb - discriminent_root) / a;
 
     if (!(t < t_max && t > t_min))
     {
@@ -24,6 +24,7 @@ static bool hit_sphere_object_callback2(rt_float discriminant, rt_float a, rt_fl
 
     return true;
 }
+
 bool sphere_get_aabb(rt_float time_start, rt_float time_end, AABB *output, const Sphere *self)
 {
     (void)time_start;
@@ -32,6 +33,7 @@ bool sphere_get_aabb(rt_float time_start, rt_float time_end, AABB *output, const
 
     return true;
 }
+
 FLATTEN bool hit_sphere_object_callback(Ray ray, rt_float t_min, rt_float t_max, HitRecord *record, const Sphere *self)
 {
 
@@ -83,11 +85,13 @@ Object sphere_create(rt_float radius, Vec3 pos, Material sphere_material)
 rt_float sphere_pdf_value(Vec3 origin, Vec3 direction, const Sphere *self)
 {
     HitRecord self_record = {};
+
     Ray r = {
         .direction = direction,
         .origin = origin,
         .time = 0,
     };
+
     if (!hit_sphere_object_callback(r, 0.001, 1000000, &self_record, self))
     {
         return 0;
@@ -104,5 +108,6 @@ Vec3 sphere_random(Vec3 origin, const Sphere *self)
     Vec3 center = vec3_sub(self->pos, origin);
     rt_float distance_squared = vec3_squared_length(center);
     Onb uvw = create_onb_from_vec(center);
+
     return onb_local(&uvw, random_vec3_direction_to_sphere(self->radius, distance_squared));
 }

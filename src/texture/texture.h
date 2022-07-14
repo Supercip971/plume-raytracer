@@ -14,6 +14,7 @@ typedef enum
 
 typedef struct texture
 {
+    // this is dumb, and should be an union
     void *data;
     TextureTypes type;
 } Texture;
