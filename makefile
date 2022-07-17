@@ -10,7 +10,7 @@ SANTIZERS = \
 	# -fsanitize=leak \
 	# -fsanitize=undefined \
 	# -fsanitize=float-divide-by-zero \
-	# -fsanitize=signed-integer-overflow -g \
+	# -fsanitize=signed-integer-overflow -g 
 
 CFLAGS = -DUSE_INTRINSIC -Ofast -march=native -mtune=native -Isrc/  \
  	-std=gnu17 -Wall -Wextra -Werror  \

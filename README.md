@@ -17,6 +17,9 @@
 
 
 
+### (17/07/2022) a new 4k picture, we now have a much cleaner code base and the raytracer is way faster.
+
+![some-objectsv2](./pic/17-07-2022.png)
 
 ### (22/04/2022) a 1920x1920 picture of some feature the raytracer have (+ sort of volumetric lighting with constant medium)
 
