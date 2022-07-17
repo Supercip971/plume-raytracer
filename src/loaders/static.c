@@ -21,10 +21,13 @@
 #include <texture/noise.h>
 #include <texture/solid_color.h>
 #include <texture/texture.h>
+#include "math/matrix4x4.h"
+#include "shape/shape.h"
 
 /*
     this cursed file will be replaced one day by json loading. For the moment this code is quick and dirty.
 */
+
 
 static struct camera_config camera_config_init(Vec3 position, Vec3 lookat, rt_float vfov, bool moving_obj)
 {
@@ -53,7 +56,7 @@ static void noise_scene(Object *root, Object *lights, WorldConfig *config)
 
     HitableList *lst = root->data;
 
-    bvh_create_rec(lst, 1, 0);
+    *root = bvh_create_rec(lst, 1, 0);
 
     config->cam_config = camera_config_init(vec3_create(13, 2, 3), vec3_create(0, 0, 0), 20, false);
 
@@ -70,7 +73,7 @@ static void earth_scene(Object *root, Object *lights, WorldConfig *config)
     add_hitable_object(lights, sphere_create(2, vec3_create(20, 0, 0), light_create(vec3_create(15, 15, 15))));
 
     HitableList *lst = root->data;
-    bvh_create_rec(lst, 1, 0);
+    *root =  bvh_create_rec(lst, 1, 0);
 
     config->cam_config = camera_config_init(vec3_create(13, 2, 3), vec3_create(0, 0, 0), 20, false);
     config->sky_color = vec3_create(0.70, 0.80, 1);
@@ -145,7 +148,7 @@ static void random_scene(Object *root, Object *lights, WorldConfig *config)
     add_hitable_object(root, sphere_create(1.0, vec3_create(4, 1, 0), metal_create(vec3_create(0.7, 0.6, 0.5), 0)));
 
     lst = root->data;
-    bvh_create_rec(lst, 1, 0);
+    *root = bvh_create_rec(lst, 1, 0);
 
     config->cam_config = camera_config_init(vec3_create(13, 2, 3), vec3_create(0, 0, 0), 20, false);
     config->sky_color = vec3_create(0.70, 0.80, 1);
@@ -170,7 +173,7 @@ static void light_scene(Object *root, Object *lights, WorldConfig *config)
 */
 
     lst = root->data;
-    bvh_create_rec(lst, 1, 0);
+    *root = bvh_create_rec(lst, 1, 0);
 
     config->cam_config = camera_config_init(vec3_create(26, 3, 6), vec3_create(0, 2, 0), 20, false);
 
@@ -231,7 +234,7 @@ static void cornell_box(Object *root, Object *lights, WorldConfig *config)
     add_hitable_object(root, translated_box2);
 
     lst = root->data;
-    bvh_create_rec(lst, 1, 0);
+    *root = bvh_create_rec(lst, 1, 0);
 
     config->cam_config = camera_config_init(vec3_create(278, 278, -800), vec3_create(278, 278, 0), 40, false);
 
@@ -292,7 +295,7 @@ static void smoky_cornell_box(Object *root, Object *lights, WorldConfig *config)
     translated_box2 = transform(box2, diff2);
    */
     lst = root->data;
-    bvh_create_rec(lst, 1, 0);
+    * root = bvh_create_rec(lst, 1, 0);
 
     config->cam_config = camera_config_init(vec3_create(278, 278, -800), vec3_create(278, 278, 0), 40, false);
     config->sky_color = vec3_create(0, 0, 0);
@@ -300,8 +303,6 @@ static void smoky_cornell_box(Object *root, Object *lights, WorldConfig *config)
 
 static void rand_chap2_scene(Object *root, Object *lights, WorldConfig *config)
 {
-    Object box2_list;
-    Object box_ground;
     Object light_object;
     Object constant_sphere;
     Object constant_sphere2;
@@ -321,8 +322,6 @@ static void rand_chap2_scene(Object *root, Object *lights, WorldConfig *config)
     *root = create_hitable_list();
     *lights = create_hitable_list();
 
-    box_ground = create_hitable_list();
-    box2_list = create_hitable_list();
     for (i = 0; i < box_per_side; i++)
     {
         for (j = 0; j < box_per_side; j++)
@@ -335,13 +334,11 @@ static void rand_chap2_scene(Object *root, Object *lights, WorldConfig *config)
             rt_float y1 = random_rt_float() * 100.0 + 1.0;
             rt_float z1 = z0 + size;
 
-            add_hitable_object(&box_ground,
+            add_hitable_object(root,
                                box_create(vec3_create(x0, y0, z0), vec3_create(x1, y1, z1), ground_mat));
         }
     }
 
-    bvh_create_rec(box_ground.data, 0.0, 1);
-    add_hitable_object(root, box_ground);
 
     light_object = aaxzrect_create(123, 423, 147, 412, 554, light_mat);
     add_hitable_object(root, light_object);
@@ -366,23 +363,29 @@ static void rand_chap2_scene(Object *root, Object *lights, WorldConfig *config)
     add_hitable_object(root, sphere_create(100, vec3_create(400, 200, 400), tex_mat));
 
     add_hitable_object(root, sphere_create(80, vec3_create(220, 280, 300), noisy));
+    create_matrix_translate(&translated_sphere_agglomeration_mov, -100, 270, 395);
+    create_matrix_rotate_y(&translated_sphere_agglomeration_rot, DEG2RAD(15));
+    create_matrix_identity(&translated_sphere_agglomeration);
 
+    matrix_multiply(&translated_sphere_agglomeration, &translated_sphere_agglomeration_mov, &translated_sphere_agglomeration);
+     matrix_multiply(&translated_sphere_agglomeration, &translated_sphere_agglomeration_rot, &translated_sphere_agglomeration);
+   
+    Object balls = create_hitable_list();
     for (i = 0; i < 1000; i++)
     {
-        add_hitable_object(&box2_list, sphere_create(10,
+        add_hitable_object(&balls, (sphere_create(10,
                                                      vec3_create(
                                                          random_rt_float() * 165,
                                                          random_rt_float() * 165,
                                                          random_rt_float() * 165),
-                                                     white));
+                                                     white)));
     }
-    bvh_create_rec(box2_list.data, 0, 1000);
 
-    create_matrix_translate(&translated_sphere_agglomeration_mov, -100, 270, 395);
-    create_matrix_rotate_y(&translated_sphere_agglomeration_rot, DEG2RAD(15));
-    matrix_multiply(&translated_sphere_agglomeration_mov, &translated_sphere_agglomeration_rot, &translated_sphere_agglomeration);
-    add_hitable_object(root, transform(box2_list, translated_sphere_agglomeration));
-    bvh_create_rec(root->data, 0, 1000);
+    Object tballs = transform(bvh_create_rec(balls.data, 0, 0), translated_sphere_agglomeration );
+
+    add_hitable_object(root, tballs);
+
+    *root = bvh_create_rec(root->data, 0, 1000);
 
     config->cam_config = camera_config_init(vec3_create(478, 278, -600),
                                             vec3_create(278, 278, 0), 40, true);
