@@ -48,7 +48,6 @@ Object transform(Object translated, Matrix4x4 matrix)
     Object res = {
         .data = b,
         .type = SHAPE_TRANSFORM,
-        .is_leaf = true,
     };
 
     return res;

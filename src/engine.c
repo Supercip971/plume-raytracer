@@ -75,6 +75,7 @@ static Object lights;
 
 static Vec3 background_color;
 Vec3 calculate_ray_color(Ray from, int depth, const Vec3 *background);
+
 static Vec3 calculate_ray_color_impl(Ray from, int depth, const Vec3 *background)
 {
     HitRecord record = {};
@@ -194,15 +195,17 @@ FLATTEN static void render_update_part(struct render_part_args const *arg)
 
     for (size_t y = arg->y_begin; y < arg->y_end; y++)
     {
+        if (stop)
+        {
+            return;
+        }
+            
         for (size_t x = arg->x_begin; x < arg->x_end; x++)
         {
-            for (size_t c = 0; c < SAMPLE_PER_THREAD; c++)
+           for (size_t c = 0; c < SAMPLE_PER_THREAD; c++)
             {
 
-                if (stop)
-                {
-                    return;
-                }
+                
 
                 rt_float u = ((rt_float)x + offx[c]) * inv_w;
                 rt_float v = ((rt_float)y + offy[c]) * inv_h;
@@ -403,6 +406,5 @@ void render_deinit(void)
             impl_join_thread(thr[i]);
         }
     }
-
-    hit_destroy_all_objects(&root);
+    object_destroy(&root);
 }

@@ -41,11 +41,12 @@ Object box_create(Vec3 posa, Vec3 posb, Material box_material)
     add_hitable_object(&b->list, aayzrect_create(posa.y, posb.y, posa.z, posb.z, posb.x, box_material));
     add_hitable_object(&b->list, aayzrect_create(posa.y, posb.y, posa.z, posb.z, posa.x, box_material));
 
-    bvh_create_rec(b->list.data, 0, 1);
+
+
+    b->list = bvh_create_rec(b->list.data, 0, 1);
     return (Object){
         .data = b,
         .type = SHAPE_BOX,
-        .is_leaf = true,
     };
 }
 

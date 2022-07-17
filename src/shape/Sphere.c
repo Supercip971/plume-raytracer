@@ -78,7 +78,6 @@ Object sphere_create(rt_float radius, Vec3 pos, Material sphere_material)
     sphere->radius_squared = radius * radius;
     result.data = sphere;
     result.type = SHAPE_SPHERE;
-    result.is_leaf = true;
 
     return result;
 }

@@ -49,7 +49,6 @@ Object translate(Object translated, Vec3 displacement, Vec3 rotation)
     Object res = {
         .data = b,
         .type = SHAPE_TRANSLATE,
-        .is_leaf = true,
     };
 
     return res;

@@ -21,7 +21,6 @@ Object make_constant_medium_mat(Object obj, rt_float d, Material mat)
 
     return (Object){
         .type = SHAPE_CONSTANT_MEDIUM,
-        .is_leaf = true,
         .data = data,
     };
 }
@@ -40,7 +39,6 @@ bool hit_constant_object_callback(Ray ray, rt_float t_min, rt_float t_max, HitRe
 {
     HitRecord rec_0 = {};
     HitRecord rec_1 = {};
-    const rt_float ray_length = vec3_length(ray.direction);
 
     if (!object_collide(ray, -INFINITY, +INFINITY, &rec_0, (Object *)&self->target))
     {
@@ -62,6 +60,7 @@ bool hit_constant_object_callback(Ray ray, rt_float t_min, rt_float t_max, HitRe
 
     rec_1.t = rt_max(rec_1.t, 0);
 
+    const rt_float ray_length = vec3_length(ray.direction);
     rt_float distance_inside_box = (rec_1.t - rec_0.t) * ray_length;
     rt_float hit_distance = self->d * fast_log(random_rt_float());
 
@@ -73,8 +72,11 @@ bool hit_constant_object_callback(Ray ray, rt_float t_min, rt_float t_max, HitRe
     record->t = rec_0.t + hit_distance / ray_length;
     record->pos = ray_point_param(ray, record->t);
     record->normal = vec3_create(1, 0, 0);
+     record->outward = vec3_create(-1.f, 0, 0);
+   
     record->material = self->phase_material;
     record->front_face = true;
+
 
     return true;
 }

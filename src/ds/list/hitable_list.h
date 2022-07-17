@@ -24,7 +24,6 @@ bool hit_call_all_object(Object *hitable_list, Ray r, rt_float t_min, rt_float t
 
 Object create_hitable_list(void);
 
-void hit_remove_object(HitableList *list, Object obj);
 void add_hitable_list(HitableList *hitable_list, Object object);
 bool hit_call_all_list(const HitableList *hitable_list, Ray r, rt_float t_min, rt_float t_max, HitRecord *record);
 

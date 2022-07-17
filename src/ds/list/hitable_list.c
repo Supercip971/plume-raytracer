@@ -104,42 +104,15 @@ Object create_hitable_list(void)
 
     Object result = {
         .data = list,
-        .is_leaf = false,
         .type = SHAPE_HITABLE_LIST,
     };
 
     return result;
 }
 
-void hit_remove_object(HitableList *list, Object obj)
-{
-    size_t ri = (size_t)-1;
-    for (size_t i = 0; i < list->child_count; i++)
-    {
-        if (list->childs[i].uid == obj.uid)
-        {
-            ri = i;
-            break;
-        }
-    }
-
-    if (ri == (size_t)-1)
-    {
-        return;
-    }
-
-    for (size_t i = ri; i < list->child_count - 1; i++)
-    {
-        list->childs[i] = list->childs[i + 1];
-    }
-    list->child_count -= 1;
-
-    hitable_get_all_aabb(0, 10000, &list->bounding_box, list);
-}
 
 void add_hitable_list(HitableList *hitable_list, Object object)
 {
-    object.uid = uobj++;
     hitable_list->childs[hitable_list->child_count] = object;
     hitable_list->child_count++;
 

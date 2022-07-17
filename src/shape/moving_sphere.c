@@ -88,7 +88,6 @@ Object moving_sphere_create(rt_float radius, rt_float time_start, rt_float time_
     sphere->self_material = sphere_material;
     result.type = SHAPE_MOVING_SPHERE;
     result.data = sphere;
-    result.is_leaf = true;
 
     return result;
 }

@@ -24,6 +24,5 @@ Object material_wrap(Object target, Material material)
     return (Object){
         .data = data,
         .type = SHAPE_MATERIAL_WRAP,
-        .is_leaf = true,
     };
 }

@@ -18,13 +18,12 @@ typedef enum
     SHAPE_TRANSFORM,
     SHAPE_CONSTANT_MEDIUM,
     SHAPE_MATERIAL_WRAP,
+    
 
 } ShapeTypes;
 
 typedef struct
 {
-    uint32_t uid;
-    bool is_leaf;
     void *data;
     ShapeTypes type;
 } Object;

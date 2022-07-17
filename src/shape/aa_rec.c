@@ -174,7 +174,6 @@ Object aaxyrect_create(rt_float x_0, rt_float x_1, rt_float y_0, rt_float y_1, r
 
     result.data = rect;
     result.type = SHAPE_AAREC_XY;
-    result.is_leaf = true;
 
     return result;
 }
@@ -239,7 +238,6 @@ Object aaxzrect_create(rt_float x_0, rt_float x_1, rt_float z_0, rt_float z_1, r
     rect->x_1 = x_1;
     result.type = SHAPE_AAREC_XZ;
     result.data = rect;
-    result.is_leaf = true;
 
     return result;
 }
@@ -302,7 +300,6 @@ Object aayzrect_create(rt_float y_0, rt_float y_1, rt_float z_0, rt_float z_1, r
     rect->y_1 = y_1;
     result.type = SHAPE_AAREC_YZ;
     result.data = rect;
-    result.is_leaf = true;
 
     return result;
 }
