@@ -1,5 +1,4 @@
 #include "static.h"
-#include <stdio.h>
 #include <ds/bvh/bvh.h>
 #include <ds/list/hitable_list.h>
 #include <gfx/image.h>
@@ -16,10 +15,11 @@
 #include <shape/constant_medium.h>
 #include <shape/moving_sphere.h>
 #include <shape/transform.h>
+#include <shape/triangle.h>
+#include <stdio.h>
 #include <texture/checker.h>
 #include <texture/image.h>
 #include <texture/noise.h>
-#include <shape/triangle.h>
 #include <texture/solid_color.h>
 #include <texture/texture.h>
 #include "math/matrix4x4.h"
@@ -29,7 +29,6 @@
 /*
     this cursed file will be replaced one day by json loading. For the moment this code is quick and dirty.
 */
-
 
 static struct camera_config camera_config_init(Vec3 position, Vec3 lookat, rt_float vfov, bool moving_obj)
 {
@@ -75,7 +74,7 @@ static void earth_scene(Object *root, Object *lights, WorldConfig *config)
     add_hitable_object(lights, sphere_create(2, vec3_create(20, 0, 0), light_create(vec3_create(15, 15, 15))));
 
     HitableList *lst = root->data;
-    *root =  bvh_create_rec(lst, 1, 0);
+    *root = bvh_create_rec(lst, 1, 0);
 
     config->cam_config = camera_config_init(vec3_create(13, 2, 3), vec3_create(0, 0, 0), 20, false);
     config->sky_color = vec3_create(0.70, 0.80, 1);
@@ -213,13 +212,13 @@ static void cornell_box(Object *root, Object *lights, WorldConfig *config)
 
     create_matrix_scale(&diff_light, 1, -1, 1);
     ((Light *)light.data)->flipped = true;
-//    light_obj = aaxzrect_create(213 - 64, 343 + 64, 227 - 64, 332 + 64, 554.9, light);
+    //    light_obj = aaxzrect_create(213 - 64, 343 + 64, 227 - 64, 332 + 64, 554.9, light);
 
     float y = 554;
-Object triangle_one = 
-    material_wrap( triangle_create(vec3_create(213 - 64, y, 277 - 64 ), vec3_create(213 - 64, y,  332 + 64), vec3_create(343 + 64, y, 332 + 64)), light);
-Object triangle_two = 
-    material_wrap( triangle_create(vec3_create(213 - 64, y, 277 - 64), vec3_create(343 + 64, y, 332 + 64), vec3_create(343 + 64, y, 277 - 64)), light);
+    Object triangle_one =
+        material_wrap(triangle_create(vec3_create(213 - 64, y, 277 - 64), vec3_create(213 - 64, y, 332 + 64), vec3_create(343 + 64, y, 332 + 64)), light);
+    Object triangle_two =
+        material_wrap(triangle_create(vec3_create(213 - 64, y, 277 - 64), vec3_create(343 + 64, y, 332 + 64), vec3_create(343 + 64, y, 277 - 64)), light);
 
     add_hitable_object(root, triangle_one);
     add_hitable_object(lights, triangle_one);
@@ -308,7 +307,7 @@ static void smoky_cornell_box(Object *root, Object *lights, WorldConfig *config)
     translated_box2 = transform(box2, diff2);
    */
     lst = root->data;
-    * root = bvh_create_rec(lst, 1, 0);
+    *root = bvh_create_rec(lst, 1, 0);
 
     config->cam_config = camera_config_init(vec3_create(278, 278, -800), vec3_create(278, 278, 0), 40, false);
     config->sky_color = vec3_create(0, 0, 0);
@@ -352,7 +351,6 @@ static void rand_chap2_scene(Object *root, Object *lights, WorldConfig *config)
         }
     }
 
-
     light_object = aaxzrect_create(123, 423, 147, 412, 554, light_mat);
     add_hitable_object(root, light_object);
     add_hitable_object(lights, light_object);
@@ -381,20 +379,20 @@ static void rand_chap2_scene(Object *root, Object *lights, WorldConfig *config)
     create_matrix_identity(&translated_sphere_agglomeration);
 
     matrix_multiply(&translated_sphere_agglomeration, &translated_sphere_agglomeration_mov, &translated_sphere_agglomeration);
-     matrix_multiply(&translated_sphere_agglomeration, &translated_sphere_agglomeration_rot, &translated_sphere_agglomeration);
-   
+    matrix_multiply(&translated_sphere_agglomeration, &translated_sphere_agglomeration_rot, &translated_sphere_agglomeration);
+
     Object balls = create_hitable_list();
     for (i = 0; i < 1000; i++)
     {
         add_hitable_object(&balls, (sphere_create(10,
-                                                     vec3_create(
-                                                         random_rt_float() * 165,
-                                                         random_rt_float() * 165,
-                                                         random_rt_float() * 165),
-                                                     white)));
+                                                  vec3_create(
+                                                      random_rt_float() * 165,
+                                                      random_rt_float() * 165,
+                                                      random_rt_float() * 165),
+                                                  white)));
     }
 
-    Object tballs = transform(bvh_create_rec(balls.data, 0, 0), translated_sphere_agglomeration );
+    Object tballs = transform(bvh_create_rec(balls.data, 0, 0), translated_sphere_agglomeration);
 
     add_hitable_object(root, tballs);
 

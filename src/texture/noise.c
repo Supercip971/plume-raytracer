@@ -1,7 +1,7 @@
 
 #include <stdlib.h>
-#include "noise.h"
 #include <texture/texture.h>
+#include "noise.h"
 
 Vec3 perlin_get(rt_float u, rt_float v, const Vec3 *point, const Perlin *self)
 {

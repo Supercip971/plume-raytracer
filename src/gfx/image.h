@@ -1,8 +1,8 @@
 #ifndef IMAGE_H
 #define IMAGE_H
+#include <gfx/color.h>
 #include <stddef.h>
 #include <stdint.h>
-#include <gfx/color.h>
 
 typedef struct image
 {

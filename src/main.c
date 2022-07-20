@@ -1,11 +1,11 @@
 #include <SDL/SDL.h>
+#include <engine.h>
+#include <impl.h>
 #include <stdbool.h>
 #include <stdio.h>
 #include <sys/time.h>
 #include <time.h>
 #include <utils/config.h>
-#include <engine.h>
-#include <impl.h>
 #include <utils/utils.h>
 
 FLATTEN int main(void)

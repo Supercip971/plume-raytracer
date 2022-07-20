@@ -1,9 +1,9 @@
 #pragma once
 
-#include <shape/shape.h>
 #include <material/material.h>
 #include <math/ray.h>
 #include <math/vec3.h>
+#include <shape/shape.h>
 
 typedef struct moving_sphere
 {

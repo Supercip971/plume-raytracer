@@ -1,7 +1,7 @@
 #include "aa_rec.h"
+#include <shape/hittable.h>
 #include <stdlib.h>
 #include <utils/utils.h>
-#include <shape/hittable.h>
 /* TODO: make this code better because it's shit for now */
 
 rt_float aa_xyrect_pdf_value(Vec3 origin, Vec3 direction, XYrec *self)

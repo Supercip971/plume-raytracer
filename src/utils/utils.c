@@ -1,10 +1,10 @@
 #include "utils.h"
 #include <math.h>
+#include <math/vec3.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include "config.h"
-#include <math/vec3.h>
 
 /* note: quake inv squareroot is slower than sse square root (+ only for floats)*/
 

@@ -1,7 +1,7 @@
 
 #include <stdlib.h>
-#include "checker.h"
 #include <texture/solid_color.h>
+#include "checker.h"
 
 Vec3 checker_get(rt_float u, rt_float v, const Vec3 *point, const CheckerTexture *self)
 {

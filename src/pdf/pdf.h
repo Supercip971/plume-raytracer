@@ -1,9 +1,9 @@
 #ifndef PDF_H
 #define PDF_H
 #include <math/onb.h>
+#include <math/vec3.h>
 #include <shape/shape.h>
 #include <utils/utils.h>
-#include <math/vec3.h>
 
 typedef enum
 {

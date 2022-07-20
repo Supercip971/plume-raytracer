@@ -1,9 +1,9 @@
 #ifndef GFX_PERLIN_H
 #define GFX_PERLIN_H
 
+#include <math/vec3.h>
 #include <utils/config.h>
 #include <utils/utils.h>
-#include <math/vec3.h>
 
 typedef struct perlin_noise
 {

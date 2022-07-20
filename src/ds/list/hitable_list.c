@@ -1,9 +1,9 @@
 #include "hitable_list.h"
+#include <shape/hittable.h>
+#include <shape/shape.h>
 #include <stddef.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <shape/shape.h>
-#include <shape/hittable.h>
 
 size_t uobj = 0;
 
@@ -109,7 +109,6 @@ Object create_hitable_list(void)
 
     return result;
 }
-
 
 void add_hitable_list(HitableList *hitable_list, Object object)
 {

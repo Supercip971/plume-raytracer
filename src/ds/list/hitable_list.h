@@ -1,12 +1,11 @@
 #ifndef HITABLE_H
 #define HITABLE_H
-#include <stdbool.h>
-#include <stddef.h>
-#include <math/aabb.h>
 #include <material/material.h>
+#include <math/aabb.h>
 #include <math/ray.h>
 #include <shape/shape.h>
-
+#include <stdbool.h>
+#include <stddef.h>
 
 typedef struct hitable_list
 {

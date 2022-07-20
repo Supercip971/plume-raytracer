@@ -1,11 +1,11 @@
+#include <shape/hittable.h>
+#include <shape/shape.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <utils.h>
 #include "bvh.h"
 #include "ds/list/hitable_list.h"
 #include "math/aabb.h"
-#include <shape/shape.h>
-#include <shape/hittable.h>
 
 typedef struct
 {
@@ -31,7 +31,6 @@ static Vec3 aabb_centroid(const AABB *a)
 }
 
 typedef vec_t(ElementOnList) tempBvhList;
-
 
 static BvhEntry bvh_make_mesh_fusion(BvhEntry left, BvhEntry right)
 {
@@ -84,8 +83,8 @@ static BvhEntry bvh_make_from_temp_list(BvhList *self, ElementOnList *element)
     return curr;
 }
 
- int bvh_dump(BvhList *self, BvhEntry *entry, int depth)
-; int bvh_dump(BvhList *self, BvhEntry *entry, int depth)
+int bvh_dump(BvhList *self, BvhEntry *entry, int depth);
+int bvh_dump(BvhList *self, BvhEntry *entry, int depth)
 {
 
     int maxdepth = depth;
@@ -109,10 +108,9 @@ static BvhEntry bvh_make_from_temp_list(BvhList *self, ElementOnList *element)
         printf("- l: %i \n", entry->l);
         int c = bvh_dump(self, &self->data[entry->l], depth + 1);
 
-
         TAB();
         printf("- r: %i \n", entry->r);
-        int c2 =  bvh_dump(self, &self->data[entry->r], depth + 1);
+        int c2 = bvh_dump(self, &self->data[entry->r], depth + 1);
 
         maxdepth = rt_max(rt_max(c, c2), maxdepth);
     }
@@ -120,8 +118,8 @@ static BvhEntry bvh_make_from_temp_list(BvhList *self, ElementOnList *element)
     return maxdepth;
 }
 
- void sbvh_init(BvhList *self, int entry_id, HitableList *scene);
- void sbvh_init(BvhList *self, int entry_id, HitableList *scene)
+void sbvh_init(BvhList *self, int entry_id, HitableList *scene);
+void sbvh_init(BvhList *self, int entry_id, HitableList *scene)
 {
     BvhEntry *entry = &self->data[entry_id];
     if (!entry->is_next_a_bvh && entry->r != 0)
@@ -224,7 +222,6 @@ static ElementOnList bvh_init_rec(tempBvhList *list, BvhList *tlist, int depth)
     {
         ElementOnList curr = list->data[i];
 
-         
         if (is_vec3_dim_superior(aabb_centroid(&curr.entry.box), max_c, min_c, dim))
         {
             vec_push(&vr, curr);
@@ -272,7 +269,7 @@ static ElementOnList bvh_init_rec(tempBvhList *list, BvhList *tlist, int depth)
 
     return res;
 }
- void bvh_construct_impl(BvhList *self, const HitableList *target)
+void bvh_construct_impl(BvhList *self, const HitableList *target)
 {
 
     tempBvhList curr;
@@ -286,7 +283,6 @@ static ElementOnList bvh_init_rec(tempBvhList *list, BvhList *tlist, int depth)
             .is_next_a_bvh = false,
             .l = i,
         };
-
 
         object_get_aabb(0, 1, &entry.box, &m);
         printf("entry: {%f %f %f} {%f %f %f} \n", entry.box.min.x, entry.box.min.y, entry.box.min.z, entry.box.max.x, entry.box.max.y, entry.box.max.z);
@@ -304,7 +300,6 @@ static ElementOnList bvh_init_rec(tempBvhList *list, BvhList *tlist, int depth)
 
     self->data[0] = start;
     int i = bvh_dump(self, self->data, 0);
-    printf("bvh depth: %i \n",i);
+    printf("bvh depth: %i \n", i);
     printf("bvh size: %lu \n", self->length * sizeof(BvhEntry));
-
 }

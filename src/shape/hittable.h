@@ -1,13 +1,12 @@
 #ifndef HITTABLE_H
-#define HITTABLE_H 
+#define HITTABLE_H
 
-#include <stdbool.h>
-#include <stddef.h>
-#include <math/aabb.h>
-#include <shape/shape.h>
 #include <material/material.h>
+#include <math/aabb.h>
 #include <math/ray.h>
 #include <shape/shape.h>
+#include <stdbool.h>
+#include <stddef.h>
 
 struct hit_record
 {
@@ -23,6 +22,5 @@ struct hit_record
 };
 
 void set_face_normal(const Ray *r, const Vec3 outward, HitRecord *self);
-
 
 #endif

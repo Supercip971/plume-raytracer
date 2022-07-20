@@ -1,8 +1,8 @@
 #pragma once
-#include <stdbool.h>
-#include <stdint.h>
 #include <gfx/color.h>
 #include <gfx/image.h>
+#include <stdbool.h>
+#include <stdint.h>
 
 #ifndef NOT_USE_THREAD
 

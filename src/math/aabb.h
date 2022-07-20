@@ -1,9 +1,9 @@
 #ifndef AABB_H
 #define AABB_H
 
-#include <stddef.h>
 #include <math/ray.h>
 #include <math/vec3.h>
+#include <stddef.h>
 
 typedef struct aabb
 {

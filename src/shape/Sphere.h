@@ -1,9 +1,9 @@
 #pragma once
 
-#include <shape/shape.h>
 #include <material/material.h>
 #include <math/ray.h>
 #include <math/vec3.h>
+#include <shape/shape.h>
 
 typedef struct sphere
 {
@@ -24,4 +24,3 @@ bool sphere_get_aabb(rt_float time_start, rt_float time_end, AABB *output, const
 rt_float sphere_pdf_value(Vec3 origin, Vec3 direction, const Sphere *self);
 
 Vec3 sphere_random(Vec3 origin, const Sphere *self);
-

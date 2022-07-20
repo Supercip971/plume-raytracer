@@ -3,14 +3,14 @@
 #include <stdbool.h>
 #include <stdlib.h>
 #define __USE_GNU
+#include <ds/list/hitable_list.h>
+#include <engine.h>
+#include <extern/lodepng.h>
+#include <gfx/image.h>
+#include <impl.h>
 #include <pthread.h>
 #include <unistd.h>
 #include <utils/config.h>
-#include <engine.h>
-#include <extern/lodepng.h>
-#include <ds/list/hitable_list.h>
-#include <gfx/image.h>
-#include <impl.h>
 
 struct color *pixels;
 

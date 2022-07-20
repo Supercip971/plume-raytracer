@@ -5,7 +5,7 @@
 
 rt_float mwrap_pdf_value(Vec3 origin, Vec3 direction, const MaterialWrap *self)
 {
-    return object_pdf_value(origin,  direction, &self->target);
+    return object_pdf_value(origin, direction, &self->target);
 }
 
 Vec3 mwrap_pdf_random(Vec3 origin, const MaterialWrap *self)
@@ -17,9 +17,9 @@ Object material_wrap(Object target, Material material)
 {
     AABB output;
 
-    object_get_aabb(0, 1000, &output, &target) ; 
-    MaterialWrap* data = malloc(sizeof(MaterialWrap));
-    *data = (MaterialWrap) {
+    object_get_aabb(0, 1000, &output, &target);
+    MaterialWrap *data = malloc(sizeof(MaterialWrap));
+    *data = (MaterialWrap){
         .target = target,
         .material = material,
         .sbound = output,

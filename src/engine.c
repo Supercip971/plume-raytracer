@@ -1,27 +1,27 @@
 
 #include "engine.h"
+#include <ds/bvh/bvh.h>
+#include <gfx/camera.h>
+#include <impl.h>
 #include <limits.h>
+#include <loaders/static.h>
 #include <math.h>
+#include <math/matrix4x4.h>
+#include <math/ray.h>
+#include <math/vec3.h>
+#include <pdf/cosine.h>
+#include <pdf/hitable.h>
+#include <pdf/mixture.h>
+#include <shape/hittable.h>
 #include <stddef.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
-#include <ds/bvh/bvh.h>
-#include <shape/hittable.h>
-#include <gfx/camera.h>
 #include <utils/config.h>
-#include <impl.h>
 #include <utils/lock.h>
-#include <math/matrix4x4.h>
-#include <pdf/cosine.h>
-#include <pdf/hitable.h>
-#include <pdf/mixture.h>
-#include <math/ray.h>
 #include <utils/utils.h>
-#include <math/vec3.h>
-#include <loaders/static.h>
 
 struct render_thread_args
 {
@@ -199,13 +199,11 @@ FLATTEN static void render_update_part(struct render_part_args const *arg)
         {
             return;
         }
-            
+
         for (size_t x = arg->x_begin; x < arg->x_end; x++)
         {
-           for (size_t c = 0; c < SAMPLE_PER_THREAD; c++)
+            for (size_t c = 0; c < SAMPLE_PER_THREAD; c++)
             {
-
-                
 
                 rt_float u = ((rt_float)x + offx[c]) * inv_w;
                 rt_float v = ((rt_float)y + offy[c]) * inv_h;

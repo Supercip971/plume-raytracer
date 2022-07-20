@@ -47,13 +47,13 @@ Camera create_camera(CameraConfig config)
         .origin = config.position,
         .horizontal = vec3_mul_val(u, 2 * half_width * config.focus_distance),
         .vertical = vec3_mul_val(v, 2 * half_height * config.focus_distance),
-        .low_left =    vec3_sub(
-        vec3_sub(
-            vec3_sub(config.position,
-                     vec3_mul_val(u, half_width * config.focus_distance)),
-            vec3_mul_val(v, half_height * config.focus_distance)),
-        vec3_mul_val(w, config.focus_distance)),
-    .u = u,
+        .low_left = vec3_sub(
+            vec3_sub(
+                vec3_sub(config.position,
+                         vec3_mul_val(u, half_width * config.focus_distance)),
+                vec3_mul_val(v, half_height * config.focus_distance)),
+            vec3_mul_val(w, config.focus_distance)),
+        .u = u,
         .v = v,
         .w = w,
         .lens_radius = config.aperture / 2,

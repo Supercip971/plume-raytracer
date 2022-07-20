@@ -1,9 +1,8 @@
 #include "transform.h"
-
-#include <shape/hittable.h>
-#include <stdlib.h>
 #include <math/matrix4x4.h>
+#include <shape/hittable.h>
 #include <shape/shape.h>
+#include <stdlib.h>
 
 static AABB get_transformed_aabb(AABB from, Matrix4x4 matrix)
 {

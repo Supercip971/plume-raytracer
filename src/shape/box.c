@@ -1,7 +1,7 @@
 #include "box.h"
 #include <ds/bvh/bvh.h>
-#include <shape/aa_rec.h>
 #include <math/aabb.h>
+#include <shape/aa_rec.h>
 #include <shape/shape.h>
 
 bool box_get_aabb(rt_float time_start, rt_float time_end, AABB *output, const Box *self)
@@ -40,8 +40,6 @@ Object box_create(Vec3 posa, Vec3 posb, Material box_material)
 
     add_hitable_object(&b->list, aayzrect_create(posa.y, posb.y, posa.z, posb.z, posb.x, box_material));
     add_hitable_object(&b->list, aayzrect_create(posa.y, posb.y, posa.z, posb.z, posa.x, box_material));
-
-
 
     b->list = bvh_create_rec(b->list.data, 0, 1);
     return (Object){

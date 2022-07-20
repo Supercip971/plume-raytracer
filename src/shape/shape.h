@@ -19,7 +19,6 @@ typedef enum
     SHAPE_CONSTANT_MEDIUM,
     SHAPE_MATERIAL_WRAP,
     SHAPE_TRIANGLE,
-    
 
 } ShapeTypes;
 
@@ -30,7 +29,6 @@ typedef struct
 } Object;
 
 typedef struct hit_record HitRecord;
-
 
 bool object_collide(Ray r, rt_float t_min, rt_float t_max, HitRecord *record, Object *self);
 

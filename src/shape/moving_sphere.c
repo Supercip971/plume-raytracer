@@ -1,7 +1,7 @@
+#include <shape/hittable.h>
+#include <shape/moving_sphere.h>
 #include <stdlib.h>
 #include <utils/utils.h>
-#include <shape/moving_sphere.h>
-#include <shape/hittable.h>
 
 /*
  == this is so dumb, I mean, this is just a transform of an object, but affected by time.

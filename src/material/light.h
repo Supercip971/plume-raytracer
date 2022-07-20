@@ -1,9 +1,8 @@
 #pragma once
 #include <material/material.h>
-
+#include <math/vec3.h>
 #include <texture/texture.h>
 #include <utils/utils.h>
-#include <math/vec3.h>
 
 typedef struct
 {

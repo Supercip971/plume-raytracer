@@ -1,9 +1,9 @@
 #include "constant_medium.h"
-#include <stdlib.h>
 #include <material/isotropic.h>
+#include <shape/hittable.h>
+#include <stdlib.h>
 #include <texture/solid_color.h>
 #include <utils/utils.h>
-#include <shape/hittable.h>
 
 Object make_constant_medium(Object obj, rt_float d, Vec3 albedo)
 {
@@ -72,11 +72,10 @@ bool hit_constant_object_callback(Ray ray, rt_float t_min, rt_float t_max, HitRe
     record->t = rec_0.t + hit_distance / ray_length;
     record->pos = ray_point_param(ray, record->t);
     record->normal = vec3_create(1, 0, 0);
-     record->outward = vec3_create(-1.f, 0, 0);
-   
+    record->outward = vec3_create(-1.f, 0, 0);
+
     record->material = self->phase_material;
     record->front_face = true;
-
 
     return true;
 }

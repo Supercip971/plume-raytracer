@@ -1,10 +1,10 @@
 #ifndef AA_REC_H
 #define AA_REC_H
+#include <material/material.h>
 #include <math/aabb.h>
 #include <math/ray.h>
-#include <shape/shape.h>
-#include <material/material.h>
 #include <math/vec3.h>
+#include <shape/shape.h>
 
 typedef struct xy_rec
 {

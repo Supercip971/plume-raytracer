@@ -1,10 +1,10 @@
 #ifndef VEC3_H
 #define VEC3_H
+#include <gfx/color.h>
 #include <math.h>
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdio.h>
-#include <gfx/color.h>
 #include <utils/config.h>
 #include <utils/utils.h>
 
@@ -31,8 +31,6 @@ typedef union vec2_t
     };
 
 } Vec2;
-
-
 
 static inline void print_vec3(Vec3 self)
 {
@@ -341,7 +339,6 @@ static inline Vec3 random_vec3_cosine_direction(void)
     rt_float y = fast_sin(phi) * fast_sqrt(r2);
     // printf("rvcd: %f %f %f\n", x, y, z);
     return vec3_create(x, y, z);
-    
 }
 
 static inline Vec3 random_vec3_direction_to_sphere(rt_float radius, rt_float dist_squared)

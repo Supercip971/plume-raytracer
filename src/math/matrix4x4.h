@@ -2,8 +2,8 @@
 #define MATRIX_H
 
 #include <math/ray.h>
-#include <utils/utils.h>
 #include <math/vec3.h>
+#include <utils/utils.h>
 
 typedef struct
 {

@@ -1,10 +1,10 @@
 #ifndef TRANSLATE_H
 #define TRANSLATE_H
-#include <math/aabb.h>
-#include <shape/shape.h>
 #include <material/material.h>
+#include <math/aabb.h>
 #include <math/ray.h>
 #include <math/vec3.h>
+#include <shape/shape.h>
 
 typedef struct translate
 {

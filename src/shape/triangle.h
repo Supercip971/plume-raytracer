@@ -1,9 +1,9 @@
 #pragma once
 
-#include <shape/shape.h>
 #include <material/material.h>
 #include <math/ray.h>
 #include <math/vec3.h>
+#include <shape/shape.h>
 
 typedef struct triangle
 {
@@ -25,4 +25,3 @@ bool triangle_get_aabb(rt_float time_start, rt_float time_end, AABB *output, con
 rt_float triangle_pdf_value(Vec3 origin, Vec3 direction, const Triangle *self);
 
 Vec3 triangle_random(Vec3 origin, const Triangle *self);
-

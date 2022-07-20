@@ -1,9 +1,8 @@
 #include "light.h"
-#include <stdlib.h>
-#include <texture/solid_color.h>
 #include <material/material.h>
 #include <shape/hittable.h>
-
+#include <stdlib.h>
+#include <texture/solid_color.h>
 
 bool light_emit(const HitRecord *record, Vec3 *emit, const Light *self)
 {

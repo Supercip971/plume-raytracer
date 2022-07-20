@@ -1,17 +1,17 @@
 #include "shape.h"
 #include <assert.h>
-#include <stdio.h>
-#include <stdlib.h>
 #include <ds/bvh/bvh.h>
 #include <shape/Sphere.h>
 #include <shape/aa_rec.h>
 #include <shape/box.h>
 #include <shape/constant_medium.h>
-#include <shape/moving_sphere.h>
-#include <shape/triangle.h>
-#include <shape/transform.h>
 #include <shape/material_wrap.h>
+#include <shape/moving_sphere.h>
+#include <shape/transform.h>
 #include <shape/translate.h>
+#include <shape/triangle.h>
+#include <stdio.h>
+#include <stdlib.h>
 
 bool object_collide(Ray r, rt_float t_min, rt_float t_max, HitRecord *record, Object *self)
 {
@@ -43,7 +43,7 @@ bool object_collide(Ray r, rt_float t_min, rt_float t_max, HitRecord *record, Ob
         return hit_constant_object_callback(r, t_min, t_max, record, self->data);
     case SHAPE_MATERIAL_WRAP:
         return hit_mwrap_object_callback(r, t_min, t_max, record, self->data);
-    
+
     default:
         return false;
     }
@@ -76,7 +76,7 @@ bool object_get_aabb(rt_float time_start, rt_float time_end, AABB *output, Objec
         return aayzrect_get_aabb(time_start, time_end, output, self->data);
     case SHAPE_CONSTANT_MEDIUM:
         return constant_get_aabb(time_start, time_end, output, self->data);
-     case SHAPE_MATERIAL_WRAP:
+    case SHAPE_MATERIAL_WRAP:
         return mwrap_get_aabb(time_start, time_end, output, self->data);
     default:
         return false;
@@ -104,7 +104,7 @@ bool object_destroy(Object *self)
         return constant_destroy(self->data);
     case SHAPE_MATERIAL_WRAP:
         return mwrap_destroy(self->data);
- 
+
     default:
         return false;
     }
@@ -131,7 +131,7 @@ rt_float object_pdf_value(Vec3 origin, Vec3 direction, const Object *self)
     case SHAPE_BOX:
         return box_pdf_value(origin, direction, self->data);
     case SHAPE_MATERIAL_WRAP:
-        return mwrap_pdf_value(origin,  direction, self->data);
+        return mwrap_pdf_value(origin, direction, self->data);
     case SHAPE_TRIANGLE:
         return triangle_pdf_value(origin, direction, self->data);
     default:
@@ -162,7 +162,7 @@ Vec3 object_random(Vec3 origin, const Object *self)
     case SHAPE_MATERIAL_WRAP:
         return mwrap_pdf_random(origin, self->data);
     case SHAPE_TRIANGLE:
-        return triangle_random (origin, self->data);
+        return triangle_random(origin, self->data);
     default:
         return vec3_create(1, 0, 0);
     }

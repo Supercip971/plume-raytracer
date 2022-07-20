@@ -47,8 +47,6 @@ static inline uint32_t fast_rand(void)
     return (uint32_t)x;
 }
 
-
-
 #define rt_copysign(x, y) (__builtin_copysign(x, y))
 
 static inline float Q_rsqrt(float number);
@@ -65,8 +63,8 @@ static inline float fast_sqrt(float number);
 #ifdef USE_INTRINSIC
 
 #    include <immintrin.h>
+#    include <stdio.h>
 #    include <x86intrin.h>
-#include <stdio.h>
 static inline float fast_sqrt(float number)
 {
     float a;
