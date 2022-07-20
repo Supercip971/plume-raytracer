@@ -22,6 +22,18 @@ typedef union vec3_t
 #endif
 } Vec3;
 
+typedef union vec2_t
+{
+    struct
+    {
+        rt_float x;
+        rt_float y;
+    };
+
+} Vec2;
+
+
+
 static inline void print_vec3(Vec3 self)
 {
     printf("vec: {%f,%f,%f}\n", self.x, self.y, self.z);
@@ -49,6 +61,10 @@ static inline rt_float vec3_squared_length(Vec3 vec)
 static inline rt_float vec3_length(Vec3 vec)
 {
     return fast_sqrt(vec3_squared_length(vec));
+}
+static inline rt_float vec3_invlength(Vec3 vec)
+{
+    return Q_rsqrt(vec3_squared_length(vec));
 }
 
 static inline Vec3 vec3_add(Vec3 vec1, Vec3 vec2)
@@ -139,6 +155,18 @@ static inline Vec3 vec3_max(Vec3 vec1, Vec3 vec2)
     return res;
 }
 
+static inline Vec2 vec2_mul(Vec2 vec1, Vec2 vec2)
+{
+    return (Vec2){.x = vec1.x * vec2.x, .y = vec1.y * vec2.y};
+}
+static inline Vec2 vec2_mul_val(Vec2 vec1, float v)
+{
+    return (Vec2){.x = vec1.x * v, .y = vec1.y * v};
+}
+static inline Vec2 vec2_add(Vec2 vec1, Vec2 vec2)
+{
+    return (Vec2){.x = vec1.x + vec2.x, .y = vec1.y + vec2.y};
+}
 #else
 
 static inline Vec3 vec3_cross(Vec3 vec1, Vec3 vec2)
@@ -303,6 +331,7 @@ static inline void get_sphere_uv(const Vec3 *point, rt_float *__restrict u, rt_f
 
 static inline Vec3 random_vec3_cosine_direction(void)
 {
+
     rt_float r1 = random_rt_float();
     rt_float r2 = random_rt_float();
     rt_float z = fast_sqrt(1.0 - r2);
@@ -312,6 +341,7 @@ static inline Vec3 random_vec3_cosine_direction(void)
     rt_float y = fast_sin(phi) * fast_sqrt(r2);
     // printf("rvcd: %f %f %f\n", x, y, z);
     return vec3_create(x, y, z);
+    
 }
 
 static inline Vec3 random_vec3_direction_to_sphere(rt_float radius, rt_float dist_squared)
