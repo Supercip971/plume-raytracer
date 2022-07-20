@@ -8,6 +8,7 @@
 #include <shape/box.h>
 #include <shape/constant_medium.h>
 #include <shape/moving_sphere.h>
+#include <shape/triangle.h>
 #include <shape/transform.h>
 #include <shape/material_wrap.h>
 #include <shape/translate.h>
@@ -22,6 +23,8 @@ bool object_collide(Ray r, rt_float t_min, rt_float t_max, HitRecord *record, Ob
         return hitable_list_call_all(r, t_min, t_max, record, self->data);
     case SHAPE_TRANSFORM:
         return hit_transform_object_callback(r, t_min, t_max, record, self->data);
+    case SHAPE_TRIANGLE:
+        return hit_triangle_object_callback(r, t_min, t_max, record, self->data);
     case SHAPE_BOX:
         return hit_box_object_callback(r, t_min, t_max, record, self->data);
     case SHAPE_MOVING_SPHERE:
@@ -55,7 +58,8 @@ bool object_get_aabb(rt_float time_start, rt_float time_end, AABB *output, Objec
         return hitable_get_aabb(time_start, time_end, output, self->data);
     case SHAPE_TRANSFORM:
         return transform_get_aabb(time_start, time_end, output, self->data);
-
+    case SHAPE_TRIANGLE:
+        return triangle_get_aabb(time_start, time_end, output, self->data);
     case SHAPE_BOX:
         return box_get_aabb(time_start, time_end, output, self->data);
     case SHAPE_MOVING_SPHERE:
@@ -128,6 +132,8 @@ rt_float object_pdf_value(Vec3 origin, Vec3 direction, const Object *self)
         return box_pdf_value(origin, direction, self->data);
     case SHAPE_MATERIAL_WRAP:
         return mwrap_pdf_value(origin,  direction, self->data);
+    case SHAPE_TRIANGLE:
+        return triangle_pdf_value(origin, direction, self->data);
     default:
         // printf("can't get value for: %i \n", self->type);
         return 0;
@@ -155,6 +161,8 @@ Vec3 object_random(Vec3 origin, const Object *self)
         return box_random(origin, self->data);
     case SHAPE_MATERIAL_WRAP:
         return mwrap_pdf_random(origin, self->data);
+    case SHAPE_TRIANGLE:
+        return triangle_random (origin, self->data);
     default:
         return vec3_create(1, 0, 0);
     }

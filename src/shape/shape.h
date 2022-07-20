@@ -18,6 +18,7 @@ typedef enum
     SHAPE_TRANSFORM,
     SHAPE_CONSTANT_MEDIUM,
     SHAPE_MATERIAL_WRAP,
+    SHAPE_TRIANGLE,
     
 
 } ShapeTypes;

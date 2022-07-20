@@ -9,6 +9,7 @@ typedef struct
 {
     Object target;
     Material material;
+    AABB sbound;
 } MaterialWrap;
 
 rt_float mwrap_pdf_value(Vec3 origin, Vec3 direction, const MaterialWrap *self);
@@ -29,7 +30,10 @@ static inline bool hit_mwrap_object_callback(Ray ray, rt_float t_min, rt_float t
 
 static inline bool mwrap_get_aabb(rt_float time_start, rt_float time_end, AABB *output, const MaterialWrap *self)
 {
-    return object_get_aabb(time_start, time_end, output, (Object*)&self->target);
+    (void)time_start;
+    (void)time_end;
+    *output = self->sbound;
+    return true;
 }
 
 static inline bool mwrap_destroy(MaterialWrap *self)

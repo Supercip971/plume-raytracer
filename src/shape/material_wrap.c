@@ -15,10 +15,14 @@ Vec3 mwrap_pdf_random(Vec3 origin, const MaterialWrap *self)
 
 Object material_wrap(Object target, Material material)
 {
+    AABB output;
+
+    object_get_aabb(0, 1000, &output, &target) ; 
     MaterialWrap* data = malloc(sizeof(MaterialWrap));
     *data = (MaterialWrap) {
         .target = target,
         .material = material,
+        .sbound = output,
     };
 
     return (Object){
